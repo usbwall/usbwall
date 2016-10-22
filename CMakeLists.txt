@@ -1,0 +1,10 @@
+set(CMAKE_C_COMPILER "gcc")
+
+cmake_minimum_required(VERSION 2.6)
+project(usbwall)
+
+SET(USBWALL_SOURCE_DIR src)
+SET(LIBRARY_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/out)
+SET(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/out)
+
+add_subdirectory(${USBWALL_SOURCE_DIR})
