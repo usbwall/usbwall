@@ -1,0 +1,15 @@
+dn: cn=devuser
+objectClass: olcSchemaConfig
+cn: {11}devuser
+olcAttributeTypes: {0}( 1.7.11.1.1 NAME 'devid' DESC 'serial number of an au
+ thorized device for thie user' EQUALITY caseIgnoreMatch SUBSTR caseIgnoreSu
+ bstringsMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE )
+olcObjectClasses: {0}( 1.7.11.1.1.100 NAME 'devuser' DESC 'user with granted
+  devices' SUP top AUXILIARY MUST ( cn $ devid ) MAY description )
+structuralObjectClass: olcSchemaConfig
+entryUUID: 2cf3e9f4-1524-1036-838f-d7fc6cd48efe
+creatorsName: cn=config
+createTimestamp: 20160922152253Z
+entryCSN: 20160922152253.454429Z#000000#000#000000
+modifiersName: cn=config
+modifyTimestamp: 20160922152253Z
