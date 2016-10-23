@@ -22,8 +22,12 @@ int init_devusb(void)
 
 struct devusb **devices_get(void)
 {
-
   struct devusb **devusb_list = calloc(16, sizeof (struct devusb *)); // FIXME
+  /**
+   * \todo
+   * FIXME: devusb_list should not be limited by 16 devices.
+   * That's just an hotfix because I was lazy.
+   */
 
   libusb_device **device_list = NULL;
   const size_t device_list_size = libusb_get_device_list(NULL, &device_list);

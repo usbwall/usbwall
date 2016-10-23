@@ -6,6 +6,8 @@
 #include <stdio.h>
 #include <string.h>
 
+static void skip_comments(char *line);
+
 char *cfg_file_find(void)
 {
   /**
@@ -19,21 +21,18 @@ char *cfg_file_find(void)
 
 struct ldap_cfg *make_ldap_cfg(char *cfg_file)
 {
-  struct ldap_cfg *config = calloc(1, sizeof (struct ldap_cfg));
   FILE *stream = fopen(cfg_file, "r");
-
   if (!stream)
     return NULL;
+
+  struct ldap_cfg *config = calloc(1, sizeof (struct ldap_cfg));
 
   /* parsing configurations from the file */
   char *buffer = NULL;
   size_t buff_size = 0;
   while (getline(&buffer, &buff_size, stream) != -1)
   {
-    /* delete comments */
-    char *comment_start = strchr(buffer, '#');
-    if (comment_start)
-      *comment_start = '\0';
+    skip_comments(buffer);
 
     /* store attributes to config */
     if (!sscanf(buffer, " uri %ms ", &config->uri)
@@ -62,4 +61,16 @@ void destroy_ldap_cfg(struct ldap_cfg *cfg)
   free(cfg->basedn);
   free(cfg->binddn);
   free(cfg);
+}
+
+/************************************
+ * Static functions implementations *
+ ************************************/
+
+static void skip_comments(char *line)
+{
+  char *comment_start = strchr(line, '#');
+
+  if (comment_start)
+    *comment_start = '\0';
 }

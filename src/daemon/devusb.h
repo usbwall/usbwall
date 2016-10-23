@@ -19,11 +19,19 @@ struct devusb
 /**
  * \brief initialize devusb. Must be called before every other functions.
  * \return return non 0 value in case of error
+ *
+ * The function will initialize devusb, that is try to load libusb and
+ * configure it. The return value should be verified before calling
+ * any other function from devusb.
  */
 int init_devusb(void);
 
 /**
  * \brief free everything related to devusb. Must be called last.
+ *
+ * The function will close devusb. That is, it will exit libusb.
+ * Calling an other function of devusb after close_devusb is an
+ * unspecified behavior.
  */
 void close_devusb(void);
 
@@ -43,5 +51,11 @@ void free_devices(struct devusb **devices);
 /**
  * \brief update the access status for given devices
  * \param devices list of devusb struct corresponding to device to authorize
- * \return return non 0 value in case of error */
+ * \return return non 0 value in case of error
+ *
+ * The function will search for the file that controle acces for each given
+ * devices. The path format is /sys/bus/usb/[bus]-[port]/authorized. Then,
+ * 1 will be written in the file to permit the creation of a virtual device
+ * block in /dev by udev.
+ */
 int update_devices(struct devusb **devices);
