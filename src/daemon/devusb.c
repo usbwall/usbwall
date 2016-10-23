@@ -48,11 +48,13 @@ struct devusb **devices_get(void)
                                                       tmp_dev_serial,
                                                       SERIAL_MAX_SIZE);
 
-      /* TODO : check the size */
+      /**
+       * \todo
+       * TODO : check the size of the serial id extracted from descriptors
+       */
       devusb_list[i]->serial = malloc(len + 1);
       memcpy(devusb_list[i]->serial, tmp_dev_serial, len + 1);
     }
-    /* TODO : what if the device does not have serial number ? */
 
     devusb_list[i]->bus = libusb_get_bus_number(device);
     devusb_list[i]->port = libusb_get_port_number(device);
@@ -77,8 +79,16 @@ void free_devices(struct devusb **devices)
 
 int update_devices(struct devusb **devices)
 {
-  /* TODO */
+  /**
+   * \todo
+   * TODO : get, open, and update authorized files for
+   * given devices
+   */
 
+  /**
+   * \remark
+   * the update_devices code is for now only for debug purpose.
+   */
   for (int i = 0; devices[i]; ++i)
   {
     if (!devices[i]->serial) // not an identifiable device

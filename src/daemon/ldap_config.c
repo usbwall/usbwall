@@ -8,7 +8,11 @@
 
 char *cfg_file_find(void)
 {
-  /* TODO */
+  /**
+   * \todo
+   * TODO: search for more than one place for the config file
+   * Itś optional but conveniant for the user.
+   */
 
   return "/etc/usbwall.cfg";
 }
@@ -37,7 +41,13 @@ struct ldap_cfg *make_ldap_cfg(char *cfg_file)
         && !sscanf(buffer, " binddn %ms ", &config->binddn)
         && !sscanf(buffer, " bindpw %ms ", &config->bindpw)
         && !sscanf(buffer, " version %hd ", &config->version))
-      puts("ERROR ??"); // FIXME
+      puts("ERROR ??");
+    /**
+     * \todo
+     * FIXME: Change the behavior for the case of an unknown
+     * attribute in the configuration file. A more precise message
+     * is better. Using the syslog could also be a good idea.
+     */
   }
 
   free(buffer);

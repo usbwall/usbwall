@@ -15,9 +15,10 @@
 
 char *wait_for_logging(void)
 {
-  /* TODO :
-   * - wait for an event from pam *
-   * - get the user name from utmp and return it (done) */
+  /**
+   * \todo
+   *  TODO : wait for the event from PAM
+   */
 
   int utmp_fd = open("/var/run/utmp", O_RDONLY);
   if (utmp_fd != -1)
@@ -60,20 +61,37 @@ char *devids_get(char *username, struct ldap_cfg *cfg)
                         cfg->basedn,
                         LDAP_SCOPE_SUB,
                         filter,
-                        NULL, /* FIXME : valid attribute list is better */
+                        NULL,
+                        /**
+                         * \todo
+                         * FIXME : a valid attribute list would
+                         * be better than NULL for the searching
+                         * function.
+                         */
                         0,
                         NULL, /* no timeout */
                         NULL,
                         NULL,
-                        12, /* FIXME : 1 should be valid */
+                        12,
+                        /**
+                         * \remark
+                         *  searching for 1 entry should be valid,
+                         *  12 may be overkill...
+                         */
                         &msg_ptr)
       != LDAP_SUCCESS)
     return NULL;
   if (!ldap_count_entries(ldap_ptr, msg_ptr))
     return NULL;
-  msg_ptr = ldap_first_entry(ldap_ptr, msg_ptr); // FIXME : really needed ?
+  msg_ptr = ldap_first_entry(ldap_ptr, msg_ptr);
+  /**
+   * \todo
+   * FIXME : If everything is okay, msg_ptr should already contain only
+   * one entry. If that assertion is true, is the above line really needed ?
+   */
 
   /* extract devids */
   struct berval **values = ldap_get_values_len(ldap_ptr, msg_ptr, "devid");
+
   return values[0]->bv_val;
 }
