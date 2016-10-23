@@ -1,3 +1,4 @@
+find_package(PAM REQUIRED)
 set(PAM_SRC pam_usbwall.c)
 
 add_library(pam_usbwall SHARED ${PAM_SRC})

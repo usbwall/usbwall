@@ -1,3 +1,5 @@
+find_package(USB1 REQUIRED)
+find_package(LDAP REQUIRED)
 set(DAEMON_SRC
   devusb.c
   devuser.c
