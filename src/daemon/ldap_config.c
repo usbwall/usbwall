@@ -13,7 +13,7 @@ char *cfg_file_find(void)
   /**
    * \todo
    * TODO: search for more than one place for the config file
-   * Itś optional but conveniant for the user.
+   * It's optional but conveniant for the user.
    */
 
   return "/etc/usbwall.cfg";
@@ -60,6 +60,7 @@ void destroy_ldap_cfg(struct ldap_cfg *cfg)
   free(cfg->uri);
   free(cfg->basedn);
   free(cfg->binddn);
+  free(cfg->bindpw);
   free(cfg);
 }
 

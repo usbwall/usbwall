@@ -1,4 +1,4 @@
-/** 
+/**
  * \file devusb.h
  * \brief Containing functions to manage plugged devices
  */

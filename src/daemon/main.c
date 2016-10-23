@@ -11,7 +11,7 @@ int main(void)
   if (!cfg)
     return 1; // no configs found
 
-  if (!init_devusb())
+  if (init_devusb())
     return 1; // devusb initialization error
 
   char *username = NULL;

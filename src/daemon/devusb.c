@@ -73,6 +73,9 @@ struct devusb **devices_get(void)
 
 void free_devices(struct devusb **devices)
 {
+  if (!devices)
+    return;
+
   for (int i = 0; devices[i]; ++i)
   {
     free(devices[i]->serial);
