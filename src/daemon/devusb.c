@@ -9,9 +9,13 @@
 
 #define SERIAL_MAX_SIZE 64
 
+static struct devusb *device_to_devusb(struct libusb_device *device);
+
 int init_devusb(void)
 {
-  libusb_init(NULL);
+  if (libusb_init(NULL) != LIBUSB_SUCCESS)
+    return 1;
+
   if (!libusb_has_capability(LIBUSB_CAP_HAS_HOTPLUG))
     return 1;
 
@@ -22,7 +26,9 @@ int init_devusb(void)
 
 struct devusb **devices_get(void)
 {
-  struct devusb **devusb_list = calloc(16, sizeof (struct devusb *)); // FIXME
+  struct devusb **devusb_list = calloc(16, sizeof (struct devusb *));
+  if (!devusb_list)
+    return NULL;
   /**
    * \todo
    * FIXME: devusb_list should not be limited by 16 devices.
@@ -30,42 +36,15 @@ struct devusb **devices_get(void)
    */
 
   libusb_device **device_list = NULL;
-  const size_t device_list_size = libusb_get_device_list(NULL, &device_list);
+  ssize_t device_list_size = libusb_get_device_list(NULL, &device_list);
 
-  /* iterate over all devices and get their serial */
-  struct libusb_device *device = NULL;
-  struct libusb_device_descriptor *usb_infos =
-    malloc(sizeof (struct libusb_device_descriptor));
-  libusb_device_handle *udev = NULL;
-  for (unsigned i = 0; i < device_list_size; ++i)
+  /* iterate over all devices and extract needed infos */
+  for (int i = 0; i < device_list_size; ++i)
   {
-    devusb_list[i] = calloc(1, sizeof (struct devusb));
-    device = device_list[i];
-    libusb_get_device_descriptor(device, usb_infos);
-    libusb_open(device, &udev);
-
-    if (usb_infos->iSerialNumber) // the device does have an unique identifier
-    {
-      unsigned char tmp_dev_serial[SERIAL_MAX_SIZE] = { '\0' };
-      size_t len = libusb_get_string_descriptor_ascii(udev,
-                                                      usb_infos->iSerialNumber,
-                                                      tmp_dev_serial,
-                                                      SERIAL_MAX_SIZE);
-
-      /**
-       * \todo
-       * TODO : check the size of the serial id extracted from descriptors
-       */
-      devusb_list[i]->serial = malloc(len + 1);
-      memcpy(devusb_list[i]->serial, tmp_dev_serial, len + 1);
-    }
-
-    devusb_list[i]->bus = libusb_get_bus_number(device);
-    devusb_list[i]->port = libusb_get_port_number(device);
-    libusb_close(udev);
+    devusb_list[i] = device_to_devusb(device_list[i]);
+    if (!devusb_list[i])
+      break; // error !
   }
-
-  free(usb_infos);
   libusb_free_device_list(device_list, 1);
 
   return devusb_list;
@@ -86,6 +65,9 @@ void free_devices(struct devusb **devices)
 
 int update_devices(struct devusb **devices)
 {
+  if (!devices)
+    return 1;
+
   /**
    * \todo
    * TODO : get, open, and update authorized files for
@@ -112,4 +94,57 @@ int update_devices(struct devusb **devices)
 void close_devusb(void)
 {
   libusb_exit(NULL);
+}
+
+/************************************
+ * Static functions implementations *
+ ************************************/
+
+static struct devusb *device_to_devusb(struct libusb_device *device)
+{
+  struct devusb *result = calloc(1, sizeof (struct devusb));
+  if (!result)
+    return NULL;
+
+  struct libusb_device_descriptor usb_infos;
+  libusb_device_handle *udev = NULL;
+
+  if (libusb_get_device_descriptor(device, &usb_infos) != LIBUSB_SUCCESS)
+  {
+    free(result);
+    return NULL;
+  }
+
+  if (libusb_open(device, &udev) != LIBUSB_SUCCESS)
+  {
+    free(result);
+    return NULL;
+  }
+
+  if (usb_infos.iSerialNumber) // the device does have an unique identifier
+  {
+    unsigned char tmp_dev_serial[SERIAL_MAX_SIZE] = { '\0' };
+    int len = libusb_get_string_descriptor_ascii(udev,
+                                                 usb_infos.iSerialNumber,
+                                                 tmp_dev_serial,
+                                                 SERIAL_MAX_SIZE);
+    if (len > 0) // len < 0 is a LIBUSB_ERROR
+    {
+      /**
+       * \todo
+       * TODO : Some serials extracted from descriptors may not be unique, and
+       * some are just useless garbage. We need to find a way to identify those
+       * bad serial ids.
+       */
+      result->serial = malloc(len + 1);
+      if (result->serial)
+        memcpy(result->serial, tmp_dev_serial, len + 1);
+    }
+  }
+
+  result->bus = libusb_get_bus_number(device);
+  result->port = libusb_get_port_number(device);
+  libusb_close(udev);
+
+  return result;
 }
