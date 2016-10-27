@@ -1,7 +1,5 @@
 #include "devuser.h"
 
-#define _XOPEN_SOURCE 500
-
 #include <fcntl.h>
 #include <ldap.h>
 #include <stdlib.h>
@@ -13,10 +11,10 @@
 
 #define LOGIN_MAX_LEN 32
 
-static LDAP *setup_ldap(struct ldap_cfg *cfg);
+static LDAP *setup_ldap(const struct ldap_cfg *cfg);
 static struct berval **extract_devids(LDAP *ldap_ptr,
-                                      char *username,
-                                      struct ldap_cfg *cfg);
+                                      const char *username,
+                                      const struct ldap_cfg *cfg);
 
 char *wait_for_logging(void)
 {
@@ -41,7 +39,7 @@ char *wait_for_logging(void)
   return NULL;
 }
 
-char **devids_get(char *username, struct ldap_cfg *cfg)
+char **devids_get(const char *username, const struct ldap_cfg *cfg)
 {
   if (!username || !cfg)
     return NULL;
@@ -54,7 +52,7 @@ char **devids_get(char *username, struct ldap_cfg *cfg)
   if (!values)
     return NULL;
 
-  size_t values_count = ldap_count_values_len(values);
+  const size_t values_count = ldap_count_values_len(values);
 
   /* convert berval array to string array */
   char **devids = malloc(sizeof (char *) * (values_count + 1));
@@ -82,7 +80,7 @@ void free_devids(char **devids)
  * Static functions implementations *
  ************************************/
 
-static LDAP *setup_ldap(struct ldap_cfg *cfg)
+static LDAP *setup_ldap(const struct ldap_cfg *cfg)
 {
   LDAP *ldap_ptr = NULL;
 
@@ -107,8 +105,8 @@ static LDAP *setup_ldap(struct ldap_cfg *cfg)
 }
 
 static struct berval **extract_devids(LDAP *ldap_ptr,
-                                      char *username,
-                                      struct ldap_cfg *cfg)
+                                      const char *username,
+                                      const struct ldap_cfg *cfg)
 {
   LDAPMessage *msg_ptr = NULL;
   char filter[LOGIN_MAX_LEN + 1] = { '\0' };

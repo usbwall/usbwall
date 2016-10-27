@@ -1,7 +1,5 @@
 #include "devusb.h"
 
-#define _XOPEN_SOURCE 600
-
 #include <libusb-1.0/libusb.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -36,7 +34,7 @@ struct devusb **devices_get(void)
    */
 
   libusb_device **device_list = NULL;
-  ssize_t device_list_size = libusb_get_device_list(NULL, &device_list);
+  const ssize_t device_list_size = libusb_get_device_list(NULL, &device_list);
 
   /* iterate over all devices and extract needed infos */
   for (int i = 0; i < device_list_size; ++i)
@@ -124,10 +122,10 @@ static struct devusb *device_to_devusb(struct libusb_device *device)
   if (usb_infos.iSerialNumber) // the device does have an unique identifier
   {
     unsigned char tmp_dev_serial[SERIAL_MAX_SIZE] = { '\0' };
-    int len = libusb_get_string_descriptor_ascii(udev,
-                                                 usb_infos.iSerialNumber,
-                                                 tmp_dev_serial,
-                                                 SERIAL_MAX_SIZE);
+    const int len = libusb_get_string_descriptor_ascii(udev,
+                                                       usb_infos.iSerialNumber,
+                                                       tmp_dev_serial,
+                                                       SERIAL_MAX_SIZE);
     if (len > 0) // len < 0 is a LIBUSB_ERROR
     {
       /**

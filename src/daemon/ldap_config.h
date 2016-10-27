@@ -28,7 +28,7 @@ char *cfg_file_find(void);
  * \param cfg_file path of the configuration file
  * \return ldap_cfg struct containing ldap configurations, NULL in case of error
  */
-struct ldap_cfg *make_ldap_cfg(char *cfg_file);
+struct ldap_cfg *make_ldap_cfg(const char *cfg_file);
 
 /**
  * \brief destroy and free ldap_cfg struct

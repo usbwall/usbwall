@@ -31,7 +31,7 @@ char *wait_for_logging(void);
  * case of a connection problem, or if no entry are found,
  * NULL is returned.
  */
-char **devids_get(char *username, struct ldap_cfg *cfg);
+char **devids_get(const char *username, const struct ldap_cfg *cfg);
 
 /**
  * \brief Destroy and free the serial array returned by devids_get

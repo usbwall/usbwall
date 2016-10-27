@@ -1,7 +1,5 @@
 #include "ldap_config.h"
 
-#define _POSIX_C_SOURCE 200809L
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -19,7 +17,7 @@ char *cfg_file_find(void)
   return "/etc/usbwall.cfg";
 }
 
-struct ldap_cfg *make_ldap_cfg(char *cfg_file)
+struct ldap_cfg *make_ldap_cfg(const char *cfg_file)
 {
   FILE *stream = fopen(cfg_file, "r");
   if (!stream)
