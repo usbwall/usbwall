@@ -1,4 +1,5 @@
 #include "devuser.h"
+#include "socket.h"
 
 #include <fcntl.h>
 #include <ldap.h>
@@ -17,12 +18,14 @@ static struct berval **extract_devids(LDAP *ldap_ptr,
                                       const char *username,
                                       const struct ldap_cfg *cfg);
 
-char *wait_for_logging(void)
+char *wait_for_logging(int netlink_fd)
 {
   /**
-   * \todo
-   *  TODO : wait for the event from PAM
+   *  Wait for the event from PAM
    */
+  int connecting = accept_user(netlink_fd);
+  if (connecting == -1)
+	  return NULL;
 
   int utmp_fd = open("/var/run/utmp", O_RDONLY);
   if (utmp_fd != -1)

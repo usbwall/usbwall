@@ -3,6 +3,7 @@ find_package(LDAP REQUIRED)
 set(DAEMON_SRC
   devusb.c
   devuser.c
+  socket.c
   ldap_config.c
   main.c
   )

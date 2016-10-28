@@ -1,7 +1,7 @@
 /**
  * \file devuser.h
  * \brief Contain user management functions
- * \author Arthur d'Avray
+ * \author Arthur d'Avray, Damien Pradier
  **/
 
 #pragma once
@@ -9,14 +9,14 @@
 #include "ldap_config.h"
 
 /**
- * \brief Wait for a user to loggin and return his name
+ * \brief Wait for a user to login and return his name
  * \return current user name. Return NULL on error.
  *
  * The function wait for an event from the pam module,
  * it will block until something is received.
  * Then, the user name is extracted from utmp get.
  */
-char *wait_for_logging(void);
+char *wait_for_logging(int netlink_fd);
 
 /**
  * \brief Extract the list of usb serial ids allowed by
