@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <syslog.h>
 
 #include "devusb.h"
 #include "devuser.h"
@@ -7,6 +8,8 @@
 
 int main(void)
 {
+  openlog("usbwall", LOG_CONS | LOG_PID, LOG_USER);
+
   struct ldap_cfg *cfg = make_ldap_cfg(cfg_file_find());
   if (!cfg)
     return 1; // no configs found
@@ -26,7 +29,8 @@ int main(void)
      * Only authorized devices should be kept
      */
 
-    update_devices(device_list);
+    if (update_devices(device_list))
+      syslog(LOG_WARNING, "Device update failed");
 
     free_devids(devids);
     free_devices(device_list);
@@ -36,6 +40,8 @@ int main(void)
   }
   close_devusb();
   destroy_ldap_cfg(cfg);
+
+  closelog();
 
   return 0;
 }

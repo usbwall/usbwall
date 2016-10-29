@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <syslog.h>
 
 #define SERIAL_MAX_SIZE 64
 
@@ -12,10 +13,18 @@ static struct devusb *device_to_devusb(struct libusb_device *device);
 int init_devusb(void)
 {
   if (libusb_init(NULL) != LIBUSB_SUCCESS)
+  {
+    syslog(LOG_ERR,
+           "Initialization error - libusb can not be initiated");
     return 1;
+  }
 
   if (!libusb_has_capability(LIBUSB_CAP_HAS_HOTPLUG))
+  {
+    syslog(LOG_ERR,
+           "Initialization error - your system does not support hotplug");
     return 1;
+  }
 
   libusb_set_debug(NULL, LIBUSB_LOG_LEVEL_WARNING);
 
@@ -41,7 +50,10 @@ struct devusb **devices_get(void)
   {
     devusb_list[i] = device_to_devusb(device_list[i]);
     if (!devusb_list[i])
-      break; // error !
+    {
+      syslog(LOG_WARNING, "corrupted devusb no %d", i);
+      break;
+    }
   }
   libusb_free_device_list(device_list, 1);
 
@@ -122,11 +134,11 @@ static struct devusb *device_to_devusb(struct libusb_device *device)
   if (usb_infos.iSerialNumber) // the device does have an unique identifier
   {
     unsigned char tmp_dev_serial[SERIAL_MAX_SIZE] = { '\0' };
-    const int len = libusb_get_string_descriptor_ascii(udev,
+    const int ret = libusb_get_string_descriptor_ascii(udev,
                                                        usb_infos.iSerialNumber,
                                                        tmp_dev_serial,
                                                        SERIAL_MAX_SIZE);
-    if (len > 0) // len < 0 is a LIBUSB_ERROR
+    if (ret > 0) // ret < 0 is a LIBUSB_ERROR
     {
       /**
        * \todo
@@ -134,10 +146,14 @@ static struct devusb *device_to_devusb(struct libusb_device *device)
        * some are just useless garbage. We need to find a way to identify those
        * bad serial ids.
        */
+      const size_t len = (size_t)ret;
       result->serial = malloc(len + 1);
       if (result->serial)
         memcpy(result->serial, tmp_dev_serial, len + 1);
     }
+    else
+      syslog(LOG_WARNING, "Unable to extract usb string descriptor");
+
   }
 
   result->bus = libusb_get_bus_number(device);

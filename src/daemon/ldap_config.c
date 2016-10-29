@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <syslog.h>
 
 static void skip_comments(char *line);
 
@@ -21,7 +22,10 @@ struct ldap_cfg *make_ldap_cfg(const char *cfg_file)
 {
   FILE *stream = fopen(cfg_file, "r");
   if (!stream)
+  {
+    syslog(LOG_ERR, "Configuration file not accessible : %s", cfg_file);
     return NULL;
+  }
 
   struct ldap_cfg *config = calloc(1, sizeof (struct ldap_cfg));
 
@@ -38,13 +42,9 @@ struct ldap_cfg *make_ldap_cfg(const char *cfg_file)
         && !sscanf(buffer, " binddn %ms ", &config->binddn)
         && !sscanf(buffer, " bindpw %ms ", &config->bindpw)
         && !sscanf(buffer, " version %hd ", &config->version))
-      puts("ERROR ??");
-    /**
-     * \todo
-     * FIXME: Change the behavior for the case of an unknown
-     * attribute in the configuration file. A more precise message
-     * is better. Using the syslog could also be a good idea.
-     */
+      syslog(LOG_WARNING,
+             "config syntax error, this line is invalid %s",
+             buffer);
   }
 
   free(buffer);

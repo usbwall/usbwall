@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <syslog.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include <utmp.h>
@@ -52,16 +53,21 @@ char **devids_get(const char *username, const struct ldap_cfg *cfg)
   if (!values)
     return NULL;
 
-  const size_t values_count = ldap_count_values_len(values);
+  char **devids = NULL;
+  const int ret = ldap_count_values_len(values);
+  if (ret > 0)
+  {
+    const size_t values_count = (size_t)ret;
 
-  /* convert berval array to string array */
-  char **devids = malloc(sizeof (char *) * (values_count + 1));
-  if (!devids)
-    return NULL;
+    /* convert berval array to string array */
+    devids = malloc(sizeof (char *) * (values_count + 1));
+    if (!devids)
+      return NULL;
 
-  for (unsigned i = 0; i < values_count; ++i)
-    devids[i] = values[i]->bv_val;
-  devids[values_count] = NULL;
+    for (unsigned i = 0; i < values_count; ++i)
+      devids[i] = values[i]->bv_val;
+    devids[values_count] = NULL;
+  }
 
   return devids;
 }
@@ -85,11 +91,19 @@ static LDAP *setup_ldap(const struct ldap_cfg *cfg)
   LDAP *ldap_ptr = NULL;
 
   if (ldap_initialize(&ldap_ptr, cfg->uri) != LDAP_SUCCESS)
+  {
+    syslog(LOG_WARNING, "ldap initialization failed");
     return NULL;
+  }
 
   if (ldap_set_option(ldap_ptr, LDAP_OPT_PROTOCOL_VERSION, &cfg->version)
       != LDAP_OPT_SUCCESS)
+  {
+    syslog(LOG_WARNING,
+           "ldap does not support the protocol version %hd",
+           cfg->version);
     return NULL;
+  }
 
   if (ldap_sasl_bind_s(ldap_ptr,
                        cfg->binddn,
@@ -99,7 +113,10 @@ static LDAP *setup_ldap(const struct ldap_cfg *cfg)
                        NULL,
                        NULL)
       != LDAP_SUCCESS)
+  {
+    syslog(LOG_WARNING, "ldap sasl binding failed");
     return NULL;
+  }
 
   return ldap_ptr;
 }
@@ -137,7 +154,12 @@ static struct berval **extract_devids(LDAP *ldap_ptr,
       != LDAP_SUCCESS)
     return NULL;
   if (!ldap_count_entries(ldap_ptr, msg_ptr))
+  {
+    syslog(LOG_WARNING,
+           "ldap research failed. No entry found for user %s",
+           username);
     return NULL;
+  }
   msg_ptr = ldap_first_entry(ldap_ptr, msg_ptr);
   /**
    * \todo
@@ -145,5 +167,8 @@ static struct berval **extract_devids(LDAP *ldap_ptr,
    * one entry. If that assertion is true, is the above line really needed ?
    */
 
-  return ldap_get_values_len(ldap_ptr, msg_ptr, "devid");
+  struct berval **res = ldap_get_values_len(ldap_ptr, msg_ptr, "devid");
+  ldap_msgfree(msg_ptr);
+
+  return res;
 }
