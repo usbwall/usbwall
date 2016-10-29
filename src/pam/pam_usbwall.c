@@ -1,4 +1,4 @@
-#define PAM_SM_SESSION 1
+#define PAM_SM_SESSION
 
 #include <security/pam_ext.h>
 #include <security/pam_modules.h>
