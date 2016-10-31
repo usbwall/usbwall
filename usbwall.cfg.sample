@@ -1,0 +1,35 @@
+#
+# Sample configuration for usbwall
+#
+
+# name: uri
+# description: specify the LDAP URI to connect to. Conform
+#   to standard URI declaration (see man ldap.conf(5)).
+# example: ldap://my_ldap_server/
+# type: string
+uri ldap://usbwall.org:389/
+
+# name: basedn
+# description: specify the base DN used for search request
+# example: ou=People,dc=my,dc=domain,dc=com
+# type: string
+basedn ou=People,dc=my,dc=domain,dc=com
+
+# name: binddn
+# description: specify the bind DNS for LDAP binding
+# example: cn=user,dc=my,dc=domain,dc=com
+# type: string
+binddn cn=user,dc=my,dc=domain,dc=com
+
+# name: bindpw
+# description: specify the bind password associated to bind DN
+# example: password
+# type: string
+bindpw password
+
+# name: version
+# description: Specify the version of the LDAP protocol to use.
+#   should be one of '2' or '3'.
+# example: version 3
+# type: Integer
+version 3

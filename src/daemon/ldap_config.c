@@ -43,7 +43,7 @@ struct ldap_cfg *make_ldap_cfg(const char *cfg_file)
         && !sscanf(buffer, " bindpw %ms ", &config->bindpw)
         && !sscanf(buffer, " version %hd ", &config->version))
       syslog(LOG_WARNING,
-             "config syntax error, this line is invalid %s",
+             "config syntax error, this line is invalid: %s",
              buffer);
   }
 

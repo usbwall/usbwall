@@ -153,7 +153,6 @@ static struct devusb *device_to_devusb(struct libusb_device *device)
     }
     else
       syslog(LOG_WARNING, "Unable to extract usb string descriptor");
-
   }
 
   result->bus = libusb_get_bus_number(device);
