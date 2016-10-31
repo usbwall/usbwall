@@ -34,16 +34,29 @@ if (HAS_PEDANTIC_CFLAG)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pedantic")
 endif()
 
+check_c_compiler_flag(-Wunused-macros HAS_UNUSED_MACROS_CFLAG)
+if (HAS_UNUSED_MACROS_CFLAG)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wunused-macros")
+endif()
+
 ### Disabled compile flags because of code incompatibility (yet)
 
+# Used for GCC "m" modifier
 check_c_compiler_flag(-Wformat=0 HAS_FORMAT_0_CFLAG)
 if (HAS_FORMAT_0_CFLAG)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wformat=0")
 endif()
 
-check_c_compiler_flag(-Wunused-macros HAS_UNUSED_MACROS_CFLAG)
-if (HAS_UNUSED_MACROS_CFLAG)
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wunused-macros")
+# Used for Clang "m" modifier
+check_c_compiler_flag(-Wno-format-non-iso HAS_FORMAT_NON_ISO_CFLAG)
+if (HAS_FORMAT_NON_ISO_CFLAG)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-format-non-iso")
+endif()
+
+# Used for skip strutures alignement requirement
+check_c_compiler_flag(-Wno-padded HAS_PADDED_CFLAG)
+if (HAS_PADDED_CFLAG)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-padded")
 endif()
 
 ### Define mandatory CFLAGS
@@ -75,6 +88,10 @@ set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -g3")
 ### Define mandatory RELEASE CFLAGS
 
 set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -O2")
+
+###########################
+### continue to subdirectories
+###########################
 
 add_subdirectory(pam)
 add_subdirectory(daemon)
