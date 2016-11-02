@@ -10,12 +10,12 @@ int main(void)
 {
   openlog("usbwall", LOG_CONS | LOG_PID, LOG_USER);
 
+  if (init_devusb())
+    return 1; // devusb initialization error
+
   struct ldap_cfg *cfg = make_ldap_cfg(cfg_file_find());
   if (!cfg)
     return 1; // no configs found
-
-  if (init_devusb())
-    return 1; // devusb initialization error
 
   char *username = NULL;
   while ((username = wait_for_logging()))

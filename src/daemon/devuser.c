@@ -45,13 +45,12 @@ char **devids_get(const char *username, const struct ldap_cfg *cfg)
   if (!username || !cfg)
     return NULL;
 
-  LDAP *ldap_ptr = setup_ldap(cfg);
+  LDAP *ldap_ptr = setup_ldap(cfg); // init the connection
   if (!ldap_ptr)
     return NULL;
 
   struct berval **values = extract_devids(ldap_ptr, username, cfg);
-  if (!values)
-    return NULL;
+  ldap_unbind_ext(ldap_ptr, NULL, NULL); // close the connection
 
   char **devids = NULL;
   const int ret = ldap_count_values_len(values);
@@ -93,6 +92,7 @@ static LDAP *setup_ldap(const struct ldap_cfg *cfg)
   if (ldap_initialize(&ldap_ptr, cfg->uri) != LDAP_SUCCESS)
   {
     syslog(LOG_WARNING, "ldap initialization failed");
+
     return NULL;
   }
 
@@ -102,6 +102,8 @@ static LDAP *setup_ldap(const struct ldap_cfg *cfg)
     syslog(LOG_WARNING,
            "ldap does not support the protocol version %hd",
            cfg->version);
+    ldap_unbind_ext(ldap_ptr, NULL, NULL);
+
     return NULL;
   }
 
@@ -115,6 +117,8 @@ static LDAP *setup_ldap(const struct ldap_cfg *cfg)
       != LDAP_SUCCESS)
   {
     syslog(LOG_WARNING, "ldap sasl binding failed");
+    ldap_unbind_ext(ldap_ptr, NULL, NULL);
+
     return NULL;
   }
 
@@ -158,6 +162,7 @@ static struct berval **extract_devids(LDAP *ldap_ptr,
     syslog(LOG_WARNING,
            "ldap research failed. No entry found for user %s",
            username);
+
     return NULL;
   }
   msg_ptr = ldap_first_entry(ldap_ptr, msg_ptr);
