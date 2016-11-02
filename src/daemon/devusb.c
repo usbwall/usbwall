@@ -9,6 +9,8 @@
 #define SERIAL_MAX_SIZE 64
 
 static struct devusb *device_to_devusb(struct libusb_device *device);
+static char *device_serial_get(struct libusb_device *device,
+                               struct libusb_device_descriptor *usb_infos);
 
 int init_devusb(void)
 {
@@ -110,32 +112,25 @@ void close_devusb(void)
  * Static functions implementations *
  ************************************/
 
-static struct devusb *device_to_devusb(struct libusb_device *device)
+static char *device_serial_get(struct libusb_device *device,
+                               struct libusb_device_descriptor *usb_infos)
 {
-  struct devusb *result = calloc(1, sizeof (struct devusb));
-  if (!result)
-    return NULL;
-
-  struct libusb_device_descriptor usb_infos;
   libusb_device_handle *udev = NULL;
-
-  if (libusb_get_device_descriptor(device, &usb_infos) != LIBUSB_SUCCESS)
+  int ret = libusb_open(device, &udev);
+  if (ret != LIBUSB_SUCCESS)
   {
-    free(result);
+    syslog(LOG_WARNING,
+           "Failed to open device : %s",
+           libusb_strerror(ret));
     return NULL;
   }
 
-  if (libusb_open(device, &udev) != LIBUSB_SUCCESS)
-  {
-    free(result);
-    return NULL;
-  }
-
-  if (usb_infos.iSerialNumber) // the device does have an unique identifier
+  char *serial = NULL;
+  if (usb_infos->iSerialNumber) // the device does have an unique identifier
   {
     unsigned char tmp_dev_serial[SERIAL_MAX_SIZE] = { '\0' };
     const int ret = libusb_get_string_descriptor_ascii(udev,
-                                                       usb_infos.iSerialNumber,
+                                                       usb_infos->iSerialNumber,
                                                        tmp_dev_serial,
                                                        SERIAL_MAX_SIZE);
     if (ret > 0) // ret < 0 is a LIBUSB_ERROR
@@ -147,17 +142,36 @@ static struct devusb *device_to_devusb(struct libusb_device *device)
        * bad serial ids.
        */
       const size_t len = (size_t)ret;
-      result->serial = malloc(len + 1);
-      if (result->serial)
-        memcpy(result->serial, tmp_dev_serial, len + 1);
+      serial = malloc(len + 1);
+      if (serial)
+        memcpy(serial, tmp_dev_serial, len + 1);
     }
     else
-      syslog(LOG_WARNING, "Unable to extract usb string descriptor");
+      syslog(LOG_WARNING,
+             "Unable to extract usb string descriptor : %s",
+             libusb_strerror(ret));
+  }
+  libusb_close(udev);
+
+  return serial;
+}
+
+static struct devusb *device_to_devusb(struct libusb_device *device)
+{
+  struct devusb *result = calloc(1, sizeof (struct devusb));
+  if (!result)
+    return NULL;
+
+  struct libusb_device_descriptor usb_infos;
+  if (libusb_get_device_descriptor(device, &usb_infos) != LIBUSB_SUCCESS)
+  {
+    free(result);
+    return NULL;
   }
 
+  result->serial = device_serial_get(device, &usb_infos);
   result->bus = libusb_get_bus_number(device);
   result->port = libusb_get_port_number(device);
-  libusb_close(udev);
 
   return result;
 }
