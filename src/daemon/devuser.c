@@ -8,6 +8,7 @@
 #include <string.h>
 #include <syslog.h>
 #include <sys/stat.h>
+#include <syslog.h>
 #include <unistd.h>
 #include <utmp.h>
 
@@ -26,6 +27,8 @@ char *wait_for_logging(int netlink_fd)
   int connecting = accept_user(netlink_fd);
   if (connecting == -1)
 	  return NULL;
+
+  syslog(LOG_INFO, "New user just connected.");
 
   int utmp_fd = open("/var/run/utmp", O_RDONLY);
   if (utmp_fd != -1)

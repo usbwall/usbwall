@@ -12,6 +12,8 @@
 
 #include "socket.h"
 
+/* Unique Domain Socket name, must be the same one in PAM
+ * and daemon */
 const char *socket_path = "\0usbwall";
 
 static int die(const char *s)
@@ -24,14 +26,15 @@ int accept_user(int socket_fd)
 {
   char buffer[1];
   int client_fd = 0;
+
   if ((client_fd = accept(socket_fd, NULL, NULL)) == -1)
     return -1;
 
   int len = recv(client_fd, buffer, sizeof(buffer), 0);
+
   if (len == -1)
     return -1;
 
-  puts("New user just connected.");
   return 0;
 }
 

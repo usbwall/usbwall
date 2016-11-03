@@ -1,79 +1,21 @@
 /*
- * \file netlink.h
- * \brief Containing function to link PAM and daemon
+ * \file socket.h
+ * \brief Containing function to do IPC between PAM and daemon
+ * \Author Damien Pradier
  */
 
-#ifndef NETLINK_H_
-# define NETLINK_H_
+#pragma once
 
-/*!
- ** @brief list of possible actions
- **
- ** supporting various device actions:
- ** add (when adding a new device)
- ** change (when a connected device changes its behavior)
- ** remove (wen a device is being disconnected)
- */
-enum action
-{
-  ACTION_ADD = 1,
-  ACTION_CHANGE,
-  ACTION_REMOVE,
-  ACTION_MAX
-};
-
-typedef enum action action_t;
-
-/*!
- ** @brief list of device types
- **
- ** There is various device types depending on what is hotplugged
- ** device: basic client controler (such as usb client controler)
- ** disk: mass storage disk, associated to various filesystem(s)
- */
-enum dev_type
-{
-  DEVTYPE_USBDEVICE = 1,
-  DEVTYPE_DISK,
-  DEVTYPE_MAX
-};
-
-typedef enum dev_type devtype_t;
-
-/*!
- ** @brief the bus identifier, depending on which bus the device is connected
- **
- ** usb: USB bus
- ** pci: PCI bus
- ** firewire: FIREWIRE bus
- */
-enum id_bus
-{
-  IDBUS_USB = 1,
-  IDBUS_PCI,
-  IDBUS_FIREWIRE,
-  IDBUS_MAX
-};
-
-typedef enum id_bus idbus_t;
-
-/*!
- ** @brief the udev informational environment structure, created from the data given by the kernel
- */
-struct udev_env
-{
-  char *serial;
-  char *devpath;
-  action_t action;
-  devtype_t idbus;
-  devtype_t devtype;
-};
-
-/*!
- **
+/**
+ * \brief Initialize a Unix Domain Socket to receive notifications from PAM.
+ * \return socket file descriptor. Return -1 on error.
  */
 int init_socket(void);
 
+/**
+ * \brief Block until PAM notify the daemon.
+ * The function wait for an event from the pam module.
+ * The daemon is notified when a user connect to the machine.
+ * \return 0 when a user just connected. Return -1 on error.
+ */
 int accept_user(int netlink_fd);
-
-#endif /* !NETLINK_H_ */
