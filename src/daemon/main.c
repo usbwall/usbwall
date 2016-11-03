@@ -5,13 +5,13 @@
 #include "devusb.h"
 #include "devuser.h"
 #include "ldap_config.h"
-#include "socket.h"
+#include "ipc_pam.h"
 
 int main(void)
 {
   openlog("usbwall", LOG_CONS | LOG_PID, LOG_USER);
   struct ldap_cfg *cfg = make_ldap_cfg(cfg_file_find());
-  int netlink_fd = -1;
+  int domain_socket_fd = -1;
 
   if (!cfg)
     return 1; // no configs found
@@ -19,11 +19,11 @@ int main(void)
   if (init_devusb())
     return 1; // devusb initialization error
 
-  if ((netlink_fd = init_socket()) == -1)
-    return 1; // netlink initialization error
+  if ((domain_socket_fd = init_socket()) == -1)
+    return 1; // Unix Domain Socket initialization error
 
   char *username = NULL;
-  while ((username = wait_for_logging(netlink_fd)))
+  while ((username = wait_for_logging(domain_socket_fd)))
   {
     struct devusb **device_list = devices_get();
     char **devids = devids_get(username, cfg);

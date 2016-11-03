@@ -1,7 +1,6 @@
 /**
  * \file devuser.h
  * \brief Contain user management functions
- * \author Arthur d'Avray
  **/
 
 #pragma once
@@ -10,13 +9,14 @@
 
 /**
  * \brief Wait for a user to login and return his name.
+ * \param Unix Domain Socket used to receive notifications
  * \return current user name. Return NULL on error.
  *
  * The function wait for an event from the pam module,
  * it will block until something is received.
  * Then, the user name is extracted from utmp get.
  */
-char *wait_for_logging(int netlink_fd);
+char *wait_for_logging(int socket_fd);
 
 /**
  * \brief Extract the list of usb serial ids allowed by

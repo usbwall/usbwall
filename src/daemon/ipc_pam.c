@@ -6,11 +6,10 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#include <linux/types.h>
 #include <sys/un.h>
 #include <syslog.h>
 
-#include "socket.h"
+#include "ipc_pam.h"
 
 /* Unique Domain Socket name, must be the same one in PAM
  * and daemon */
@@ -30,9 +29,7 @@ int accept_user(int socket_fd)
   if ((client_fd = accept(socket_fd, NULL, NULL)) == -1)
     return -1;
 
-  int len = recv(client_fd, buffer, sizeof(buffer), 0);
-
-  if (len == -1)
+  if (recv(client_fd, buffer, sizeof (buffer), 0) == -1)
     return -1;
 
   return 0;

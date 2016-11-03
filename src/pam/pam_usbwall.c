@@ -6,7 +6,6 @@
 #include <unistd.h>
 #include <syslog.h>
 
-#include <linux/types.h>
 #include <linux/un.h>
 
 #include <stdio.h>
@@ -16,7 +15,7 @@
 const char *socket_path = "\0usbwall";
 
 static int fetch_debug(int argc, const char **argv);
-static void notify_daemon(int netlink_fd);
+static void notify_daemon(int socket_fd);
 
 PAM_EXTERN int pam_sm_open_session(pam_handle_t *pamh __attribute__((unused)),
                                    int flags          __attribute__((unused)),

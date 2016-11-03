@@ -1,5 +1,5 @@
 #include "devuser.h"
-#include "socket.h"
+#include "ipc_pam.h"
 
 #include <fcntl.h>
 #include <ldap.h>
@@ -19,14 +19,14 @@ static struct berval **extract_devids(LDAP *ldap_ptr,
                                       const char *username,
                                       const struct ldap_cfg *cfg);
 
-char *wait_for_logging(int netlink_fd)
+char *wait_for_logging(int socket_fd)
 {
   /**
    *  Wait for the event from PAM
    */
-  int connecting = accept_user(netlink_fd);
+  int connecting = accept_user(socket_fd);
   if (connecting == -1)
-	  return NULL;
+    return NULL;
 
   syslog(LOG_INFO, "New user just connected.");
 
