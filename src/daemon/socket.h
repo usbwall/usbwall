@@ -69,7 +69,11 @@ struct udev_env
   devtype_t devtype;
 };
 
+/*!
+ **
+ */
 int init_socket(void);
+
 int accept_user(int netlink_fd);
 
 #endif /* !NETLINK_H_ */

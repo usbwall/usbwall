@@ -4,6 +4,7 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <syslog.h>
 
 #include <linux/types.h>
 #include <linux/un.h>
@@ -18,67 +19,62 @@ static int fetch_debug(int argc, const char **argv);
 static void notify_daemon(int netlink_fd);
 
 PAM_EXTERN int pam_sm_open_session(pam_handle_t *pamh __attribute__((unused)),
-				   int flags          __attribute__((unused)),
-				   int argc,
-				   const char **argv)
+                                   int flags          __attribute__((unused)),
+                                   int argc,
+                                   const char **argv)
 {
-	// Unix Domain Socket
-	struct sockaddr_un addr;
+  // Unix Domain Socket
+  struct sockaddr_un addr;
+  int debug = fetch_debug(argc, argv);
 
-	int fd = socket(AF_UNIX, SOCK_STREAM, 0);
-	if (fd == -1)
-		return PAM_ABORT;
+  int fd = socket(AF_UNIX, SOCK_STREAM, 0);
+  if (fd == -1)
+    return PAM_ABORT;
 
-	memset(&addr, 0, sizeof(addr));
-	addr.sun_family = AF_UNIX;
-	if (*socket_path == '\0')
-	{
-		*addr.sun_path = '\0';
-		strncpy(addr.sun_path+1, socket_path+1, sizeof(addr.sun_path)-2);
-	}
-	else
-	{
-		strncpy(addr.sun_path, socket_path, sizeof(addr.sun_path)-1);
-	}
+  memset(&addr, 0, sizeof (addr));
+  addr.sun_family = AF_UNIX;
 
-	if (connect(fd, (struct sockaddr *)&addr, sizeof(addr)) == -1)
-	{
-		printf("Error\n");
-		return PAM_ABORT;
-	}
-	else
-		puts("Connection success!");
+  if (*socket_path == '\0')
+  {
+    *addr.sun_path = '\0';
+    strncpy(addr.sun_path + 1, socket_path + 1, sizeof (addr.sun_path) - 2);
+  }
+  else
+    strncpy(addr.sun_path, socket_path, sizeof (addr.sun_path) - 1);
 
-	fetch_debug(argc, argv);
-	notify_daemon(fd);
+  if (connect(fd, (struct sockaddr *)&addr, sizeof (addr)) == -1)
+  {
+    if (debug)
+      syslog(LOG_ERR, "Initialization error - can not connect to daemon");
+    return PAM_ABORT;
+  }
 
-	close(fd);
-	return PAM_SUCCESS;
+  notify_daemon(fd);
+  close(fd);
+
+  return PAM_SUCCESS;
 }
 
 PAM_EXTERN int pam_sm_close_session(pam_handle_t *pamh __attribute__((unused)),
-				    int flags          __attribute__((unused)),
-				    int argc,
-				    const char **argv)
+                                    int flags          __attribute__((unused)),
+                                    int argc           __attribute__((unused)),
+                                    const char **argv  __attribute__((unused)))
 {
-	fetch_debug(argc, argv);
-	return PAM_SUCCESS;
+  return PAM_SUCCESS;
 }
 
 /************************************
  * Static functions implementations *
  ************************************/
 
-static int fetch_debug(int argc, const char **argv)
+static int fetch_debug(int argc          __attribute__((unused)),
+                       const char **argv __attribute__((unused)))
 {
-	for (int i = 0; i < argc; ++i)
-		puts(argv[i]);
-
-	return 0;
+  return 1;
 }
 
 static void notify_daemon(int fd)
 {
-	char buffer[] = "";
-	send(fd, buffer, sizeof(buffer), 0);
+  char buffer[] = "";
+  send(fd, buffer, sizeof (buffer), 0);
 }
