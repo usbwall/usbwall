@@ -5,7 +5,18 @@
 #include <string.h>
 #include <syslog.h>
 
-static void skip_comments(char *line);
+static void skip_comments(char *line)
+{
+  /**
+   * \todo
+   * FIXME: Bug if a sharp is used as a full character, like in
+   * a password. Thanks to Sylvain for reporting this bug.
+   */
+  char *comment_start = strchr(line, '#');
+
+  if (comment_start)
+    *comment_start = '\0';
+}
 
 char *cfg_file_find(void)
 {
@@ -60,16 +71,4 @@ void destroy_ldap_cfg(struct ldap_cfg *cfg)
   free(cfg->binddn);
   free(cfg->bindpw);
   free(cfg);
-}
-
-/************************************
- * Static functions implementations *
- ************************************/
-
-static void skip_comments(char *line)
-{
-  char *comment_start = strchr(line, '#');
-
-  if (comment_start)
-    *comment_start = '\0';
 }

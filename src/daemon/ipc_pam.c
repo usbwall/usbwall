@@ -1,15 +1,13 @@
+#include "ipc_pam.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
 #include <sys/socket.h>
 #include <sys/types.h>
-#include <unistd.h>
-
 #include <sys/un.h>
 #include <syslog.h>
-
-#include "ipc_pam.h"
+#include <unistd.h>
 
 /* Unique Domain Socket name, must be the same one in PAM
  * and daemon */
@@ -18,6 +16,7 @@ const char *socket_path = "\0usbwall";
 static int die(const char *s)
 {
   syslog(LOG_ERR, s);
+
   return -1;
 }
 

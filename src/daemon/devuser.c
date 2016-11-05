@@ -1,5 +1,4 @@
 #include "devuser.h"
-#include "ipc_pam.h"
 
 #include <fcntl.h>
 #include <ldap.h>
@@ -12,84 +11,9 @@
 #include <unistd.h>
 #include <utmp.h>
 
+#include "ipc_pam.h"
+
 #define LOGIN_MAX_LEN 32
-
-static LDAP *setup_ldap(const struct ldap_cfg *cfg);
-static struct berval **extract_devids(LDAP *ldap_ptr,
-                                      const char *username,
-                                      const struct ldap_cfg *cfg);
-
-char *wait_for_logging(int socket_fd)
-{
-  /**
-   *  Wait for the event from PAM
-   */
-  int connecting = accept_user(socket_fd);
-  if (connecting == -1)
-    return NULL;
-
-  syslog(LOG_INFO, "New user just connected.");
-
-  int utmp_fd = open("/var/run/utmp", O_RDONLY);
-  if (utmp_fd != -1)
-  {
-    struct utmp log;
-    while (read(utmp_fd, &log, sizeof (struct utmp)) == sizeof (struct utmp))
-      if (log.ut_type == USER_PROCESS)
-      {
-        close(utmp_fd);
-        return strdup(log.ut_name);
-      }
-    close(utmp_fd);
-  }
-
-  return NULL;
-}
-
-char **devids_get(const char *username, const struct ldap_cfg *cfg)
-{
-  if (!username || !cfg)
-    return NULL;
-
-  LDAP *ldap_ptr = setup_ldap(cfg); // init the connection
-  if (!ldap_ptr)
-    return NULL;
-
-  struct berval **values = extract_devids(ldap_ptr, username, cfg);
-  ldap_unbind_ext(ldap_ptr, NULL, NULL); // close the connection
-
-  char **devids = NULL;
-  const int ret = ldap_count_values_len(values);
-  if (ret > 0)
-  {
-    const size_t values_count = (size_t)ret;
-
-    /* convert berval array to string array */
-    devids = malloc(sizeof (char *) * (values_count + 1));
-    if (!devids)
-      return NULL;
-
-    for (unsigned i = 0; i < values_count; ++i)
-      devids[i] = values[i]->bv_val;
-    devids[values_count] = NULL;
-  }
-
-  return devids;
-}
-
-void free_devids(char **devids)
-{
-  if (!devids)
-    return;
-
-  for (int i = 0; devids[i]; ++i)
-    free(devids[i]);
-  free(devids);
-}
-
-/************************************
- * Static functions implementations *
- ************************************/
 
 static LDAP *setup_ldap(const struct ldap_cfg *cfg)
 {
@@ -182,4 +106,72 @@ static struct berval **extract_devids(LDAP *ldap_ptr,
   ldap_msgfree(msg_ptr);
 
   return res;
+}
+
+char *wait_for_logging(int socket_fd)
+{
+  /**
+   *  Wait for the event from PAM
+   */
+  int connecting = accept_user(socket_fd);
+  if (connecting == -1)
+    return NULL;
+
+  syslog(LOG_INFO, "New user just connected.");
+
+  int utmp_fd = open("/var/run/utmp", O_RDONLY);
+  if (utmp_fd != -1)
+  {
+    struct utmp log;
+    while (read(utmp_fd, &log, sizeof (struct utmp)) == sizeof (struct utmp))
+      if (log.ut_type == USER_PROCESS)
+      {
+        close(utmp_fd);
+        return strdup(log.ut_name);
+      }
+    close(utmp_fd);
+  }
+
+  return NULL;
+}
+
+char **devids_get(const char *username, const struct ldap_cfg *cfg)
+{
+  if (!username || !cfg)
+    return NULL;
+
+  LDAP *ldap_ptr = setup_ldap(cfg); // init the connection
+  if (!ldap_ptr)
+    return NULL;
+
+  struct berval **values = extract_devids(ldap_ptr, username, cfg);
+  ldap_unbind_ext(ldap_ptr, NULL, NULL); // close the connection
+
+  char **devids = NULL;
+  const int ret = ldap_count_values_len(values);
+  if (ret > 0)
+  {
+    const size_t values_count = (size_t)ret;
+
+    /* convert berval array to string array */
+    devids = malloc(sizeof (char *) * (values_count + 1));
+    if (!devids)
+      return NULL;
+
+    for (unsigned i = 0; i < values_count; ++i)
+      devids[i] = values[i]->bv_val;
+    devids[values_count] = NULL;
+  }
+
+  return devids;
+}
+
+void free_devids(char **devids)
+{
+  if (!devids)
+    return;
+
+  for (int i = 0; devids[i]; ++i)
+    free(devids[i]);
+  free(devids);
 }

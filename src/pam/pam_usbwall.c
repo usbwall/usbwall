@@ -1,21 +1,30 @@
-#include <security/pam_ext.h>
-#include <security/pam_modules.h>
-
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <unistd.h>
-#include <syslog.h>
-
-#include <linux/un.h>
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <sys/un.h>
+#include <syslog.h>
+#include <unistd.h>
 
-const char *socket_path = "\0usbwall";
+#include <security/pam_ext.h>
+#include <security/pam_modules.h>
 
-static int fetch_debug(int argc, const char **argv);
-static void notify_daemon(int socket_fd);
+static const char *socket_path = "\0usbwall";
+
+static int fetch_debug(int argc          __attribute__((unused)),
+                       const char **argv __attribute__((unused)))
+{
+  // TODO
+
+  return 1;
+}
+
+static void notify_daemon(int fd)
+{
+  char buffer[] = "";
+  send(fd, buffer, sizeof (buffer), 0);
+}
 
 PAM_EXTERN int pam_sm_open_session(pam_handle_t *pamh __attribute__((unused)),
                                    int flags          __attribute__((unused)),
@@ -60,20 +69,4 @@ PAM_EXTERN int pam_sm_close_session(pam_handle_t *pamh __attribute__((unused)),
                                     const char **argv  __attribute__((unused)))
 {
   return PAM_SUCCESS;
-}
-
-/************************************
- * Static functions implementations *
- ************************************/
-
-static int fetch_debug(int argc          __attribute__((unused)),
-                       const char **argv __attribute__((unused)))
-{
-  return 1;
-}
-
-static void notify_daemon(int fd)
-{
-  char buffer[] = "";
-  send(fd, buffer, sizeof (buffer), 0);
 }
