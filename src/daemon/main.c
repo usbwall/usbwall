@@ -4,8 +4,8 @@
 
 #include "devusb.h"
 #include "devuser.h"
-#include "ldap_config.h"
 #include "ipc_pam.h"
+#include "ldap_config.h"
 
 int main(void)
 {

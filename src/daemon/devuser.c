@@ -2,10 +2,9 @@
 
 #include <fcntl.h>
 #include <ldap.h>
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
-#include <syslog.h>
 #include <sys/stat.h>
 #include <syslog.h>
 #include <unistd.h>
@@ -40,7 +39,7 @@ static LDAP *setup_ldap(const struct ldap_cfg *cfg)
   if (ldap_sasl_bind_s(ldap_ptr,
                        cfg->binddn,
                        NULL,
-                       &(struct berval) { strlen(cfg->bindpw), cfg->bindpw },
+                       &(struct berval){ strlen(cfg->bindpw), cfg->bindpw },
                        NULL,
                        NULL,
                        NULL)
@@ -123,7 +122,7 @@ char *wait_for_logging(int socket_fd)
   if (utmp_fd != -1)
   {
     struct utmp log;
-    while (read(utmp_fd, &log, sizeof (struct utmp)) == sizeof (struct utmp))
+    while (read(utmp_fd, &log, sizeof(struct utmp)) == sizeof(struct utmp))
       if (log.ut_type == USER_PROCESS)
       {
         close(utmp_fd);
@@ -154,7 +153,7 @@ char **devids_get(const char *username, const struct ldap_cfg *cfg)
     const size_t values_count = (size_t)ret;
 
     /* convert berval array to string array */
-    devids = malloc(sizeof (char *) * (values_count + 1));
+    devids = malloc(sizeof(char *) * (values_count + 1));
     if (!devids)
       return NULL;
 

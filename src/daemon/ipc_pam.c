@@ -28,7 +28,7 @@ int accept_user(int socket_fd)
   if ((client_fd = accept(socket_fd, NULL, NULL)) == -1)
     return -1;
 
-  if (recv(client_fd, buffer, sizeof (buffer), 0) == -1)
+  if (recv(client_fd, buffer, sizeof(buffer), 0) == -1)
     return -1;
 
   return 0;
@@ -48,16 +48,16 @@ int init_socket(void)
   if (*socket_path == '\0')
   {
     *addr.sun_path = '\0';
-    strncpy(addr.sun_path + 1, socket_path + 1, sizeof (addr.sun_path) - 2);
+    strncpy(addr.sun_path + 1, socket_path + 1, sizeof(addr.sun_path) - 2);
   }
   else
   {
-    strncpy(addr.sun_path, socket_path, sizeof (addr.sun_path) - 1);
+    strncpy(addr.sun_path, socket_path, sizeof(addr.sun_path) - 1);
     unlink(socket_path);
   }
 
   // Unlink the socket if it already exist
-  if (bind(fd, (struct sockaddr *)&addr, sizeof (addr)) == -1)
+  if (bind(fd, (struct sockaddr *)&addr, sizeof(addr)) == -1)
     return die("Initialization error - bind Unix Domain Socket failed");
 
   // Listen to Unix Domain socket

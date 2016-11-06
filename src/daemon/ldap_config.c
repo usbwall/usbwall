@@ -1,7 +1,7 @@
 #include "ldap_config.h"
 
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <syslog.h>
 
@@ -38,7 +38,7 @@ struct ldap_cfg *make_ldap_cfg(const char *cfg_file)
     return NULL;
   }
 
-  struct ldap_cfg *config = calloc(1, sizeof (struct ldap_cfg));
+  struct ldap_cfg *config = calloc(1, sizeof(struct ldap_cfg));
 
   /* parsing configurations from the file */
   char *buffer = NULL;

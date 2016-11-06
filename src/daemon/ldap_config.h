@@ -14,7 +14,7 @@ struct ldap_cfg
   char *basedn;  /**< base domain name to access users on ldap */
   char *binddn;  /**< bind domain name to connect to ldap */
   char *bindpw;  /**< bind password to connect to ldap */
-  short version;   /**< ldap version (2 and 3 are supported) */
+  short version; /**< ldap version (2 and 3 are supported) */
 };
 
 /**

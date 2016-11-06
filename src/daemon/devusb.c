@@ -1,11 +1,10 @@
 #include "devusb.h"
 
-#include <stdlib.h>
+#include <libusb-1.0/libusb.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <syslog.h>
-
-#include <libusb-1.0/libusb.h>
 
 #define SERIAL_MAX_SIZE 64
 
@@ -16,9 +15,7 @@ static char *device_serial_get(struct libusb_device *device,
   int ret = libusb_open(device, &udev);
   if (ret != LIBUSB_SUCCESS)
   {
-    syslog(LOG_WARNING,
-           "Failed to open device : %s",
-           libusb_strerror(ret));
+    syslog(LOG_WARNING, "Failed to open device : %s", libusb_strerror(ret));
     return NULL;
   }
 
@@ -55,7 +52,7 @@ static char *device_serial_get(struct libusb_device *device,
 
 static struct devusb *device_to_devusb(struct libusb_device *device)
 {
-  struct devusb *result = calloc(1, sizeof (struct devusb));
+  struct devusb *result = calloc(1, sizeof(struct devusb));
   if (!result)
     return NULL;
 
@@ -96,7 +93,7 @@ int init_devusb(void)
 
 struct devusb **devices_get(void)
 {
-  struct devusb **devusb_list = calloc(16, sizeof (struct devusb *));
+  struct devusb **devusb_list = calloc(16, sizeof(struct devusb *));
   if (!devusb_list)
     return NULL;
   /**

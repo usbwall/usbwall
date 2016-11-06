@@ -15,7 +15,6 @@ struct devusb
   int port;     /**< port number on which the device is attached */
 };
 
-
 /**
  * \brief initialize devusb. Must be called before every other functions.
  * \return return non 0 value in case of error
