@@ -126,6 +126,7 @@ char *wait_for_logging(int socket_fd)
       if (log.ut_type == USER_PROCESS)
       {
         close(utmp_fd);
+
         return strdup(log.ut_name);
       }
     close(utmp_fd);

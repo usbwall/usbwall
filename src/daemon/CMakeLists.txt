@@ -2,6 +2,7 @@ find_package(USB1    REQUIRED)
 find_package(LDAP    REQUIRED)
 find_package(Threads REQUIRED)
 set(DAEMON_SRC
+  core.c
   devusb.c
   devuser.c
   ipc_pam.c

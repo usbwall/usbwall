@@ -20,8 +20,9 @@ struct devusb
  * \return return non 0 value in case of error
  *
  * The function will initialize devusb, that is try to load libusb and
- * configure it. The return value should be verified before calling
- * any other function from devusb.
+ * configure it. It will also start a second thread to listen for device
+ * hotplug. The return value should be verified before calling any other
+ * function from devusb.
  */
 int init_devusb(void);
 
