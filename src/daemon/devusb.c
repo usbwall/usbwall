@@ -1,10 +1,12 @@
 #include "devusb.h"
 
 #include <libusb-1.0/libusb.h>
+#include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <syslog.h>
+#include <unistd.h>
 
 #define SERIAL_MAX_SIZE 64
 
@@ -16,6 +18,7 @@ static char *device_serial_get(struct libusb_device *device,
   if (ret != LIBUSB_SUCCESS)
   {
     syslog(LOG_WARNING, "Failed to open device : %s", libusb_strerror(ret));
+
     return NULL;
   }
 
@@ -70,6 +73,43 @@ static struct devusb *device_to_devusb(struct libusb_device *device)
   return result;
 }
 
+static libusb_hotplug_callback_handle handle;
+static int hotplug_callback(struct libusb_context *ctx __attribute__((unused)),
+                            struct libusb_device *dev,
+                            libusb_hotplug_event event __attribute__((unused)),
+                            void *user_data __attribute__((unused)))
+{
+  struct devusb *device = device_to_devusb(dev);
+  if (!device)
+  {
+    syslog(LOG_WARNING, "corrupted hotplug devusb");
+
+    return 1;
+  }
+
+  /**
+   * \todo
+   * TODO: test if the device is authorized.
+   * Then, modify the sysfs to authorize it in the case where it is.
+   */
+
+  printf("Device plugged : %s", device->serial);
+
+  return 0;
+}
+
+static void *wait_for_hotplug(void *arg __attribute__((unused)))
+{
+  struct timeval tv = { 0, 0 };
+  while (1)
+  {
+    libusb_handle_events_timeout_completed(NULL, &tv, NULL);
+    sleep(3);
+  }
+
+  return NULL;
+}
+
 int init_devusb(void)
 {
   if (libusb_init(NULL) != LIBUSB_SUCCESS)
@@ -87,6 +127,26 @@ int init_devusb(void)
   }
 
   libusb_set_debug(NULL, LIBUSB_LOG_LEVEL_WARNING);
+
+  int rcode =
+    libusb_hotplug_register_callback(NULL,
+                                     LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED,
+                                     0,
+                                     LIBUSB_HOTPLUG_MATCH_ANY,
+                                     LIBUSB_HOTPLUG_MATCH_ANY,
+                                     LIBUSB_HOTPLUG_MATCH_ANY,
+                                     hotplug_callback,
+                                     NULL,
+                                     &handle);
+
+  if (rcode != LIBUSB_SUCCESS)
+  {
+    libusb_exit(NULL);
+    return 1;
+  }
+
+  pthread_t hotplug_thread;
+  pthread_create(&hotplug_thread, NULL, wait_for_hotplug, NULL);
 
   return 0;
 }
@@ -162,5 +222,6 @@ int update_devices(struct devusb **devices)
 
 void close_devusb(void)
 {
+  libusb_hotplug_deregister_callback(NULL, handle);
   libusb_exit(NULL);
 }

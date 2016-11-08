@@ -36,7 +36,8 @@ void close_devusb(void);
 
 /**
  * \brief Scan for plugged usb devices and return informations on devices
- * \return list of devusb struct for each plugged usb device
+ * \return list of devusb struct for each plugged usb device. The array is
+ *  null terminated.
  */
 struct devusb **devices_get(void);
 

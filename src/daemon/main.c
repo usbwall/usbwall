@@ -7,6 +7,9 @@
 #include "ipc_pam.h"
 #include "ldap_config.h"
 
+#include <libusb-1.0/libusb.h>
+#include <unistd.h>
+
 int main(void)
 {
   openlog("usbwall", LOG_CONS | LOG_PID, LOG_USER);
