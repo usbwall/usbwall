@@ -21,7 +21,7 @@ struct ldap_cfg
  * \brief find the path of the file containing the ldap configuration
  * \return path to the configuration file
  */
-char *cfg_file_find(void);
+const char *cfg_file_find(void);
 
 /**
  * \brief parse, and extract information from the configuration file

@@ -24,11 +24,6 @@ if (HAS_WEXTRA_CFLAG)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wextra")
 endif()
 
-# check_c_compiler_flag(-Werror HAS_WERROR_CFLAG)
-# if (HAS_WERROR_CFLAG)
-#     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Werror")
-# endif()
-
 check_c_compiler_flag(-pedantic HAS_PEDANTIC_CFLAG)
 if (HAS_PEDANTIC_CFLAG)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pedantic")
@@ -40,18 +35,6 @@ if (HAS_UNUSED_MACROS_CFLAG)
 endif()
 
 ### Disabled compile flags because of code incompatibility (yet)
-
-# Used for GCC "m" modifier
-check_c_compiler_flag(-Wformat=0 HAS_FORMAT_0_CFLAG)
-if (HAS_FORMAT_0_CFLAG)
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wformat=0")
-endif()
-
-# Used for Clang "m" modifier
-check_c_compiler_flag(-Wno-format-non-iso HAS_FORMAT_NON_ISO_CFLAG)
-if (HAS_FORMAT_NON_ISO_CFLAG)
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-format-non-iso")
-endif()
 
 # Used for skip strutures alignement requirement
 check_c_compiler_flag(-Wno-padded HAS_PADDED_CFLAG)
@@ -75,6 +58,11 @@ endif()
 check_c_compiler_flag(-fsanitize=undefined HAS_SAN_UNDEF_CFLAG)
 if (HAS_SAN_UNDEF_CFLAG)
     set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -fsanitize=undefined")
+endif()
+
+check_c_compiler_flag(-Werror HAS_WERROR_CFLAG)
+if (HAS_WERROR_CFLAG)
+  set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS} -Werror")
 endif()
 
 ### Define mandatory DEBUG CFLAGS

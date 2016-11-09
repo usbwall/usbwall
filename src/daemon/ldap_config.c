@@ -5,6 +5,8 @@
 #include <string.h>
 #include <syslog.h>
 
+#define MAX_LINE_LEN 256
+
 static void skip_comments(char *line)
 {
   /**
@@ -18,7 +20,30 @@ static void skip_comments(char *line)
     *comment_start = '\0';
 }
 
-char *cfg_file_find(void)
+static int scanstr(const char *line, const char *format, char **destination)
+{
+  char buffer[MAX_LINE_LEN] = { '\0' };
+
+  int parse_success = sscanf(line, format, buffer);
+  if (parse_success != 1)
+    return 0;
+
+  /* We need to check if the value was duplicated. If it is, then we free it
+   * and rewrite it = the last given value prevale! */
+  if (*destination)
+    free(*destination);
+
+  const size_t len = strlen(buffer);
+  *destination = malloc(len + 1);
+  if (!*destination)
+    return 0;
+
+  memcpy(*destination, buffer, len + 1);
+
+  return 1;
+}
+
+const char *cfg_file_find(void)
 {
   /**
    * \todo
@@ -48,10 +73,10 @@ struct ldap_cfg *make_ldap_cfg(const char *cfg_file)
     skip_comments(buffer);
 
     /* store attributes to config */
-    if (!sscanf(buffer, " uri %ms ", &config->uri)
-        && !sscanf(buffer, " basedn %ms ", &config->basedn)
-        && !sscanf(buffer, " binddn %ms ", &config->binddn)
-        && !sscanf(buffer, " bindpw %ms ", &config->bindpw)
+    if (!scanstr(buffer, " uri %s ", &config->uri)
+        && !scanstr(buffer, " basedn %s ", &config->basedn)
+        && !scanstr(buffer, " binddn %s ", &config->binddn)
+        && !scanstr(buffer, " bindpw %s ", &config->bindpw)
         && !sscanf(buffer, " version %hd ", &config->version))
       syslog(LOG_WARNING,
              "config syntax error, this line is invalid: %s",
