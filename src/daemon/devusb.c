@@ -1,6 +1,11 @@
 #include "devusb.h"
 
+#ifdef _FREEBSD
+#include <libusb.h>
+#else
 #include <libusb-1.0/libusb.h>
+#endif
+
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>

@@ -9,7 +9,7 @@ find_path(USB1_INCLUDE_DIR
   PATH_SUFFIXES include libusb-1.0)
 
 find_library(USB1_LIBRARIES
-  NAMES usb-1.0
+  NAMES usb-1.0 usb
   PATH_SUFFIXES lib)
 
 include(FindPackageHandleStandardArgs)

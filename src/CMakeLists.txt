@@ -46,6 +46,11 @@ endif()
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D_XOPEN_SOURCE=800")
 
+if (${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD")
+    # FreeBSD specific code
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D_FREEBSD")
+endif()
+
 ###########################
 ### Check for DEBUG mode CFLAGS compiler support
 ###########################
