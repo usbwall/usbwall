@@ -1,10 +1,91 @@
+#include <stdio.h>
+#include <string.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 #include <syslog.h>
+#include <unistd.h>
 
 #include "core.h"
 
-int main(void)
+/**
+ * \brief daemonize the process
+ *
+ * \return 1 if the process must stop, 0 else way
+ */
+static int daemonize(void)
 {
+  pid_t pid = fork();
+
+  if (pid < 0)
+    return 1; // fork error
+  if (pid > 0)
+    return 1; // terminate parent;
+  if (setsid() < 0)
+    return 1; // create a new session
+
+  /**
+   * \todo
+   * TODO: Implement signal handlers
+   */
+
+  pid = fork();
+  if (pid < 0)
+    return 1; // fork error
+  if (pid > 0)
+    return 1; // terminate session leader process
+
+  umask(0); // new file permissions
+  chdir("/"); // change working directory
+  for (int fd = sysconf(_SC_OPEN_MAX); fd > 0; --fd)
+    close(fd); // close all file descriptors
+
+  openlog("usbwall", LOG_PID, LOG_DAEMON);
+
+  return 0;
+}
+
+/**
+ * \brief parse arguments and execute the associated action. The function will
+ * also appropriatly open the syslog
+ *
+ * \param argc  number of arguments
+ * \param argv[] program arguments
+ *
+ * \return 1 if the process must exit, 0 if it must continue
+ */
+static int parse_args(int argc, char *argv[])
+{
+  const char *help_msg =
+    "usage :"
+    "\n\t-h [--help] : print the usage help message"
+    "\n\t-d [--daemonize]: start the program as a daemon\n";
+
+  for (int idx = 1; idx < argc; ++idx)
+  {
+    if (!strcmp(argv[idx], "-d") || !strcmp(argv[idx], "--daemonize"))
+      return daemonize();
+
+    if (!strcmp(argv[idx], "-h") || !strcmp(argv[idx], "--help"))
+    {
+      printf(help_msg);
+      return 1;
+    }
+
+    fprintf(stderr, "Unknown argument %s\n", argv[idx]);
+    fprintf(stderr, help_msg);
+
+    return 1;
+  }
+
   openlog("usbwall", LOG_CONS | LOG_PID, LOG_USER);
+
+  return 0;
+}
+
+int main(int argc, char *argv[])
+{
+  if (parse_args(argc, argv))
+    return 0;
 
   int rcode = usbwall_run();
 
