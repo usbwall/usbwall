@@ -24,7 +24,7 @@ static const char *socket_path = "\0usbwall";
  */
 static int die(const char *err_msg)
 {
-  syslog(LOG_ERR, err_msg);
+  syslog(LOG_ERR, "%s\n", err_msg);
 
   return -1;
 }

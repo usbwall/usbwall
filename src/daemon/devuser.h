@@ -9,7 +9,7 @@
 
 /**
  * \brief Wait for a user to login and return his name.
- * \param Unix Domain Socket used to receive notifications
+ * \param socket_fd Unix Domain Socket used to receive notifications
  * \return current user name. Return NULL on error.
  *
  * The function wait for an event from the pam module,

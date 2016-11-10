@@ -36,8 +36,11 @@ static int daemonize(void)
 
   umask(0); // new file permissions
   chdir("/"); // change working directory
-  for (int fd = sysconf(_SC_OPEN_MAX); fd > 0; --fd)
-    close(fd); // close all file descriptors
+
+  /**
+   * \todo
+   * TODO: Close all file descriptors
+   */
 
   openlog("usbwall", LOG_PID, LOG_DAEMON);
 
@@ -49,7 +52,7 @@ static int daemonize(void)
  * also appropriatly open the syslog
  *
  * \param argc  number of arguments
- * \param argv[] program arguments
+ * \param argv  program arguments
  *
  * \return 1 if the process must exit, 0 if it must continue
  */
@@ -58,21 +61,21 @@ static int parse_args(int argc, char *argv[])
   const char *help_msg =
     "usage :"
     "\n\t-h [--help] : print the usage help message"
-    "\n\t-d [--daemonize]: start the program as a daemon\n";
+    "\n\t-d [--daemonize]: start the program as a daemon";
 
-  for (int idx = 1; idx < argc; ++idx)
+  if (argc < 2)
   {
-    if (!strcmp(argv[idx], "-d") || !strcmp(argv[idx], "--daemonize"))
+    if (!strcmp(argv[1], "-d") || !strcmp(argv[1], "--daemonize"))
       return daemonize();
 
-    if (!strcmp(argv[idx], "-h") || !strcmp(argv[idx], "--help"))
+    if (!strcmp(argv[1], "-h") || !strcmp(argv[1], "--help"))
     {
-      printf(help_msg);
+      puts(help_msg);
       return 1;
     }
 
-    fprintf(stderr, "Unknown argument %s\n", argv[idx]);
-    fprintf(stderr, help_msg);
+    fprintf(stderr, "Unknown argument %s\n", argv[1]);
+    fputs(help_msg, stderr);
 
     return 1;
   }

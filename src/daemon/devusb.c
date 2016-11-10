@@ -51,10 +51,10 @@ static char *device_serial_get(struct libusb_device *device,
                                struct libusb_device_descriptor *usb_infos)
 {
   libusb_device_handle *udev = NULL;
-  int ret = libusb_open(device, &udev);
-  if (ret != LIBUSB_SUCCESS)
+  int rcode = libusb_open(device, &udev);
+  if (rcode != LIBUSB_SUCCESS)
   {
-    syslog(LOG_WARNING, "Failed to open device : %s", libusb_strerror(ret));
+    syslog(LOG_WARNING, "Failed to open device : %s", libusb_strerror(rcode));
 
     return NULL;
   }
@@ -207,7 +207,7 @@ int init_devusb(void)
   int rcode =
     libusb_hotplug_register_callback(NULL,
                                      LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED,
-                                     0,
+                                     LIBUSB_HOTPLUG_NO_FLAGS,
                                      LIBUSB_HOTPLUG_MATCH_ANY,
                                      LIBUSB_HOTPLUG_MATCH_ANY,
                                      LIBUSB_HOTPLUG_MATCH_ANY,

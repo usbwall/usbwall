@@ -13,7 +13,7 @@ int init_socket(void);
 
 /**
  * \brief Block until PAM notify the daemon.
- * \param Unix Domain Socket used to receive notifications
+ * \param socket_fd Unix Domain Socket used to receive notifications
  * \return 0 when a user just connected. Return -1 on error.
  *
  * The function wait for an event from the pam module.
