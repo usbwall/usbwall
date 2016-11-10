@@ -12,6 +12,29 @@
  * \brief maximum possible size of a device serial id.
  */
 #define SERIAL_MAX_SIZE 64
+/**
+ * \brief interval time in second where usb plugging event are checked
+ */
+#define HOTPLUG_CHECK_INTV 3
+
+
+/* Globals */
+/**
+ * \brief devusb internal global used to register/deregister the hotplug
+ * callback.
+ */
+static libusb_hotplug_callback_handle g_callback_handler;
+/**
+ * \brief devusb internal global to define if the wait_for_hotplug thread
+ * need to continue its checks or exit (1 to continue, 0 for exit).
+ */
+static int g_wait_for_hotplugs;
+/**
+ * \brief devusb internal global used to reference the wait_for_hotplug thread.
+ * It is started in the module init and exited in the module exit.
+ */
+static pthread_t g_hotplug_thread;
+/* ****** */
 
 /**
  * \brief devusb internal function that will extract the serial from a device.
@@ -132,40 +155,36 @@ static int hotplug_callback(struct libusb_context *ctx __attribute__((unused)),
    * Then, modify the sysfs to authorize it in the case where it is.
    */
 
-  printf("Device plugged : %s", device->serial);
+  printf("Device plugged : %s\n", device->serial);
 
   return 0;
 }
 
 /**
- * \brief devusb internal function that will check every 3 seconds if an usb has
- * been plugged.
+ * \brief devusb internal function that will check every HOTPLUG_CHECK_INTV
+ * seconds if an usb has been plugged.
  *
  * \param arg  unused
  *
  * \return NULL
  *
  * The function must be launched in a separated thread, where it will check
- * every 3 seconds for an usb event. If an event come up, it will make libusb
- * call the hotplug callback.
+ * every HOTPLUG_CHECK_INTV seconds for an usb event. If an event come up, it
+ * will make libusb call the hotplug callback.
  */
+__attribute__((noreturn))
 static void *wait_for_hotplug(void *arg __attribute__((unused)))
 {
   struct timeval tv = { 0, 0 };
-  while (1)
+  while (g_wait_for_hotplugs)
   {
     libusb_handle_events_timeout_completed(NULL, &tv, NULL);
-    sleep(3);
+    sleep(HOTPLUG_CHECK_INTV);
   }
 
-  return NULL;
+  pthread_exit(NULL);
 }
 
-/**
- * \brief devusb internal global used to register/deregister the hotplug
- * callback
- */
-static libusb_hotplug_callback_handle handle;
 int init_devusb(void)
 {
   if (libusb_init(NULL) != LIBUSB_SUCCESS)
@@ -184,6 +203,7 @@ int init_devusb(void)
 
   libusb_set_debug(NULL, LIBUSB_LOG_LEVEL_WARNING);
 
+  g_wait_for_hotplugs = 1;
   int rcode =
     libusb_hotplug_register_callback(NULL,
                                      LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED,
@@ -193,7 +213,7 @@ int init_devusb(void)
                                      LIBUSB_HOTPLUG_MATCH_ANY,
                                      hotplug_callback,
                                      NULL,
-                                     &handle);
+                                     &g_callback_handler);
 
   if (rcode != LIBUSB_SUCCESS)
   {
@@ -201,8 +221,8 @@ int init_devusb(void)
     return 1;
   }
 
-  pthread_t hotplug_thread;
-  pthread_create(&hotplug_thread, NULL, wait_for_hotplug, NULL);
+  /* start the wait_for_hotplug thread */
+  pthread_create(&g_hotplug_thread, NULL, wait_for_hotplug, NULL);
 
   return 0;
 }
@@ -278,6 +298,8 @@ int update_devices(struct devusb **devices)
 
 void close_devusb(void)
 {
-  libusb_hotplug_deregister_callback(NULL, handle);
+  g_wait_for_hotplugs = 0;
+  pthread_join(g_hotplug_thread, NULL);
+  libusb_hotplug_deregister_callback(NULL, g_callback_handler);
   libusb_exit(NULL);
 }
