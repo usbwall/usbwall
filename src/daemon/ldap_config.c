@@ -5,8 +5,17 @@
 #include <string.h>
 #include <syslog.h>
 
+/**
+ * \brief maximum size of a configuration line, in characters
+ */
 #define MAX_LINE_LEN 256
 
+/**
+ * \brief Internal ldap_config function that take a string and delete comments
+ * from it
+ *
+ * \param line  line to be modified
+ */
 static void skip_comments(char *line)
 {
   /**
@@ -20,6 +29,22 @@ static void skip_comments(char *line)
     *comment_start = '\0';
 }
 
+/**
+ * \brief Internal ldap_config function to parse a line for a string and
+ * allocated the destination to the good
+ * size and copy the string in the destination.
+ *
+ * \param line  The line to be parsed
+ * \param format  the format string used to detect the substring to copy
+ * \param destination  the pointer to malloc and to fill with the substring copy
+ *
+ * \return non zero value in case of error of unsuccesful parsing.
+ *
+ * The function is used to replace the use of sscanf with the m flag, that
+ * produced warnings. The function will just call sscanf with the given format
+ * string, allocated the destination with the good size and put the parsed
+ * substring in destination, if one is found.
+ */
 static int scanstr(const char *line, const char *format, char **destination)
 {
   char buffer[MAX_LINE_LEN] = { '\0' };

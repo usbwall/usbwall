@@ -4,7 +4,6 @@
  */
 #pragma once
 
-
 /**
  * \brief init usbwall modules and wait for users to login
  * \return return non 0 value in case of error

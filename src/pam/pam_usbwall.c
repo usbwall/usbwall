@@ -11,20 +11,49 @@
 
 static const char *socket_path = "\0usbwall";
 
+/**
+ * \brief pam usbwall module internal function to check if the debug mode has
+ * been
+ * enabled
+ *
+ * \param argc  unused
+ * \param argv  unused
+ *
+ * \return non zero value if the debug mode is activated
+ */
 static int fetch_debug(int argc __attribute__((unused)),
                        const char **argv __attribute__((unused)))
 {
-  // TODO
+  /**
+   * \todo
+   * TODO: The function will allways return 1
+   **/
 
   return 1;
 }
 
+/**
+ * \brief pam usbwall module internal function used to send an event to the
+ * daemon.
+ *
+ * \param fd  The filedescriptor of the socket used for IPC
+ */
 static void notify_daemon(int fd)
 {
   char buffer[] = "";
   send(fd, buffer, sizeof(buffer), 0);
 }
 
+/**
+ * \brief function called when an user connect
+ *
+ * \param pamh  unused
+ * \param flags  unused
+ * \param argc  number of arguments
+ * \param argv  arguments array
+ *
+ * \return PAM_SUCCESS if no error occured.
+ */
 PAM_EXTERN int pam_sm_open_session(pam_handle_t *pamh __attribute__((unused)),
                                    int flags __attribute__((unused)),
                                    int argc,
@@ -62,10 +91,25 @@ PAM_EXTERN int pam_sm_open_session(pam_handle_t *pamh __attribute__((unused)),
   return PAM_SUCCESS;
 }
 
+/**
+ * \brief function called when an user disconnect
+ *
+ * \param pamh  unused
+ * \param flags  unused
+ * \param argc  unused
+ * \param argv  unused
+ *
+ * \return PAM_SUCCESS if no error occured.
+ */
 PAM_EXTERN int pam_sm_close_session(pam_handle_t *pamh __attribute__((unused)),
                                     int flags __attribute__((unused)),
                                     int argc __attribute__((unused)),
                                     const char **argv __attribute__((unused)))
 {
+  /**
+   * \todo
+   * TODO: Send to the daemon a disconnection event.
+   **/
+
   return PAM_SUCCESS;
 }

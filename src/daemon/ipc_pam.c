@@ -9,13 +9,22 @@
 #include <syslog.h>
 #include <unistd.h>
 
-/* Unique Domain Socket name, must be the same one in PAM
- * and daemon */
-const char *socket_path = "\0usbwall";
+/**
+ * \brief ipc_pam internal constant global used as the Unique Domain Socket
+ * name. It must be the same one in PAM and daemon
+ */
+static const char *socket_path = "\0usbwall";
 
-static int die(const char *s)
+/**
+ * \brief Simple ipc_pam internal function to log an error and return -1
+ *
+ * \param err_msg  error message to be displayed in the syslog
+ *
+ * \return allways -1
+ */
+static int die(const char *err_msg)
 {
-  syslog(LOG_ERR, s);
+  syslog(LOG_ERR, err_msg);
 
   return -1;
 }

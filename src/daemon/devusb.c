@@ -8,8 +8,22 @@
 #include <syslog.h>
 #include <unistd.h>
 
+/**
+ * \brief maximum possible size of a device serial id.
+ */
 #define SERIAL_MAX_SIZE 64
 
+/**
+ * \brief devusb internal function that will extract the serial from a device.
+ *
+ * \param device  the libusb object associated with the device
+ * \param usb_infos  the libusb descriptor object associated with the device
+ *
+ * \return the device serial id. NULL if an error occured.
+ *
+ * The function will access to the device string descriptor and extract the
+ * serial.
+ */
 static char *device_serial_get(struct libusb_device *device,
                                struct libusb_device_descriptor *usb_infos)
 {
@@ -53,6 +67,17 @@ static char *device_serial_get(struct libusb_device *device,
   return serial;
 }
 
+/**
+ * \brief devusb internal function that convert a libusb device object to a
+ * devusb structure
+ *
+ * \param device  the structure to convert
+ *
+ * \return the converted devusb structure. NULL if an error occured
+ *
+ * The device will extract all the information from the device
+ * and store it in a devusb structure.
+ */
 static struct devusb *device_to_devusb(struct libusb_device *device)
 {
   struct devusb *result = calloc(1, sizeof(struct devusb));
@@ -73,7 +98,21 @@ static struct devusb *device_to_devusb(struct libusb_device *device)
   return result;
 }
 
-static libusb_hotplug_callback_handle handle;
+/**
+ * \brief devusb internal function that check if the device is accessible by the
+ * current user and
+ *
+ * \param ctx  unused
+ * \param dev  the libusb device object associated with the plugged device
+ * \param event  unused
+ * \param user_data  unused
+ *
+ * \return non zero value if an error occured
+ *
+ * The callback is called by libusb when a usb device is plugged (see libusb
+ * documentation for more informations). It will update the device
+ * accessibility.
+ */
 static int hotplug_callback(struct libusb_context *ctx __attribute__((unused)),
                             struct libusb_device *dev,
                             libusb_hotplug_event event __attribute__((unused)),
@@ -98,6 +137,18 @@ static int hotplug_callback(struct libusb_context *ctx __attribute__((unused)),
   return 0;
 }
 
+/**
+ * \brief devusb internal function that will check every 3 seconds if an usb has
+ * been plugged.
+ *
+ * \param arg  unused
+ *
+ * \return NULL
+ *
+ * The function must be launched in a separated thread, where it will check
+ * every 3 seconds for an usb event. If an event come up, it will make libusb
+ * call the hotplug callback.
+ */
 static void *wait_for_hotplug(void *arg __attribute__((unused)))
 {
   struct timeval tv = { 0, 0 };
@@ -110,6 +161,11 @@ static void *wait_for_hotplug(void *arg __attribute__((unused)))
   return NULL;
 }
 
+/**
+ * \brief devusb internal global used to register/deregister the hotplug
+ * callback
+ */
+static libusb_hotplug_callback_handle handle;
 int init_devusb(void)
 {
   if (libusb_init(NULL) != LIBUSB_SUCCESS)

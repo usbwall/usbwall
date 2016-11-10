@@ -8,6 +8,15 @@
 #include "ipc_pam.h"
 #include "ldap_config.h"
 
+/**
+ * \brief core internal function to handle a user connection
+ * \param cfg the configuration structure, needed to use devuser functions
+ * \param username the login of the connected user
+ *
+ * The function will get plugged device list from devusb, it will get the list
+ * of authorized devices from devuser, and update the access of devices in the
+ * sysfs.
+ */
 static void handle_login(struct ldap_cfg *cfg, const char *username)
 {
   struct devusb **device_list = devices_get();

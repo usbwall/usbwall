@@ -12,8 +12,20 @@
 
 #include "ipc_pam.h"
 
+/**
+ * \brief maximum possible size of a user login
+ */
 #define LOGIN_MAX_LEN 32
 
+/**
+ * \brief internal devuser function that start and configure a connection with
+ * the ldap server
+ *
+ * \param cfg the configuration structure containing needed information to setup
+ * the connection with the ldap
+ *
+ * \return the LDAP connection handler pointer. NULL if an error occured
+ */
 static LDAP *setup_ldap(const struct ldap_cfg *cfg)
 {
   LDAP *ldap_ptr = NULL;
@@ -54,6 +66,20 @@ static LDAP *setup_ldap(const struct ldap_cfg *cfg)
   return ldap_ptr;
 }
 
+/**
+ * \brief internal devuser function that ask the LDAP all the allowed device ids
+ * for the given user.
+ *
+ * \param ldap_ptr  Ldap connection handler pointer
+ * \param username  The uid that will be searched in the LDAP
+ * \param cfg  the ldap configuration structure
+ *
+ * \return NULL terminated array of ber values containing the allowed devices
+ * for the given user. NULL if an error occured
+ *
+ * The function will request the devids from the LDAP for the given uid
+ * (username). The returned values are bervals to be coherant with the LDAP API.
+ */
 static struct berval **extract_devids(LDAP *ldap_ptr,
                                       const char *username,
                                       const struct ldap_cfg *cfg)
