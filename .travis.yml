@@ -5,9 +5,13 @@ compiler:
 os: linux
 dist: trusty
 sudo: required
-before_install:
-  - sudo apt-get install -y libpam0g libpam0g-dev
-  - sudo apt-get install -y libusb-1.0.0 libusb-1.0.0-dev
-  - sudo apt-get install -y libldap-2.4-2
 script:
-  - ./bootstrap DEBUG && make -j
+  - ./bootstrap && make -j
+addons:
+  apt:
+    packages:
+      - libpam0g
+      - libpam0g-dev
+      - libusb-1.0.0
+      - libusb-1.0.0-dev
+      - libldap-2.4-2

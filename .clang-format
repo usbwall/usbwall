@@ -52,7 +52,7 @@ IncludeCategories:
     Priority:        2
   - Regex:           '.*'
     Priority:        3
-IncludeIsMainRegex: '([-_](test|unittest))?$'
+IncludeIsMainRegex: '$'
 IndentCaseLabels: true
 IndentWidth:     2
 IndentWrappedFunctionNames: false

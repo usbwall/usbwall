@@ -17,7 +17,6 @@
  */
 #define HOTPLUG_CHECK_INTV 3
 
-
 /* Globals */
 /**
  * \brief devusb internal global used to register/deregister the hotplug
@@ -172,8 +171,8 @@ static int hotplug_callback(struct libusb_context *ctx __attribute__((unused)),
  * every HOTPLUG_CHECK_INTV seconds for an usb event. If an event come up, it
  * will make libusb call the hotplug callback.
  */
-__attribute__((noreturn))
-static void *wait_for_hotplug(void *arg __attribute__((unused)))
+__attribute__((noreturn)) static void *wait_for_hotplug(void *arg
+                                                        __attribute__((unused)))
 {
   struct timeval tv = { 0, 0 };
   while (g_wait_for_hotplugs)
@@ -207,7 +206,13 @@ int init_devusb(void)
   int rcode =
     libusb_hotplug_register_callback(NULL,
                                      LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED,
-                                     LIBUSB_HOTPLUG_NO_FLAGS,
+                                     /**
+                                      * \todo
+                                      * FIXME: LIBUSB_HOTPLUG_NO_FLAGS should be
+                                      * used instead of 0, but the enum value is
+                                      * not recognized on the all OS
+                                      **/
+                                     0,
                                      LIBUSB_HOTPLUG_MATCH_ANY,
                                      LIBUSB_HOTPLUG_MATCH_ANY,
                                      LIBUSB_HOTPLUG_MATCH_ANY,

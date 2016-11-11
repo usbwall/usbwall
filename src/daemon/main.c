@@ -35,7 +35,8 @@ static int daemonize(void)
     return 1; // terminate session leader process
 
   umask(0); // new file permissions
-  chdir("/"); // change working directory
+  if (chdir("/") < 0) // change working directory
+    return 1;
 
   /**
    * \todo
