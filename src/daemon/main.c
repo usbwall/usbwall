@@ -64,7 +64,7 @@ static int parse_args(int argc, char *argv[])
     "\n\t-h [--help] : print the usage help message"
     "\n\t-d [--daemonize]: start the program as a daemon";
 
-  if (argc < 2)
+  if (argc > 2)
   {
     if (!strcmp(argv[1], "-d") || !strcmp(argv[1], "--daemonize"))
       return daemonize();
