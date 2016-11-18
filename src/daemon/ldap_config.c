@@ -116,6 +116,9 @@ struct ldap_cfg *make_ldap_cfg(const char *cfg_file)
 
 void destroy_ldap_cfg(struct ldap_cfg *cfg)
 {
+  if (!cfg)
+    return;
+
   free(cfg->uri);
   free(cfg->basedn);
   free(cfg->binddn);

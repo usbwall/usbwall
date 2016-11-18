@@ -1,9 +1,12 @@
 #include <stdio.h>
 #include <string.h>
+#include <sys/resource.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <syslog.h>
 #include <unistd.h>
+
+#include <stdio.h>
 
 #include "core.h"
 
@@ -23,11 +26,6 @@ static int daemonize(void)
   if (setsid() < 0)
     return 1; // create a new session
 
-  /**
-   * \todo
-   * TODO: Implement signal handlers
-   */
-
   pid = fork();
   if (pid < 0)
     return 1; // fork error
@@ -38,10 +36,9 @@ static int daemonize(void)
   if (chdir("/") < 0) // change working directory
     return 1;
 
-  /**
-   * \todo
-   * TODO: Close all file descriptors
-   */
+  close(STDOUT_FILENO);
+  close(STDIN_FILENO);
+  close(STDERR_FILENO);
 
   openlog("usbwall", LOG_PID, LOG_DAEMON);
 
@@ -64,7 +61,7 @@ static int parse_args(int argc, char *argv[])
     "\n\t-h [--help] : print the usage help message"
     "\n\t-d [--daemonize]: start the program as a daemon";
 
-  if (argc > 2)
+  if (argc >= 2)
   {
     if (!strcmp(argv[1], "-d") || !strcmp(argv[1], "--daemonize"))
       return daemonize();
@@ -90,6 +87,12 @@ int main(int argc, char *argv[])
 {
   if (parse_args(argc, argv))
     return 0;
+
+  if (signal_handling())
+  {
+    syslog(LOG_ERR, "Signal handling init failed.");
+    return 1; // a valid signal handling is mandatory
+  }
 
   int rcode = usbwall_run();
 
