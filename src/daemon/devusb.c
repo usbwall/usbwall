@@ -6,10 +6,12 @@
 #include <libusb-1.0/libusb.h>
 #endif
 
+#include <fcntl.h>
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
 #include <syslog.h>
 #include <unistd.h>
 
@@ -39,6 +41,55 @@ static int g_wait_for_hotplugs;
  */
 static pthread_t g_hotplug_thread;
 /* ****** */
+
+/**
+ * \brief devusb internal function that will write 0/1 in the given file.
+ *
+ * \param value  The boolean value to be written to the file
+ * \param file_path  The path to the file we must write to
+ *
+ * \return non zero value if an error occured
+ */
+static int write_bool(int value, const char *file_path)
+{
+  int fd = open(file_path, O_WRONLY | O_TRUNC);
+  if (fd < 0)
+    return 1;
+
+  const char *boolean_value = value ? "1" : "0";
+  if (write(fd, boolean_value, 1) < 0)
+    return 1;
+
+  close(fd);
+
+  return 0;
+}
+
+/**
+ * \brief devusb internal function that will authorize a given device to be
+ * accessible.
+ *
+ * \param device  the devusb structure with all informations on the device to be
+ * authorized
+ *
+ * \return non zero value if an error occured
+ */
+static int authorize_device(struct devusb *device)
+{
+  char file_path[64] = { '\0' };
+
+  sprintf(file_path,
+          "/sys/bus/usb/devices/%hd-%hd/authorized",
+          device->bus,
+          device->port);
+  syslog(LOG_INFO,
+         "Authorizing device %s on %d-%d",
+         device->serial,
+         device->bus,
+         device->port);
+
+  return write_bool(1, file_path);
+}
 
 /**
  * \brief devusb internal function that will extract the serial from a device.
@@ -152,14 +203,18 @@ static int hotplug_callback(struct libusb_context *ctx __attribute__((unused)),
 
     return 1;
   }
+  printf("Device plugged : %s\n", device->serial);
 
   /**
    * \todo
    * TODO: test if the device is authorized.
-   * Then, modify the sysfs to authorize it in the case where it is.
    */
+  if (authorize_device(device))
+  {
+    syslog(LOG_WARNING, "Device access update error");
 
-  printf("Device plugged : %s\n", device->serial);
+    return 1;
+  }
 
   return 0;
 }
@@ -176,8 +231,8 @@ static int hotplug_callback(struct libusb_context *ctx __attribute__((unused)),
  * every HOTPLUG_CHECK_INTV seconds for an usb event. If an event come up, it
  * will make libusb call the hotplug callback.
  */
-__attribute__((noreturn)) static void *wait_for_hotplug(void *arg
-                                                        __attribute__((unused)))
+__attribute__((noreturn))
+static void *wait_for_hotplug(void *arg __attribute__((unused)))
 {
   struct timeval tv = { 0, 0 };
   while (g_wait_for_hotplugs)
@@ -187,6 +242,24 @@ __attribute__((noreturn)) static void *wait_for_hotplug(void *arg
   }
 
   pthread_exit(NULL);
+}
+
+
+/**
+ * \brief devusb internal function that will set the accessibility default value
+ * for usb devices.
+ *
+ * \param value  0 if all devices must be blocked by default, 1 otherwhise.
+ */
+static void set_usb_default_access(int value)
+{
+  char file_path[64] = { '\0' };
+  int idx =  1;
+  do
+  {
+    sprintf(file_path, "/sys/bus/usb/devices/usb%d/authorized_default", idx);
+    idx++;
+  } while (!write_bool(value, file_path));
 }
 
 int init_devusb(void)
@@ -230,6 +303,8 @@ int init_devusb(void)
     libusb_exit(NULL);
     return 1;
   }
+
+  set_usb_default_access(0);
 
   /* start the wait_for_hotplug thread */
   pthread_create(&g_hotplug_thread, NULL, wait_for_hotplug, NULL);
@@ -285,23 +360,12 @@ int update_devices(struct devusb **devices)
     return 1;
 
   /**
-   * \todo
-   * TODO : get, open, and update authorized files for given devices
-   */
-
-  /**
    * \remark
    * the update_devices code is for now only for debug purpose.
    */
   for (int i = 0; devices[i]; ++i)
-  {
-    if (!devices[i]->serial) // not an identifiable device
-      printf("unknown device ");
-    else
-      printf("recognized device %s ", devices[i]->serial);
-
-    printf("on %d:%d\n", devices[i]->bus, devices[i]->port);
-  }
+    if (authorize_device(devices[i]))
+      syslog(LOG_WARNING, "Update device %s error", devices[i]->serial);
 
   return 0;
 }
