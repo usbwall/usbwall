@@ -34,25 +34,25 @@ static int g_cfgupdate = 0;
  */
 static int notifs_lookup(struct ldap_cfg **cfg)
 {
-    if (g_terminaison)
+  if (g_terminaison)
+  {
+    syslog(LOG_INFO, "Terminaison notif received, terminating program");
+    return 1;
+  }
+
+  if (g_cfgupdate)
+  {
+    syslog(LOG_INFO, "Update notif received, updating config");
+    *cfg = make_ldap_cfg(cfg_file_find());
+    if (*cfg == NULL)
     {
-      syslog(LOG_INFO, "Terminaison notif received, terminating program");
-      return 1;
+      syslog(LOG_WARNING, "Configuration update failed, terminating program");
+
+      return 1; // no configs found
     }
+  }
 
-    if (g_cfgupdate)
-    {
-      syslog(LOG_INFO, "Update notif received, updating config");
-      *cfg = make_ldap_cfg(cfg_file_find());
-      if (*cfg == NULL)
-      {
-        syslog(LOG_WARNING, "Configuration update failed, terminating program");
-
-        return 1; // no configs found
-      }
-    }
-
-    return 0;
+  return 0;
 }
 
 /**

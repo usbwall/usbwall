@@ -32,7 +32,7 @@ static int daemonize(void)
   if (pid > 0)
     return 1; // terminate session leader process
 
-  umask(0); // new file permissions
+  umask(0);           // new file permissions
   if (chdir("/") < 0) // change working directory
     return 1;
 
@@ -56,10 +56,9 @@ static int daemonize(void)
  */
 static int parse_args(int argc, char *argv[])
 {
-  const char *help_msg =
-    "usage :"
-    "\n\t-h [--help] : print the usage help message"
-    "\n\t-d [--daemonize]: start the program as a daemon";
+  const char *help_msg = "usage :"
+                         "\n\t-h [--help] : print the usage help message"
+                         "\n\t-d [--daemonize]: start the program as a daemon";
 
   if (argc >= 2)
   {
