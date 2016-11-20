@@ -5,10 +5,10 @@
 #include <syslog.h>
 #include <unistd.h>
 
-#include "devusb.h"
 #include "devuser.h"
 #include "ipc_pam.h"
 #include "ldap_config.h"
+#include "usb_access.h"
 
 /* Globals */
 /**
@@ -71,12 +71,12 @@ static void handle_login(struct ldap_cfg *cfg, const char *username)
 
   /**
    * \todo
-   * TODO: update devices_list depending of devids.
-   * Only authorized devices should be kept
+   * TODO: update devices_list depending of devids. Two lists
+   * must be created. One with only the authorized device, the
+   * other with the non authorized ones.
    */
 
-  if (update_devices(device_list))
-    syslog(LOG_WARNING, "Device update failed");
+  update_devices_access(device_list, NULL);
 
   free_devids(devids);
   free_devices(device_list);
@@ -108,7 +108,6 @@ int usbwall_run(void)
   char *username = NULL;
   while ((username = wait_for_logging(domain_socket_fd)))
   {
-    sleep(10);
     if (notifs_lookup(&cfg))
       break; // program terminaison requested
 

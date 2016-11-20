@@ -6,14 +6,14 @@
 #include <libusb-1.0/libusb.h>
 #endif
 
-#include <fcntl.h>
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/stat.h>
 #include <syslog.h>
 #include <unistd.h>
+
+#include "usb_access.h"
 
 /**
  * \brief maximum possible size of a device serial id.
@@ -41,55 +41,6 @@ static int g_wait_for_hotplugs;
  */
 static pthread_t g_hotplug_thread;
 /* ****** */
-
-/**
- * \brief devusb internal function that will write 0/1 in the given file.
- *
- * \param value  The boolean value to be written to the file
- * \param file_path  The path to the file we must write to
- *
- * \return non zero value if an error occured
- */
-static int write_bool(int value, const char *file_path)
-{
-  int fd = open(file_path, O_WRONLY | O_TRUNC);
-  if (fd < 0)
-    return 1;
-
-  const char *boolean_value = value ? "1" : "0";
-  if (write(fd, boolean_value, 1) < 0)
-    return 1;
-
-  close(fd);
-
-  return 0;
-}
-
-/**
- * \brief devusb internal function that will authorize a given device to be
- * accessible.
- *
- * \param device  the devusb structure with all informations on the device to be
- * authorized
- *
- * \return non zero value if an error occured
- */
-static int authorize_device(struct devusb *device)
-{
-  char file_path[64] = { '\0' };
-
-  sprintf(file_path,
-          "/sys/bus/usb/devices/%hd-%hd/authorized",
-          device->bus,
-          device->port);
-  syslog(LOG_INFO,
-         "Authorizing device %s on %d-%d",
-         device->serial,
-         device->bus,
-         device->port);
-
-  return write_bool(1, file_path);
-}
 
 /**
  * \brief devusb internal function that will extract the serial from a device.
@@ -207,9 +158,12 @@ static int hotplug_callback(struct libusb_context *ctx __attribute__((unused)),
 
   /**
    * \todo
-   * TODO: test if the device is authorized.
+   * TODO: test if the device is authorized and fill the authorized_status
+   * variable with 1 if authorized, 0 otherwise.
    */
-  if (authorize_device(device))
+  int authorized_status = 1;
+
+  if (update_device_access(device, authorized_status))
   {
     syslog(LOG_WARNING, "Device access update error");
 
@@ -242,24 +196,6 @@ static void *wait_for_hotplug(void *arg __attribute__((unused)))
   }
 
   pthread_exit(NULL);
-}
-
-
-/**
- * \brief devusb internal function that will set the accessibility default value
- * for usb devices.
- *
- * \param value  0 if all devices must be blocked by default, 1 otherwhise.
- */
-static void set_usb_default_access(int value)
-{
-  char file_path[64] = { '\0' };
-  int idx =  1;
-  do
-  {
-    sprintf(file_path, "/sys/bus/usb/devices/usb%d/authorized_default", idx);
-    idx++;
-  } while (!write_bool(value, file_path));
 }
 
 int init_devusb(void)
@@ -352,22 +288,6 @@ void free_devices(struct devusb **devices)
     free(devices[i]);
   }
   free(devices);
-}
-
-int update_devices(struct devusb **devices)
-{
-  if (!devices)
-    return 1;
-
-  /**
-   * \remark
-   * the update_devices code is for now only for debug purpose.
-   */
-  for (int i = 0; devices[i]; ++i)
-    if (authorize_device(devices[i]))
-      syslog(LOG_WARNING, "Update device %s error", devices[i]->serial);
-
-  return 0;
 }
 
 void close_devusb(void)

@@ -48,15 +48,3 @@ struct devusb **devices_get(void);
  * \param devices list of devusb struct to destroy
  */
 void free_devices(struct devusb **devices);
-
-/**
- * \brief update the access status for given devices
- * \param devices list of devusb struct corresponding to device to authorize
- * \return return non 0 value in case of error
- *
- * The function will search for the file that controle acces for each given
- * devices. The path format is /sys/bus/usb/[bus]-[port]/authorized. Then,
- * 1 will be written in the file to permit the creation of a virtual device
- * block in /dev by udev.
- */
-int update_devices(struct devusb **devices);
