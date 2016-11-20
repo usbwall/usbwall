@@ -106,7 +106,8 @@ int usbwall_run(void)
     return 1; // no configs found
 
   char *username = NULL;
-  while ((username = wait_for_logging(domain_socket_fd)))
+
+  do
   {
     if (notifs_lookup(&cfg))
       break; // program terminaison requested
@@ -119,7 +120,7 @@ int usbwall_run(void)
 
     handle_login(cfg, username);
     free(username);
-  }
+  } while ((username = wait_for_logging(domain_socket_fd)));
 
   close_devusb();
   destroy_ldap_cfg(cfg);
