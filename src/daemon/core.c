@@ -105,7 +105,7 @@ int usbwall_run(void)
   if (!cfg)
     return 1; // no configs found
 
-  char *username = NULL;
+  char *username = username_get();
 
   do
   {

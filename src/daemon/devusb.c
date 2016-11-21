@@ -64,6 +64,8 @@ static char *device_serial_get(struct libusb_device *device,
 
     return NULL;
   }
+  if (libusb_set_auto_detach_kernel_driver(udev, 1) < 0)
+    syslog(LOG_WARNING, "driver auto detach failed");
 
   char *serial = NULL;
   if (usb_infos->iSerialNumber) // the device does have an unique identifier

@@ -133,17 +133,8 @@ static struct berval **extract_devids(LDAP *ldap_ptr,
   return res;
 }
 
-char *wait_for_logging(int socket_fd)
+char *username_get(void)
 {
-  /**
-   *  Wait for the event from PAM
-   */
-  int connecting = accept_user(socket_fd);
-  if (connecting == -1)
-    return NULL;
-
-  syslog(LOG_INFO, "New user just connected.");
-
   int utmp_fd = open("/var/run/utmp", O_RDONLY);
   if (utmp_fd != -1)
   {
@@ -159,6 +150,18 @@ char *wait_for_logging(int socket_fd)
   }
 
   return NULL;
+}
+
+char *wait_for_logging(int socket_fd)
+{
+  /* Wait for the event from PAM */
+  int connecting = accept_user(socket_fd);
+  if (connecting == -1)
+    return NULL;
+
+  syslog(LOG_INFO, "New user just connected.");
+
+  return username_get();
 }
 
 char **devids_get(const char *username, const struct ldap_cfg *cfg)
