@@ -42,6 +42,13 @@ void set_usb_default_access(int value)
 
 int update_device_access(struct devusb *device, int value)
 {
+  if (!device->port || !device->port || !device->serial)
+  {
+    syslog(LOG_INFO, "skipping update for unavailable device ...");
+
+    return 0;
+  }
+
   char file_path[64] = { '\0' };
 
   sprintf(file_path,
