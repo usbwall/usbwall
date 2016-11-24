@@ -23,6 +23,11 @@
  * \brief interval time in second where usb plugging event are checked
  */
 #define HOTPLUG_CHECK_INTV 3
+/**
+ * \brief Maximum port numbers for a device. The USB3 standard say 7
+ * is the current max depth. It should never be set above 255!
+ */
+#define MAX_PORTS_NB 7
 
 /* Globals */
 /**
@@ -99,6 +104,38 @@ static char *device_serial_get(struct libusb_device *device,
 }
 
 /**
+ * \brief devusb internal function that will extract ports from a device.
+ *
+ * \param device  the libusb object associated with the device
+ * \param ports  pointer to the array of ports. The pointed pointer
+ * must be NULL! The function will be in charge of allocating the array.
+ *
+ * \return the number of device ports. 0 is returned in case of error.
+ */
+static uint8_t device_ports_get(struct libusb_device *device, uint8_t **ports)
+{
+
+  uint8_t result[MAX_PORTS_NB];
+  int res = libusb_get_port_numbers(device, result, MAX_PORTS_NB);
+  if (res < 0 || res > 255)
+  {
+      syslog(LOG_WARNING, "Too many ports for the device!");
+
+      return 0;
+  }
+
+  uint8_t ports_nb = (uint8_t)res;
+
+  *ports = malloc(sizeof (uint8_t) * ports_nb);
+  if (!ports)
+    return 0;
+
+  memcpy(*ports, result, ports_nb);
+
+  return ports_nb;
+}
+
+/**
  * \brief devusb internal function that convert a libusb device object to a
  * devusb structure
  *
@@ -124,7 +161,7 @@ static struct devusb *device_to_devusb(struct libusb_device *device)
 
   result->serial = device_serial_get(device, &usb_infos);
   result->bus = libusb_get_bus_number(device);
-  result->port = libusb_get_port_number(device);
+  result->ports_nb = device_ports_get(device, &result->ports);
 
   return result;
 }
@@ -287,6 +324,7 @@ void free_devices(struct devusb **devices)
   for (int i = 0; devices[i]; ++i)
   {
     free(devices[i]->serial);
+    free(devices[i]->ports);
     free(devices[i]);
   }
   free(devices);

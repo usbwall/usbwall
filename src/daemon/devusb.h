@@ -4,15 +4,19 @@
  */
 #pragma once
 
+#include <stdint.h>
+
 /**
  * \brief structure containing information on a plugged usb device.
  */
 struct devusb
 {
   char *serial; /**< device unique serial id,
-                     NULL in the case of non existance */
-  int bus;      /**< bus number where the device is attached */
-  int port;     /**< port number on which the device is attached */
+                 * NULL in the case of non existance */
+  uint8_t bus; /**< bus number where the device is attached */
+  uint8_t *ports; /**< port numbers from the root on which
+                   * the device is attached. */
+  uint8_t ports_nb; /**< number of elements in the ports array */
 };
 
 /**
