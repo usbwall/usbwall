@@ -65,11 +65,6 @@ if (HAS_SAN_UNDEF_CFLAG)
     set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -fsanitize=undefined")
 endif()
 
-check_c_compiler_flag(-Werror HAS_WERROR_CFLAG)
-if (HAS_WERROR_CFLAG)
-  set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS} -Werror")
-endif()
-
 ### Define mandatory DEBUG CFLAGS
 
 set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -g3")

@@ -6,7 +6,7 @@ os: linux
 dist: trusty
 sudo: required
 script:
-  - ./bootstrap && make -j
+  - ./bootstrap DEBUG && make -j
 addons:
   apt:
     packages:
