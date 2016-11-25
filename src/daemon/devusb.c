@@ -6,6 +6,7 @@
 #include <libusb-1.0/libusb.h>
 #endif
 
+#include <assert.h>
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -61,6 +62,8 @@ static pthread_t g_hotplug_thread;
 static char *device_serial_get(struct libusb_device *device,
                                struct libusb_device_descriptor *usb_infos)
 {
+  assert(device && usb_infos);
+
   libusb_device_handle *udev = NULL;
   int rcode = libusb_open(device, &udev);
   if (rcode != LIBUSB_SUCCESS)
@@ -69,8 +72,6 @@ static char *device_serial_get(struct libusb_device *device,
 
     return NULL;
   }
-  if (libusb_set_auto_detach_kernel_driver(udev, 1) < 0)
-    syslog(LOG_WARNING, "driver auto detach failed");
 
   char *serial = NULL;
   if (usb_infos->iSerialNumber) // the device does have an unique identifier
@@ -114,6 +115,7 @@ static char *device_serial_get(struct libusb_device *device,
  */
 static uint8_t device_ports_get(struct libusb_device *device, uint8_t **ports)
 {
+  assert(device && ports);
 
   uint8_t result[MAX_PORTS_NB];
   int res = libusb_get_port_numbers(device, result, MAX_PORTS_NB);
@@ -148,6 +150,8 @@ static uint8_t device_ports_get(struct libusb_device *device, uint8_t **ports)
  */
 static struct devusb *device_to_devusb(struct libusb_device *device)
 {
+  assert(device);
+
   struct devusb *result = calloc(1, sizeof(struct devusb));
   if (!result)
     return NULL;
@@ -318,8 +322,7 @@ struct devusb **devices_get(void)
 
 void free_devices(struct devusb **devices)
 {
-  if (!devices)
-    return;
+  assert(devices);
 
   for (int i = 0; devices[i]; ++i)
   {

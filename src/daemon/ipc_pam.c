@@ -1,5 +1,6 @@
 #include "ipc_pam.h"
 
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -45,7 +46,7 @@ int accept_user(int socket_fd)
 
 int init_socket(void)
 {
-  // Unix Domain Socket
+  /* Unix Domain Socket */
   struct sockaddr_un addr;
 
   int fd = socket(AF_UNIX, SOCK_STREAM, 0);
@@ -65,11 +66,11 @@ int init_socket(void)
     unlink(socket_path);
   }
 
-  // Unlink the socket if it already exist
+  /* Unlink the socket if it already exist */
   if (bind(fd, (struct sockaddr *)&addr, sizeof(addr)) == -1)
     return die("Initialization error - bind Unix Domain Socket failed");
 
-  // Listen to Unix Domain socket
+  /* Listen to Unix Domain socket */
   if (listen(fd, 5) == -1)
     return die("Initialization error - listen Unix Domain Socket failed");
 

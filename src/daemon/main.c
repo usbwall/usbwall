@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <stdio.h>
 #include <string.h>
 #include <sys/resource.h>
@@ -5,8 +6,6 @@
 #include <sys/types.h>
 #include <syslog.h>
 #include <unistd.h>
-
-#include <stdio.h>
 
 #include "core.h"
 
@@ -68,6 +67,7 @@ static int parse_args(int argc, char *argv[])
     if (!strcmp(argv[1], "-h") || !strcmp(argv[1], "--help"))
     {
       puts(help_msg);
+
       return 1;
     }
 
@@ -90,6 +90,7 @@ int main(int argc, char *argv[])
   if (signal_handling())
   {
     syslog(LOG_ERR, "Signal handling init failed.");
+
     return 1; // a valid signal handling is mandatory
   }
 

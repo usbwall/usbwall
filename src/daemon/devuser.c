@@ -1,5 +1,6 @@
 #include "devuser.h"
 
+#include <assert.h>
 #include <fcntl.h>
 #include <ldap.h>
 #include <stdio.h>
@@ -28,6 +29,8 @@
  */
 static LDAP *setup_ldap(const struct ldap_cfg *cfg)
 {
+  assert(cfg);
+
   LDAP *ldap_ptr = NULL;
 
   if (ldap_initialize(&ldap_ptr, cfg->uri) != LDAP_SUCCESS)
@@ -84,6 +87,8 @@ static struct berval **extract_devids(LDAP *ldap_ptr,
                                       const char *username,
                                       const struct ldap_cfg *cfg)
 {
+  assert(ldap_ptr && username && cfg);
+
   LDAPMessage *msg_ptr = NULL;
   char filter[LOGIN_MAX_LEN + 1] = { '\0' };
   snprintf(filter, LOGIN_MAX_LEN, "(uid=%s)", username);
@@ -166,8 +171,7 @@ char *wait_for_logging(int socket_fd)
 
 char **devids_get(const char *username, const struct ldap_cfg *cfg)
 {
-  if (!username || !cfg)
-    return NULL;
+  assert(username && cfg);
 
   LDAP *ldap_ptr = setup_ldap(cfg); // init the connection
   if (!ldap_ptr)
@@ -197,8 +201,7 @@ char **devids_get(const char *username, const struct ldap_cfg *cfg)
 
 void free_devids(char **devids)
 {
-  if (!devids)
-    return;
+  assert(devids);
 
   for (int i = 0; devids[i]; ++i)
     free(devids[i]);

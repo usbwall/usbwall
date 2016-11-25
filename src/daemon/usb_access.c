@@ -1,6 +1,8 @@
 #include "usb_access.h"
 
+#include <assert.h>
 #include <fcntl.h>
+#include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -19,6 +21,8 @@
  */
 static int write_bool(int value, const char *file_path)
 {
+  assert(file_path);
+
   int fd = open(file_path, O_WRONLY | O_TRUNC);
   if (fd < 0)
     return 1;
@@ -44,6 +48,8 @@ static int write_bool(int value, const char *file_path)
  */
 static char *ports_to_string(uint8_t *ports, uint8_t ports_nb)
 {
+  assert(ports && ports_nb != 0);
+
   char result[ports_nb * 4]; // max length of a uint8_t is 3(+1 for the dot)
   result[0] = '\0';
 
@@ -53,7 +59,10 @@ static char *ports_to_string(uint8_t *ports, uint8_t ports_nb)
   char *last_dot = strrchr(result, '.');
   *last_dot = '\0';
 
-  size_t length = (size_t)(last_dot - result); // allways positive
+  ptrdiff_t distance = last_dot - result;
+  assert(distance > 0);
+  size_t length = (size_t)distance;
+
   char *ports_str = malloc(sizeof (char) * length);
   if (!ports_str)
     return NULL;
@@ -71,6 +80,8 @@ static char *ports_to_string(uint8_t *ports, uint8_t ports_nb)
  */
 static int device_is_valid(struct devusb *device)
 {
+  assert(device);
+
   return device->ports_nb && device->bus && device->serial;
 }
 
@@ -87,6 +98,8 @@ void set_usb_default_access(int value)
 
 int update_device_access(struct devusb *device, int value)
 {
+  assert(device);
+
   char *ports_str = ports_to_string(device->ports, device->ports_nb);
   if (!ports_str)
     return 1;

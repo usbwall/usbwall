@@ -1,5 +1,6 @@
 #include "ldap_config.h"
 
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -47,6 +48,8 @@ static void skip_comments(char *line)
  */
 static int scanstr(const char *line, const char *format, char **destination)
 {
+  assert(line && format && destination);
+
   char buffer[MAX_LINE_LEN] = { '\0' };
 
   int parse_success = sscanf(line, format, buffer);
@@ -81,14 +84,23 @@ const char *cfg_file_find(void)
 
 struct ldap_cfg *make_ldap_cfg(const char *cfg_file)
 {
+  assert(cfg_file);
+
   FILE *stream = fopen(cfg_file, "r");
   if (!stream)
   {
     syslog(LOG_ERR, "Configuration file not accessible : %s", cfg_file);
+
     return NULL;
   }
 
   struct ldap_cfg *config = calloc(1, sizeof(struct ldap_cfg));
+  if (!config)
+  {
+    fclose(stream);
+
+    return NULL;
+  }
 
   /* parsing configurations from the file */
   char *buffer = NULL;
@@ -116,8 +128,7 @@ struct ldap_cfg *make_ldap_cfg(const char *cfg_file)
 
 void destroy_ldap_cfg(struct ldap_cfg *cfg)
 {
-  if (!cfg)
-    return;
+  assert(cfg);
 
   free(cfg->uri);
   free(cfg->basedn);

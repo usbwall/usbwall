@@ -1,5 +1,6 @@
 #include "core.h"
 
+#include <assert.h>
 #include <signal.h>
 #include <stdlib.h>
 #include <syslog.h>
@@ -34,6 +35,8 @@ static int g_cfgupdate = 0;
  */
 static int notifs_lookup(struct ldap_cfg **cfg)
 {
+  assert(cfg && *cfg);
+
   if (g_terminaison)
   {
     syslog(LOG_INFO, "Terminaison notif received, terminating program");
@@ -66,8 +69,14 @@ static int notifs_lookup(struct ldap_cfg **cfg)
  */
 static void handle_login(struct ldap_cfg *cfg, const char *username)
 {
+  assert(cfg && username);
+
   struct devusb **device_list = devices_get();
+  if (!device_list)
+    return;
   char **devids = devids_get(username, cfg);
+  if (!devids)
+    return;
 
   /**
    * \todo
