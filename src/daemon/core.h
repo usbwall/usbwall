@@ -20,4 +20,4 @@ int usbwall_run(void);
  * must be listened and enable the signal handler.
  * \return return non 0 value in case of error
  */
-int signal_handling(void);
+int signal_config(void);

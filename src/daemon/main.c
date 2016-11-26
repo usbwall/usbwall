@@ -87,7 +87,7 @@ int main(int argc, char *argv[])
   if (parse_args(argc, argv))
     return 0;
 
-  if (signal_handling())
+  if (signal_config())
   {
     syslog(LOG_ERR, "Signal handling init failed.");
 

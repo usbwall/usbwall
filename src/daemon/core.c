@@ -91,14 +91,24 @@ static void handle_login(struct ldap_cfg *cfg, const char *username)
   free_devices(device_list);
 }
 
-static void terminaison_handler(int signo)
+/**
+ * \brief core internal function handling signal when received.
+ * \param signo  id number of the signal received
+ */
+static void signal_handler(int signo)
 {
-  syslog(LOG_INFO, "Received signal : %d", signo);
+  syslog(LOG_DEBUG, "Received signal no %d", signo);
 
   if (signo == SIGTERM)
+  {
+    syslog(LOG_INFO, "SIGTERM received");
     g_terminaison = 1;
+  }
   else if (signo == SIGHUP)
+  {
+    syslog(LOG_INFO, "SIGHUP received");
     g_cfgupdate = 1;
+  }
 }
 
 int usbwall_run(void)
@@ -137,10 +147,10 @@ int usbwall_run(void)
   return 0;
 }
 
-int signal_handling(void)
+int signal_config(void)
 {
   struct sigaction action;
-  action.sa_handler = terminaison_handler;
+  action.sa_handler = signal_handler;
   sigfillset(&action.sa_mask);
   action.sa_flags = SA_RESTART;
 
