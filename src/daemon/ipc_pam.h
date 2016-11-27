@@ -4,6 +4,7 @@
  */
 
 #pragma once
+#include "event.h"
 
 /**
  * \brief Initialize a Unix Domain Socket to receive notifications from PAM.
@@ -19,4 +20,4 @@ int init_socket(void);
  * The function wait for an event from the pam module.
  * The daemon is notified when a user connect to the machine.
  */
-int accept_user(int socket_fd);
+enum event accept_user(int socket_fd);
