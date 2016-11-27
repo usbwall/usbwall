@@ -140,26 +140,6 @@ static struct berval **extract_devids(LDAP *ldap_ptr,
 
 char *username_get(void)
 {
-  /**
-   *  Wait for the event from PAM
-   */
-  enum event message_event = accept_user(socket_fd);
-
-  /* Handle enum here */
-  switch (message_event)
-  {
-    case USER_CONNECT:
-      syslog(LOG_INFO, "New user just connected.");
-      break;
-    case USER_DISCONNECT:
-      syslog(LOG_INFO, "user just disconnected.");
-      break;
-    default:
-      syslog(LOG_ERR, "Unknown event from PAM module.");
-      return NULL;
-  }
-
-
   int utmp_fd = open("/var/run/utmp", O_RDONLY);
   if (utmp_fd != -1)
   {
@@ -180,11 +160,20 @@ char *username_get(void)
 char *wait_for_logging(int socket_fd)
 {
   /* Wait for the event from PAM */
-  int connecting = accept_user(socket_fd);
-  if (connecting == -1)
-    return NULL;
-
-  syslog(LOG_INFO, "New user just connected.");
+  enum event message_event = accept_user(socket_fd);
+  /* Handle enum here */
+  switch (message_event)
+  {
+    case USER_CONNECT:
+      syslog(LOG_INFO, "New user just connected.");
+      break;
+    case USER_DISCONNECT:
+      syslog(LOG_INFO, "user just disconnected.");
+      break;
+    default:
+      syslog(LOG_ERR, "Unknown event from PAM module.");
+      return NULL;
+  }
 
   return username_get();
 }
