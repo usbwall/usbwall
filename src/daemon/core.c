@@ -27,6 +27,20 @@ static int g_terminaison = 0;
 static int g_cfgupdate = 0;
 /* ****** */
 
+/**
+ * \brief core internal function to filter for allowed devices.
+ * \param allowed_devices  The list containing devices to filter.
+ * \param devids  The list containing authorized serial ids.
+ * \return Return a list of the devices that are not allowed for the
+ * current user.
+ *
+ * The function will check all the devusb structures in allowed_devices,
+ * and compare them to the serials (char *) contained in devids. For each
+ * devices, if it is allowed it stay in the given allowed_devices linked list,
+ * if it is not, then it is moved to the returned linked_list. The function will
+ * also check for invalid devices (devices that can't be acceded or manipulated
+ * by the program), and simply delete them (removed from the list, and freed).
+ */
 static struct linked_list *filter_devices(struct linked_list *allowed_devices,
                                           struct linked_list *devids)
 {
@@ -43,7 +57,6 @@ static struct linked_list *filter_devices(struct linked_list *allowed_devices,
   list_for_each(device_ptr, allowed_devices)
   {
     struct devusb *device = device_ptr->data;
-    char *devid = NULL;
     if (!device_is_valid(device))
     {
       /* Corrupted device... Store it in a list for delayed destruction */
@@ -55,7 +68,7 @@ static struct linked_list *filter_devices(struct linked_list *allowed_devices,
 
     int (*compare_function)(const void *, const void *) =
       (int (*)(const void *, const void *))strcmp;
-    if (!(devid = list_extract(devids, device->serial, compare_function)))
+    if (!list_extract(devids, device->serial, compare_function))
     {
       /* We can't find the serial in the devid list. The device is then not
        * allowed. Just push it in the forbidden list and remove it from the

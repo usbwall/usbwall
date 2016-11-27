@@ -43,7 +43,7 @@ void close_devusb(void);
 
 /**
  * \brief Scan for plugged usb devices and return informations on devices
- * \return list of devusb struct for each plugged usb device. The array is
- *  null terminated. FIXME
+ * \return linked list of devusb struct for each plugged usb device. NULL
+ * is return if an error occured.
  */
 struct linked_list *devices_get(void);

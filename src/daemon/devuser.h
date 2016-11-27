@@ -33,13 +33,12 @@ char *wait_for_logging(int socket_fd);
  *    the user.
  * \param username name of the checked user
  * \param cfg current ldap configuration
- * \return Null terminated array of allowed serial ids.
- *  NULL if an error occured or if none are allowed.
+ * \return Linked list containing serial ids as char *.
+ *  NULL if an error occured.
  *
  * The function will try to bind to the ldap server and
  * retrieved the devids from the given username. In the
- * case of a connection problem, or if no entry are found,
- * NULL is returned. FIXME
+ * case of a connection problem, NULL is returned.
  */
 struct linked_list *devids_get(const char *username,
                                const struct ldap_cfg *cfg);

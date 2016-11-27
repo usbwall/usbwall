@@ -3,8 +3,17 @@
 #include <assert.h>
 #include <stdlib.h>
 
+/**
+ * \brief linked_list internal function to create a node.
+ *
+ * \param data  the initial data to put in the node.
+ *
+ * \return the created node.
+ */
 static struct ll_node *node_make(void *data)
 {
+  assert(data);
+
   struct ll_node *node = malloc(sizeof(struct ll_node));
   if (!node)
     return NULL;
@@ -15,6 +24,12 @@ static struct ll_node *node_make(void *data)
   return node;
 }
 
+/**
+ * \brief linked_list internal function to free a node.
+ *
+ * \param node  the node to be destroyed
+ * \param data_destruction  should be 0 if the data should not be freed.
+ */
 static void node_destroy(struct ll_node *node, int data_destruction)
 {
   if (!node)
@@ -26,6 +41,13 @@ static void node_destroy(struct ll_node *node, int data_destruction)
   free(node);
 }
 
+/**
+ * \brief linked_list internal helper function to instantiate the first node
+ * in a linked_list. If the list is not empty, an undefined behavior occures.
+ *
+ * \param ll  linked_list in which the data need to be inserted.
+ * \param data  the data to be inserted.
+ */
 static void first_insertion(struct linked_list *ll, void *data)
 {
   assert(ll->first == NULL && ll->last == NULL);
@@ -53,18 +75,6 @@ void list_add_back(struct linked_list *ll, void *data)
 
   ll->last->next = node_make(data);
   ll->last = ll->last->next;
-}
-
-size_t list_size(struct linked_list *ll)
-{
-  assert(ll);
-
-  if (!ll->first)
-    return 0;
-
-  assert(ll->first < ll->last);
-
-  return (size_t)(ll->last - ll->first);
 }
 
 void *list_extract(struct linked_list *ll,
