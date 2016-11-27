@@ -129,7 +129,7 @@ static uint8_t device_ports_get(struct libusb_device *device, uint8_t **ports)
   uint8_t ports_nb = (uint8_t)res;
 
   *ports = malloc(sizeof (uint8_t) * ports_nb);
-  if (!ports)
+  if (!(*ports))
     return 0;
 
   memcpy(*ports, result, ports_nb);

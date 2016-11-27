@@ -55,12 +55,13 @@ static int daemonize(void)
  */
 static int parse_args(int argc, char *argv[])
 {
-  const char *help_msg = "usage :"
-                         "\n\t-h [--help] : print the usage help message"
-                         "\n\t-d [--daemonize]: start the program as a daemon";
-
   if (argc >= 2)
   {
+    const char *help_msg =
+      "usage :"
+      "\n\t-h [--help] : print the usage help message"
+      "\n\t-d [--daemonize]: start the program as a daemon";
+
     if (!strcmp(argv[1], "-d") || !strcmp(argv[1], "--daemonize"))
       return daemonize();
 

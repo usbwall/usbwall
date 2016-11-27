@@ -28,12 +28,10 @@ static int write_bool(int value, const char *file_path)
     return 1;
 
   const char *boolean_value = value ? "1" : "0";
-  if (write(fd, boolean_value, 1) < 0)
-    return 1;
-
+  int rcode = write(fd, boolean_value, 1) < 0;
   close(fd);
 
-  return 0;
+  return !!rcode;
 }
 
 /**
@@ -54,7 +52,11 @@ static char *ports_to_string(uint8_t *ports, uint8_t ports_nb)
   result[0] = '\0';
 
   for (uint8_t idx = 0; idx < ports_nb; ++idx)
-    sprintf(result, "%s%d.", result, ports[idx]);
+  {
+    char *temp_result = strdup(result);
+    sprintf(result, "%s%d.", temp_result, ports[idx]);
+    free(temp_result);
+  }
 
   char *last_dot = strrchr(result, '.');
   *last_dot = '\0';
