@@ -33,7 +33,13 @@ static struct linked_list *filter_devices(struct linked_list *allowed_devices,
   assert(allowed_devices && devids);
 
   struct linked_list *corrupted_devices = list_make();
+  if (!corrupted_devices)
+    return NULL;
+
   struct linked_list *forbidden_devices = list_make();
+  if (!forbidden_devices)
+    return NULL;
+
   list_for_each(device_ptr, allowed_devices)
   {
     struct devusb *device = device_ptr->data;
@@ -119,6 +125,8 @@ static void handle_login(struct ldap_cfg *cfg, const char *username)
     return;
 
   struct linked_list *forbid = filter_devices(device_list, devids);
+  if (!forbid)
+    return;
 
   update_devices_access(device_list, forbid);
 
@@ -169,6 +177,7 @@ int usbwall_run(void)
     if (!username)
     {
       syslog(LOG_WARNING, "Current user can not be fetched");
+
       continue;
     }
 

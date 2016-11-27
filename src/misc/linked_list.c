@@ -93,6 +93,9 @@ void list_remove(struct linked_list *ll,
   if (ll->first == removed_node)
   {
     ll->first = removed_node->next;
+    if (ll->last == removed_node)
+      ll->last = NULL; // single node case
+
     return;
   }
 

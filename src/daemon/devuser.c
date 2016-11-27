@@ -202,14 +202,13 @@ struct linked_list *devids_get(const char *username,
   {
     const size_t values_count = (size_t)ret;
 
-    /* convert berval array to string array */
-    devids = malloc(sizeof(char *) * (values_count + 1));
     if (!devids)
       return NULL;
 
     for (unsigned i = 0; i < values_count; ++i)
-      list_add_back(devids, values[i]->bv_val);
+      list_add_back(devids, strdup(values[i]->bv_val));
   }
+  ldap_value_free_len(values);
 
   return devids;
 }
