@@ -162,6 +162,7 @@ char *wait_for_logging(int socket_fd)
   /* Wait for the event from PAM */
   enum event message_event = accept_user(socket_fd);
   /* Handle enum here */
+  int error = 0;
   switch (message_event)
   {
     case USER_CONNECT:
@@ -172,13 +173,15 @@ char *wait_for_logging(int socket_fd)
       break;
     case ERROR:
       syslog(LOG_ERR, "Error from accept_user() function.");
+      error = 1;
+      break;
     case UNKNOWN:
-    default:
       syslog(LOG_ERR, "Unknown event from PAM module.");
-      return NULL;
+      error = 1;
+      break;
   }
 
-  return username_get();
+  return error ? NULL : username_get();
 }
 
 char **devids_get(const char *username, const struct ldap_cfg *cfg)
