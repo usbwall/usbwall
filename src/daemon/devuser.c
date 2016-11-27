@@ -184,7 +184,8 @@ char *wait_for_logging(int socket_fd)
   return error ? NULL : username_get();
 }
 
-char **devids_get(const char *username, const struct ldap_cfg *cfg)
+struct linked_list *devids_get(const char *username,
+                               const struct ldap_cfg *cfg)
 {
   assert(username && cfg);
 
@@ -195,7 +196,7 @@ char **devids_get(const char *username, const struct ldap_cfg *cfg)
   struct berval **values = extract_devids(ldap_ptr, username, cfg);
   ldap_unbind_ext(ldap_ptr, NULL, NULL); // close the connection
 
-  char **devids = NULL;
+  struct linked_list *devids = list_make();
   const int ret = ldap_count_values_len(values);
   if (ret > 0)
   {
@@ -207,18 +208,8 @@ char **devids_get(const char *username, const struct ldap_cfg *cfg)
       return NULL;
 
     for (unsigned i = 0; i < values_count; ++i)
-      devids[i] = values[i]->bv_val;
-    devids[values_count] = NULL;
+      list_add_back(devids, values[i]->bv_val);
   }
 
   return devids;
-}
-
-void free_devids(char **devids)
-{
-  assert(devids);
-
-  for (int i = 0; devids[i]; ++i)
-    free(devids[i]);
-  free(devids);
 }

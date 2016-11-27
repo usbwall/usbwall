@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "../misc/linked_list.h"
+
 #include "ldap_config.h"
 
 /**
@@ -37,12 +39,7 @@ char *wait_for_logging(int socket_fd);
  * The function will try to bind to the ldap server and
  * retrieved the devids from the given username. In the
  * case of a connection problem, or if no entry are found,
- * NULL is returned.
+ * NULL is returned. FIXME
  */
-char **devids_get(const char *username, const struct ldap_cfg *cfg);
-
-/**
- * \brief Destroy and free the serial array returned by devids_get.
- * \param devids array of string to destroy
- */
-void free_devids(char **devids);
+struct linked_list *devids_get(const char *username,
+                               const struct ldap_cfg *cfg);

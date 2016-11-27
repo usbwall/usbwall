@@ -83,3 +83,4 @@ set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -O2")
 
 add_subdirectory(pam)
 add_subdirectory(daemon)
+include_directories(.)

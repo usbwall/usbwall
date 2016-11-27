@@ -9,6 +9,7 @@ set(DAEMON_SRC
   ldap_config.c
   main.c
   usb_access.c
+  ../misc/linked_list.c
   )
 
 add_executable(usbwalld ${DAEMON_SRC})

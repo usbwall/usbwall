@@ -3,8 +3,11 @@
 #include <assert.h>
 #include <signal.h>
 #include <stdlib.h>
+#include <string.h>
 #include <syslog.h>
 #include <unistd.h>
+
+#include "../misc/linked_list.h"
 
 #include "devuser.h"
 #include "ipc_pam.h"
@@ -23,6 +26,42 @@ static int g_terminaison = 0;
  */
 static int g_cfgupdate = 0;
 /* ****** */
+
+static struct linked_list *filter_devices(struct linked_list *allowed_devices,
+                                          struct linked_list *devids)
+{
+  assert(allowed_devices && devids);
+
+  struct linked_list *corrupted_devices = list_make();
+  struct linked_list *forbidden_devices = list_make();
+  list_for_each(device_ptr, allowed_devices)
+  {
+    struct devusb *device = device_ptr->data;
+    char *devid = NULL;
+    if (!device_is_valid(device))
+    {
+      /* Corrupted device... Store it in a list for delayed destruction */
+      list_add_back(corrupted_devices, device);
+      list_remove(allowed_devices, device_ptr, 0);
+
+      continue;
+    }
+
+    int (*compare_function)(const void *, const void *) =
+      (int (*)(const void *, const void *))strcmp;
+    if (!(devid = list_extract(devids, device->serial, compare_function)))
+    {
+      /* We can't find the serial in the devid list. The device is then not
+       * allowed. Just push it in the forbidden list and remove it from the
+       * authorized ones. */
+      list_add_back(forbidden_devices, device);
+      list_remove(allowed_devices, device_ptr, 0);
+    }
+  }
+  list_destroy(corrupted_devices, 1);
+
+  return forbidden_devices;
+}
 
 /**
  * \brief core internal function to handle globals lookup.
@@ -71,24 +110,20 @@ static void handle_login(struct ldap_cfg *cfg, const char *username)
 {
   assert(cfg && username);
 
-  struct devusb **device_list = devices_get();
+  struct linked_list *device_list = devices_get();
   if (!device_list)
     return;
-  char **devids = devids_get(username, cfg);
+
+  struct linked_list *devids = devids_get(username, cfg);
   if (!devids)
     return;
 
-  /**
-   * \todo
-   * TODO: update devices_list depending of devids. Two lists
-   * must be created. One with only the authorized device, the
-   * other with the non authorized ones.
-   */
+  struct linked_list *forbid = filter_devices(device_list, devids);
 
-  update_devices_access(device_list, NULL);
+  update_devices_access(device_list, forbid);
 
-  free_devids(devids);
-  free_devices(device_list);
+  list_destroy(devids, 1);
+  list_destroy(device_list, 1);
 }
 
 /**

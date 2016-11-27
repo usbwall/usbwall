@@ -291,16 +291,11 @@ int init_devusb(void)
   return 0;
 }
 
-struct devusb **devices_get(void)
+struct linked_list *devices_get(void)
 {
-  struct devusb **devusb_list = calloc(16, sizeof(struct devusb *));
+  struct linked_list *devusb_list = list_make();
   if (!devusb_list)
     return NULL;
-  /**
-   * \todo
-   * FIXME: devusb_list should not be limited by 16 devices.
-   * That's just an hotfix because I was lazy.
-   */
 
   libusb_device **device_list = NULL;
   const ssize_t device_list_size = libusb_get_device_list(NULL, &device_list);
@@ -308,29 +303,17 @@ struct devusb **devices_get(void)
   /* iterate over all devices and extract needed infos */
   for (int i = 0; i < device_list_size; ++i)
   {
-    devusb_list[i] = device_to_devusb(device_list[i]);
-    if (!devusb_list[i])
+    struct devusb *element = device_to_devusb(device_list[i]);
+    if (!element)
     {
-      syslog(LOG_WARNING, "corrupted devusb no %d", i);
+      syslog(LOG_DEBUG, "corrupted devusb on iteration %d", i);
       break;
     }
+    list_add_back(devusb_list, element);
   }
   libusb_free_device_list(device_list, 1);
 
   return devusb_list;
-}
-
-void free_devices(struct devusb **devices)
-{
-  assert(devices);
-
-  for (int i = 0; devices[i]; ++i)
-  {
-    free(devices[i]->serial);
-    free(devices[i]->ports);
-    free(devices[i]);
-  }
-  free(devices);
 }
 
 void close_devusb(void)

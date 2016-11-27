@@ -72,15 +72,7 @@ static char *ports_to_string(uint8_t *ports, uint8_t ports_nb)
   return strcpy(ports_str, result);
 }
 
-/**
- * \brief usb_access internal function that check the possibility to
- * manipulate the given device in the sysfs.
- *
- * \param device  the device to check
- *
- * \return 0 if not valid, 1 otherwhise
- */
-static int device_is_valid(struct devusb *device)
+int device_is_valid(struct devusb *device)
 {
   assert(device);
 
@@ -122,26 +114,26 @@ int update_device_access(struct devusb *device, int value)
   return write_bool(value, file_path);
 }
 
-void update_devices_access(struct devusb **authorized,
-                           struct devusb **forbidden)
+void update_devices_access(struct linked_list *authorized,
+                           struct linked_list *forbidden)
 {
-  if (authorized)
+  assert(authorized && forbidden);
+
+  list_for_each(auth_node_ptr, authorized)
   {
-    for (int i = 0; authorized[i]; ++i)
-      if (!device_is_valid(authorized[i]))
-        syslog(LOG_INFO, "skipping update for unavailable device ...");
-      else if (update_device_access(authorized[i], 1))
-        syslog(LOG_WARNING,
-               "Update authorized device error : %s",
-               authorized[i]->serial);
+    struct devusb *device = auth_node_ptr->data;
+    assert(device_is_valid(device) && "Only valid devices are supported");
+
+    if (update_device_access(device, 1))
+      syslog(LOG_WARNING, "Update allowed device error : %s", device->serial);
   }
 
-  if (forbidden)
+  list_for_each(forb_node_ptr, forbidden)
   {
-    for (int i = 0; forbidden[i]; ++i)
-      if (update_device_access(authorized[i], 0))
-        syslog(LOG_WARNING,
-               "Update forbidden device error : %s",
-               authorized[i]->serial);
+    struct devusb *device = forb_node_ptr->data;
+    assert(device_is_valid(device) && "Only valid devices are supported");
+
+    if (update_device_access(device, 0))
+      syslog(LOG_WARNING, "Update forbidden device error : %s", device->serial);
   }
 }

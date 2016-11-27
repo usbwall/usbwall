@@ -6,6 +6,8 @@
 
 #include <stdint.h>
 
+#include "../misc/linked_list.h"
+
 /**
  * \brief structure containing information on a plugged usb device.
  */
@@ -42,13 +44,6 @@ void close_devusb(void);
 /**
  * \brief Scan for plugged usb devices and return informations on devices
  * \return list of devusb struct for each plugged usb device. The array is
- *  null terminated.
+ *  null terminated. FIXME
  */
-struct devusb **devices_get(void);
-
-/**
- * \brief Destroy and free the list of devusb structs that can be returned
- *  by devices_get function.
- * \param devices list of devusb struct to destroy
- */
-void free_devices(struct devusb **devices);
+struct linked_list *devices_get(void);

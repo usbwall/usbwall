@@ -5,8 +5,9 @@
  */
 #pragma once
 
-#include "devusb.h"
+#include "../misc/linked_list.h"
 
+#include "devusb.h"
 
 /**
  * \brief update the access status for a given device
@@ -26,8 +27,8 @@ int update_device_access(struct devusb *device, int value);
  * \param authorized  list of the devices to authorize
  * \param forbidden  list of the devices to forbid
  */
-void update_devices_access(struct devusb **authorized,
-                           struct devusb **forbidden);
+void update_devices_access(struct linked_list *authorized,
+                           struct linked_list *forbidden);
 
 /**
  * \brief set the accessibility default value for all usb devices
@@ -36,3 +37,12 @@ void update_devices_access(struct devusb **authorized,
  * \param value  0 if all devices must be blocked by default, 1 otherwhise.
  */
 void set_usb_default_access(int value);
+
+/**
+ * \brief check the possibility to manipulate the given device in the sysfs.
+ *
+ * \param device  the device to check
+ *
+ * \return 0 if not valid, 1 otherwhise
+ */
+int device_is_valid(struct devusb *device);
