@@ -1,6 +1,4 @@
-find_package(USB1    REQUIRED)
-find_package(LDAP    REQUIRED)
-find_package(Threads REQUIRED)
+
 set(DAEMON_SRC
   core.c
   devusb.c
@@ -9,10 +7,7 @@ set(DAEMON_SRC
   ldap_config.c
   main.c
   usb_access.c
-  ../misc/linked_list.c
   )
 
-add_executable(usbwalld ${DAEMON_SRC})
-target_link_libraries(usbwalld ldap)
-target_link_libraries(usbwalld usb-1.0)
-target_link_libraries(usbwalld ${CMAKE_THREAD_LIBS_INIT})
+add_library(usbwalld_obj OBJECT ${DAEMON_SRC})
+

@@ -7,7 +7,7 @@
 #include <syslog.h>
 #include <unistd.h>
 
-#include "../misc/linked_list.h"
+#include <misc/linked_list.h>
 
 #include "devuser.h"
 #include "ipc_pam.h"

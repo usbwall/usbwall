@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "../misc/linked_list.h"
+#include <misc/linked_list.h>
 
 #include "ldap_config.h"
 

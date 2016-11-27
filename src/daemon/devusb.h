@@ -6,7 +6,7 @@
 
 #include <stdint.h>
 
-#include "../misc/linked_list.h"
+#include <misc/linked_list.h>
 
 /**
  * \brief structure containing information on a plugged usb device.

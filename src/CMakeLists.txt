@@ -78,9 +78,35 @@ set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -g3")
 set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -O2")
 
 ###########################
+### Add src to the include path
+###########################
+
+include_directories(.)
+
+###########################
 ### continue to subdirectories
 ###########################
 
-add_subdirectory(pam)
 add_subdirectory(daemon)
-include_directories(.)
+add_subdirectory(misc)
+add_subdirectory(pam)
+
+###########################
+### Construction of usbwalld
+###########################
+find_package(USB1    REQUIRED)
+find_package(LDAP    REQUIRED)
+find_package(Threads REQUIRED)
+add_executable(usbwalld
+  $<TARGET_OBJECTS:misc_obj> $<TARGET_OBJECTS:usbwalld_obj>)
+target_link_libraries(usbwalld ldap)
+target_link_libraries(usbwalld usb-1.0)
+target_link_libraries(usbwalld ${CMAKE_THREAD_LIBS_INIT})
+
+###########################
+### Construction of pam_usbwall
+###########################
+
+find_package(PAM REQUIRED)
+add_library(pam_usbwall SHARED $<TARGET_OBJECTS:pam_obj>)
+target_link_libraries(pam_usbwall pam)
