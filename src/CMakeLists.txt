@@ -44,7 +44,7 @@ endif()
 
 ### Define mandatory CFLAGS
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D_XOPEN_SOURCE=800")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D_XOPEN_SOURCE=800 -fPIC")
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD")
     # FreeBSD specific code
