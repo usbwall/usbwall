@@ -31,10 +31,10 @@ enum event accept_user(int socket_fd)
   int client_fd = 0;
 
   if ((client_fd = accept(socket_fd, NULL, NULL)) == -1)
-    return -1;
+    return ERROR;
 
   if (recv(client_fd, &message_event, sizeof(enum event), 0) == -1)
-    return -1;
+    return ERROR;
 
   return message_event;
 }

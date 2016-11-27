@@ -168,8 +168,11 @@ char *wait_for_logging(int socket_fd)
       syslog(LOG_INFO, "New user just connected.");
       break;
     case USER_DISCONNECT:
-      syslog(LOG_INFO, "user just disconnected.");
+      syslog(LOG_INFO, "User just disconnected.");
       break;
+    case ERROR:
+      syslog(LOG_ERR, "Error from accept_user() function.");
+    case UNKNOWN:
     default:
       syslog(LOG_ERR, "Unknown event from PAM module.");
       return NULL;
