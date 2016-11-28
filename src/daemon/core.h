@@ -21,3 +21,5 @@ int usbwall_run(void);
  * \return return non 0 value in case of error
  */
 int signal_config(void);
+
+

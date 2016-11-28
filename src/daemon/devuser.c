@@ -212,3 +212,13 @@ struct linked_list *devids_get(const char *username,
 
   return devids;
 }
+
+int check_devid(const char *devid, struct linked_list *devids)
+{
+  assert(devid && devids);
+
+  int (*compare_function)(const void *, const void *) =
+    (int (*)(const void *, const void *))strcmp;
+
+  return !!list_extract(devids, devid, compare_function);
+}

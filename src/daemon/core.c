@@ -66,9 +66,7 @@ static struct linked_list *filter_devices(struct linked_list *allowed_devices,
       continue;
     }
 
-    int (*compare_function)(const void *, const void *) =
-      (int (*)(const void *, const void *))strcmp;
-    if (!list_extract(devids, device->serial, compare_function))
+    if (!check_devid(device->serial, devids))
     {
       /* We can't find the serial in the devid list. The device is then not
        * allowed. Just push it in the forbidden list and remove it from the

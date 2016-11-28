@@ -15,6 +15,7 @@
 #include <unistd.h>
 
 #include "usb_access.h"
+#include "devuser.h"
 
 /**
  * \brief maximum possible size of a device serial id.
@@ -197,23 +198,25 @@ static int hotplug_callback(struct libusb_context *ctx __attribute__((unused)),
 
     return 1;
   }
-  printf("Device plugged : %s\n", device->serial);
+  syslog(LOG_DEBUG, "Device plugged : %s\n", device->serial);
 
-  /**
-   * \todo
-   * TODO: test if the device is authorized and fill the authorized_status
-   * variable with 1 if authorized, 0 otherwise.
-   */
-  int authorized_status = 1;
-
-  if (update_device_access(device, authorized_status))
+  if (!device_is_valid(device))
   {
-    syslog(LOG_WARNING, "Device access update error");
+    syslog(LOG_WARNING, "invalid device plugged.");
+    free(device);
 
     return 1;
   }
 
-  return 0;
+  int authorized_status = check_devid(device->serial, devices_get());
+
+  int rcode = 0;
+  if ((rcode = update_device_access(device, authorized_status)))
+    syslog(LOG_WARNING, "Device access update error");
+
+  free(device);
+
+  return !!rcode;
 }
 
 /**

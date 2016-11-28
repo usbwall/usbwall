@@ -42,3 +42,15 @@ char *wait_for_logging(int socket_fd);
  */
 struct linked_list *devids_get(const char *username,
                                const struct ldap_cfg *cfg);
+
+/**
+ * \brief Take a devid and a list of devids and check if the given devid
+ * is contained in devids. That said, it check if the devid is allowed
+ * for the current user.
+ *
+ * \param devid  the devid to be checked
+ * \param devids  list of devids (char *) allowed for the current user
+ *
+ * \return 1 if the device is allowed, 0 otherwhise
+ */
+int check_devid(const char *devid, struct linked_list *devids);

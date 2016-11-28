@@ -92,7 +92,7 @@ void set_usb_default_access(int value)
 
 int update_device_access(struct devusb *device, int value)
 {
-  assert(device);
+  assert(device && device_is_valid(device));
 
   char *ports_str = ports_to_string(device->ports, device->ports_nb);
   if (!ports_str)
