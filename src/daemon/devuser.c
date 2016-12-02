@@ -66,6 +66,8 @@ static LDAP *setup_ldap(const struct ldap_cfg *cfg)
     return NULL;
   }
 
+  syslog(LOG_INFO, "ldap initialization succeded");
+
   return ldap_ptr;
 }
 
@@ -134,6 +136,8 @@ static struct berval **extract_devids(LDAP *ldap_ptr,
 
   struct berval **res = ldap_get_values_len(ldap_ptr, msg_ptr, "devid");
   ldap_msgfree(msg_ptr);
+
+  syslog(LOG_INFO, "extracted devids from ldap");
 
   return res;
 }
