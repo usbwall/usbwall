@@ -99,13 +99,15 @@ int update_device_access(struct devusb *device, int value)
     return 1;
 
   char file_path[1024] = { '\0' };
-
   sprintf(file_path,
           "/sys/bus/usb/devices/%d-%s/authorized",
           device->bus,
           ports_str);
+
+  const char *access_str = value ? "Authorizing" : "Forbid";
   syslog(LOG_INFO,
-         "Authorizing device %s on %d-%s",
+         "%s device %s on %d-%s",
+         access_str,
          device->serial,
          device->bus,
          ports_str);
