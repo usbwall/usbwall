@@ -186,11 +186,7 @@ int usbwall_run(void)
       break; // program terminaison requested
 
     if (!username)
-    {
-      syslog(LOG_WARNING, "Current user can not be fetched");
-
       continue;
-    }
 
     handle_login(cfg, username);
     free(username);

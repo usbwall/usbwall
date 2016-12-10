@@ -96,8 +96,8 @@ int main(int argc, char *argv[])
   }
 
   syslog(LOG_INFO, "usbwall started correctly");
-
   int rcode = usbwall_run();
+  syslog(LOG_INFO, "usbwall terminated correctly");
 
   closelog();
 

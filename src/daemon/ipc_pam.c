@@ -30,6 +30,7 @@ enum event accept_user(int socket_fd)
   enum event message_event;
   int client_fd = 0;
 
+  syslog(LOG_DEBUG, "Waiting for a user from pam module ...");
   if ((client_fd = accept(socket_fd, NULL, NULL)) == -1)
     return ERROR;
 
@@ -58,6 +59,8 @@ int init_socket(void)
   /* Listen to Unix Domain socket */
   if (listen(fd, 5) == -1)
     return die("Initialization error - listen Unix Domain Socket failed");
+
+  syslog(LOG_DEBUG, "Unix Domain Socket succefully initialized.");
 
   return fd;
 }

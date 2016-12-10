@@ -66,7 +66,7 @@ static LDAP *setup_ldap(const struct ldap_cfg *cfg)
     return NULL;
   }
 
-  syslog(LOG_INFO, "ldap initialization succeded");
+  syslog(LOG_DEBUG, "ldap initialization succeded");
 
   return ldap_ptr;
 }
@@ -137,7 +137,7 @@ static struct berval **extract_devids(LDAP *ldap_ptr,
   struct berval **res = ldap_get_values_len(ldap_ptr, msg_ptr, "devid");
   ldap_msgfree(msg_ptr);
 
-  syslog(LOG_INFO, "extracted devids from ldap");
+  syslog(LOG_DEBUG, "extracted devids from ldap");
 
   return res;
 }
@@ -152,11 +152,14 @@ char *username_get(void)
       if (log.ut_type == USER_PROCESS)
       {
         close(utmp_fd);
+        char *username = strdup(log.ut_name);
+        syslog(LOG_DEBUG, "fetched current username : %s", username);
 
-        return strdup(log.ut_name);
+        return username;
       }
     close(utmp_fd);
   }
+  syslog(LOG_WARNING, "current username can't be fetched!");
 
   return NULL;
 }
@@ -180,7 +183,7 @@ char *wait_for_logging(int socket_fd)
       error = 1;
       break;
     case UNKNOWN:
-      syslog(LOG_ERR, "Unknown event from PAM module.");
+      syslog(LOG_WARNING, "Unknown event from PAM module.");
       error = 1;
       break;
   }
@@ -220,6 +223,8 @@ struct linked_list *devids_get(const char *username,
 int check_devid(const char *devid, struct linked_list *devids)
 {
   assert(devid && devids);
+
+  syslog(LOG_DEBUG, "devusb intialized sucessfully");
 
   int (*compare_function)(const void *, const void *) =
     (int (*)(const void *, const void *))strcmp;

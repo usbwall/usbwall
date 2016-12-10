@@ -283,6 +283,8 @@ int init_devusb(void)
   if (rcode != LIBUSB_SUCCESS)
   {
     libusb_exit(NULL);
+    syslog(LOG_DEBUG, "hotplug callback failed to register");
+
     return 1;
   }
 
@@ -290,6 +292,8 @@ int init_devusb(void)
 
   /* start the wait_for_hotplug thread */
   pthread_create(&g_hotplug_thread, NULL, wait_for_hotplug, NULL);
+
+  syslog(LOG_DEBUG, "devusb intialized sucessfully");
 
   return 0;
 }
@@ -325,4 +329,5 @@ void close_devusb(void)
   pthread_join(g_hotplug_thread, NULL);
   libusb_hotplug_deregister_callback(NULL, g_callback_handler);
   libusb_exit(NULL);
+  syslog(LOG_DEBUG, "devusb closed");
 }

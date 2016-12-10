@@ -59,7 +59,10 @@ static int scanstr(const char *line, const char *format, char **destination)
   /* We need to check if the value was duplicated. If it is, then we free it
    * and rewrite it = the last given value prevale! */
   if (*destination)
+  {
+    syslog(LOG_NOTICE, "Value %s is shadowed!", *destination);
     free(*destination);
+  }
 
   const size_t len = strlen(buffer);
   *destination = malloc(len + 1);
@@ -93,6 +96,7 @@ struct ldap_cfg *make_ldap_cfg(const char *cfg_file)
 
     return NULL;
   }
+  syslog(LOG_INFO, "Found configuration file at %s", cfg_file);
 
   struct ldap_cfg *config = calloc(1, sizeof(struct ldap_cfg));
   if (!config)
@@ -103,6 +107,7 @@ struct ldap_cfg *make_ldap_cfg(const char *cfg_file)
   }
 
   /* parsing configurations from the file */
+  syslog(LOG_DEBUG, "Parsing configuration file");
   char *buffer = NULL;
   size_t buff_size = 0;
   while (getline(&buffer, &buff_size, stream) != -1)
