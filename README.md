@@ -26,12 +26,34 @@ The output binaries are located in the *out* directory.
 
 ## Configuration
 
+### Daemon configuration
 The project use a configuration file, using a syntax similar to usual ldap.conf
 files. The configuration file must be named *usbwall.cfg* and located in the
 */etc* folder.
 
 A sample configuration file is described in this package. Report to this file in
 order to configure properly usbwall.
+
+### PAM configuration
+The *libpam_usbwall* library also need to be configured to be used by PAM. To do
+this simply move the generated library to the pam modules folder. Example :
+~~~sh
+mv [path/to/usbwall]/out/libpam_usbwall.so /usr/lib/security/pam_usbwall.so
+~~~
+
+Finally, you need to configure PAM to load the module. To do that, simply
+modified the corresponding pam configuration file in */etc/pam.d/* and add
+this line :
+~~~sh
+session optional pam_usbwall.so debug
+~~~
+
+- *optional* means that if the module fails, the user is not disconnected from
+the host.
+- replace *pam_usbwall.so* by the name of the module you moved in the modules
+folder.
+- *debug* if an optional argument that specify if the debug mode is activated or
+not.
 
 ## Contributors
 
