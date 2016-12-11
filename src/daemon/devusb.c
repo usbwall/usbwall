@@ -194,7 +194,7 @@ static int hotplug_callback(struct libusb_context *ctx __attribute__((unused)),
   struct devusb *device = device_to_devusb(dev);
   if (!device)
   {
-    syslog(LOG_WARNING, "corrupted hotplug devusb");
+    syslog(LOG_WARNING, "Corrupted hotplug devusb");
 
     return 1;
   }
@@ -202,7 +202,7 @@ static int hotplug_callback(struct libusb_context *ctx __attribute__((unused)),
 
   if (!device_is_valid(device))
   {
-    syslog(LOG_WARNING, "invalid device plugged.");
+    syslog(LOG_WARNING, "Invalid device plugged.");
     free(device);
 
     return 1;
@@ -283,7 +283,7 @@ int init_devusb(void)
   if (rcode != LIBUSB_SUCCESS)
   {
     libusb_exit(NULL);
-    syslog(LOG_DEBUG, "hotplug callback failed to register");
+    syslog(LOG_DEBUG, "Hotplug callback failed to register");
 
     return 1;
   }
@@ -293,7 +293,7 @@ int init_devusb(void)
   /* start the wait_for_hotplug thread */
   pthread_create(&g_hotplug_thread, NULL, wait_for_hotplug, NULL);
 
-  syslog(LOG_DEBUG, "devusb intialized sucessfully");
+  syslog(LOG_DEBUG, "Devusb initialized sucessfully");
 
   return 0;
 }
@@ -313,7 +313,7 @@ struct linked_list *devices_get(void)
     struct devusb *element = device_to_devusb(device_list[i]);
     if (!element)
     {
-      syslog(LOG_DEBUG, "corrupted devusb on iteration %d", i);
+      syslog(LOG_DEBUG, "Corrupted devusb on iteration %d", i);
       break;
     }
     list_add_back(devusb_list, element);
@@ -329,5 +329,5 @@ void close_devusb(void)
   pthread_join(g_hotplug_thread, NULL);
   libusb_hotplug_deregister_callback(NULL, g_callback_handler);
   libusb_exit(NULL);
-  syslog(LOG_DEBUG, "devusb closed");
+  syslog(LOG_DEBUG, "Devusb closed");
 }

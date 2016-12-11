@@ -109,6 +109,7 @@ static int notifs_lookup(struct ldap_cfg **cfg)
 
       return 1; // no configs found
     }
+    g_cfgupdate = 0;
   }
 
   return 0;

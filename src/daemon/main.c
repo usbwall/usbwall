@@ -95,9 +95,9 @@ int main(int argc, char *argv[])
     return 1; // a valid signal handling is mandatory
   }
 
-  syslog(LOG_INFO, "usbwall started correctly");
+  syslog(LOG_INFO, "Usbwall started correctly");
   int rcode = usbwall_run();
-  syslog(LOG_INFO, "usbwall terminated correctly");
+  syslog(LOG_INFO, "Usbwall terminated correctly");
 
   closelog();
 

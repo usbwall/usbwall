@@ -35,7 +35,7 @@ static LDAP *setup_ldap(const struct ldap_cfg *cfg)
 
   if (ldap_initialize(&ldap_ptr, cfg->uri) != LDAP_SUCCESS)
   {
-    syslog(LOG_WARNING, "ldap initialization failed");
+    syslog(LOG_WARNING, "Ldap initialization failed");
 
     return NULL;
   }
@@ -44,7 +44,7 @@ static LDAP *setup_ldap(const struct ldap_cfg *cfg)
       != LDAP_OPT_SUCCESS)
   {
     syslog(LOG_WARNING,
-           "ldap does not support the protocol version %hd",
+           "Ldap does not support the protocol version %hd",
            cfg->version);
     ldap_unbind_ext(ldap_ptr, NULL, NULL);
 
@@ -60,13 +60,13 @@ static LDAP *setup_ldap(const struct ldap_cfg *cfg)
                        NULL)
       != LDAP_SUCCESS)
   {
-    syslog(LOG_WARNING, "ldap sasl binding failed");
+    syslog(LOG_WARNING, "Ldap sasl binding failed");
     ldap_unbind_ext(ldap_ptr, NULL, NULL);
 
     return NULL;
   }
 
-  syslog(LOG_DEBUG, "ldap initialization succeded");
+  syslog(LOG_DEBUG, "Ldap initialization succeded");
 
   return ldap_ptr;
 }
@@ -122,7 +122,7 @@ static struct berval **extract_devids(LDAP *ldap_ptr,
   if (!ldap_count_entries(ldap_ptr, msg_ptr))
   {
     syslog(LOG_WARNING,
-           "ldap research failed. No entry found for user %s",
+           "Ldap research failed. No entry found for user %s",
            username);
 
     return NULL;
@@ -137,7 +137,7 @@ static struct berval **extract_devids(LDAP *ldap_ptr,
   struct berval **res = ldap_get_values_len(ldap_ptr, msg_ptr, "devid");
   ldap_msgfree(msg_ptr);
 
-  syslog(LOG_DEBUG, "extracted devids from ldap");
+  syslog(LOG_DEBUG, "Extracted devids from ldap");
 
   return res;
 }
@@ -153,13 +153,13 @@ char *username_get(void)
       {
         close(utmp_fd);
         char *username = strdup(log.ut_name);
-        syslog(LOG_DEBUG, "fetched current username : %s", username);
+        syslog(LOG_DEBUG, "Fetched current username : %s", username);
 
         return username;
       }
     close(utmp_fd);
   }
-  syslog(LOG_WARNING, "current username can't be fetched!");
+  syslog(LOG_WARNING, "Current username can't be fetched!");
 
   return NULL;
 }
@@ -224,7 +224,7 @@ int check_devid(const char *devid, struct linked_list *devids)
 {
   assert(devid && devids);
 
-  syslog(LOG_DEBUG, "devusb intialized sucessfully");
+  syslog(LOG_DEBUG, "Devusb initialized sucessfully");
 
   int (*compare_function)(const void *, const void *) =
     (int (*)(const void *, const void *))strcmp;

@@ -124,6 +124,7 @@ struct ldap_cfg *make_ldap_cfg(const char *cfg_file)
              "config syntax error, this line is invalid: %s",
              buffer);
   }
+  syslog(LOG_DEBUG, "Configuration parsing finished");
 
   free(buffer);
   fclose(stream);
