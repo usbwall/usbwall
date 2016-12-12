@@ -1,7 +1,7 @@
 #include "ipc_pam.h"
-#include "uds.h"
 
 #include <assert.h>
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -10,6 +10,8 @@
 #include <sys/un.h>
 #include <syslog.h>
 #include <unistd.h>
+
+#include "uds.h"
 
 /**
  * \brief internal global variable corresponding to the file descriptor
@@ -38,10 +40,12 @@ enum event accept_user(void)
   enum event message_event;
   int client_fd = 0;
 
-  perror("TEST");
   syslog(LOG_DEBUG, "Waiting for a user from pam module ...");
   if ((client_fd = accept(uds_fd, NULL, NULL)) == -1)
   {
+    if (errno == EINVAL)
+      return CLOSED;
+
     return ERROR;
   }
 

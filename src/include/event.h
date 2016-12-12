@@ -5,6 +5,7 @@ enum event
 {
   USER_CONNECT,
   USER_DISCONNECT,
+  CLOSED,
   ERROR,
   UNKNOWN
 };

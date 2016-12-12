@@ -179,6 +179,9 @@ char *wait_for_logging(void)
     case USER_DISCONNECT:
       syslog(LOG_INFO, "User just disconnected.");
       break;
+    case CLOSED:
+      syslog(LOG_INFO, "Connection with PAM closed.");
+      break;
     case ERROR:
       syslog(LOG_ERR, "Error from accept_user() function.");
       error = 1;
