@@ -8,6 +8,7 @@ set(DAEMON_SRC
   main.c
   parser.c
   usb_access.c
+  complete_id.c
   )
 
 add_library(usbwalld_obj OBJECT ${DAEMON_SRC})
