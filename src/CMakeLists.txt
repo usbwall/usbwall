@@ -29,11 +29,6 @@ if (HAS_PEDANTIC_CFLAG)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pedantic")
 endif()
 
-check_c_compiler_flag(-Wunused-macros HAS_UNUSED_MACROS_CFLAG)
-if (HAS_UNUSED_MACROS_CFLAG)
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wunused-macros")
-endif()
-
 ### Disabled compile flags because of code incompatibility (yet)
 
 # Used for skip strutures alignement requirement
@@ -42,12 +37,30 @@ if (HAS_PADDED_CFLAG)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-padded")
 endif()
 
+# Skip check for variable length in arrays
+check_c_compiler_flag(-Wno-vla HAS_NOVLA_CFLAG)
+if (HAS_NOVLA_CFLAG)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-vla")
+endif()
+
+# Using sigaction create this warning
+check_c_compiler_flag(-Wno-disabled-macro-expansion HAS_NOMACEXP_CFLAG)
+if (HAS_NOMACEXP_CFLAG)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-disabled-macro-expansion")
+endif()
+
+# Skip the check for functions calls to with non litteral format string
+check_c_compiler_flag(-Wno-format-nonliteral HAS_NOFORMAT_NONLIT_CFLAG)
+if (HAS_NOFORMAT_NONLIT_CFLAG)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-format-nonliteral")
+endif()
+
 ### Define mandatory CFLAGS
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D_XOPEN_SOURCE=800 -fPIC")
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD")
-    # FreeBSD specific code
+#FreeBSD specific code
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D_FREEBSD")
 endif()
 
@@ -55,19 +68,28 @@ endif()
 ### Check for DEBUG mode CFLAGS compiler support
 ###########################
 
-check_c_compiler_flag(-fsanitize=address HAS_SAN_ADDR_CFLAG)
-if (HAS_SAN_ADDR_CFLAG)
-    set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -fsanitize=address")
-endif()
-
-check_c_compiler_flag(-fsanitize=undefined HAS_SAN_UNDEF_CFLAG)
-if (HAS_SAN_UNDEF_CFLAG)
-    set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -fsanitize=undefined")
-endif()
-
 ### Define mandatory DEBUG CFLAGS
 
-set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -g3")
+set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -g3 -Werror")
+
+### Check sanitizer support
+
+check_c_compiler_flag(-fsanitize=undefined HAS_SAN_UNDEFINED_CFLAG)
+if (HAS_SAN_UNDEFINED_CFLAG)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsanitize=undefined")
+endif()
+check_c_compiler_flag(-fsanitize=address HAS_SAN_ADDR_CFLAG)
+if (has_san_addr_cflag)
+    set(cmake_c_flags "${cmake_c_flags} -fsanitize=address")
+endif()
+check_c_compiler_flag(-fsanitize=leak HAS_SAN_LEAK_CFLAG)
+if (has_san_leak_cflag)
+    set(cmake_c_flags "${cmake_c_flags} -fsanitize=leak")
+endif()
+check_c_compiler_flag(-fno-omit-frame-pointer HAS_OMIT_FP_CFLAG)
+if (HAS_OMIT_FP_CFLAG)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-omit-frame-pointer")
+endif()
 
 ###########################
 ### Check for RELEASE CFLAGS compiler support
