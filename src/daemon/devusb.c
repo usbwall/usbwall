@@ -306,9 +306,13 @@ struct linked_list *devices_get(void)
 
   libusb_device **device_list = NULL;
   const ssize_t device_list_size = libusb_get_device_list(NULL, &device_list);
+  if (device_list_size < 0)
+    syslog(LOG_WARNING,
+           "Failed to retrieve device list : %s",
+           libusb_strerror(device_list_size));
 
   /* iterate over all devices and extract needed infos */
-  for (int i = 0; i < device_list_size; ++i)
+  for (ssize_t i = 0; i < device_list_size; ++i)
   {
     struct devusb *element = device_to_devusb(device_list[i]);
     if (!element)
