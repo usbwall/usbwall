@@ -17,6 +17,8 @@
 #include "config.h"
 #include "devuser.h"
 #include "usb_access.h"
+#include "complete_id.h"
+#include "../misc/error_handler.h"
 
 /**
  * \brief maximum possible size of a device serial id.
@@ -139,6 +141,60 @@ static uint8_t device_ports_get(struct libusb_device *device, uint8_t **ports)
   return ports_nb;
 }
 
+
+/**
+ * \brief devusb internal function that will return the hostname
+ * \return the hostname string. NULL if an error occured
+ */
+static char *get_machine_name(void)
+{
+  char *name = NULL;
+
+  name = malloc(BUF_MACH);
+
+  if (gethostname(name, BUF_MACH) != 0)
+    return NULL;
+
+  return name;
+}
+
+
+/**
+ * \brief devusb internal function that fill all the devusb fields except
+ * complete_id
+ *
+ * \param result  the devusb struct to fill
+ * \param usb_infos the descriptor from which we extract the serial, vendor,
+ *        product, bcd_device of the device
+ * \param device the device from which we extract the serial, bus and port
+ *
+ * \return error
+ *
+ * The device will extract all the information from the device
+ * and store it in a devusb structure.
+ */
+static int32_t fill_simple_id(struct devusb **result,
+                              struct libusb_device_descriptor *usb_infos,
+                              struct libusb_device *device)
+{
+  if (!(*result) || !usb_infos || !device)
+    return DEVIDD_ERR_OTHER;
+  (*result)->last_co = time(NULL);
+  (*result)->machine = get_machine_name();
+  if ((*result)->machine == NULL)
+    return DEVIDD_ERR_OTHER;
+  (*result)->serial = device_serial_get(device, usb_infos);
+  if ((*result)->serial == NULL)
+    return DEVIDD_ERR_OTHER;
+  (*result)->vendor = usb_infos->idVendor;
+  (*result)->product = usb_infos->idProduct;
+  (*result)->bcd_device = usb_infos->bcdDevice;
+  (*result)->bus = libusb_get_bus_number(device);
+  (*result)->ports_nb = device_ports_get(device, &(*result)->ports);
+
+  return DEVIDD_SUCCESS;
+}
+
 /**
  * \brief devusb internal function that convert a libusb device object to a
  * devusb structure
@@ -152,25 +208,61 @@ static uint8_t device_ports_get(struct libusb_device *device, uint8_t **ports)
  */
 static struct devusb *device_to_devusb(struct libusb_device *device)
 {
+  char **array_id = NULL;
+  char *str_complete_id = NULL;
+  int32_t err = DEVIDD_SUCCESS;
+  int32_t err_array_id = 0;
+  int32_t err_get_desc = 0;
+  struct libusb_device_descriptor usb_infos;
+
   assert(device);
 
   struct devusb *result = calloc(1, sizeof(struct devusb));
   if (!result)
     return NULL;
 
-  struct libusb_device_descriptor usb_infos;
-  if (libusb_get_device_descriptor(device, &usb_infos) != LIBUSB_SUCCESS)
+  /* Allocate str_complete_id with the size of each of its id */
+  str_complete_id = malloc(LEN_STR * (NB_FIELD_COMPLETE_ID + 1));
+  /* Allocate array_id and each of its cells */
+  err_array_id = allocate_array_id(&array_id);
+  /* Extract usb descriptor from device */
+  err_get_desc = libusb_get_device_descriptor(device, &usb_infos);
+
+  /* If one of these operations failed, free ressources and return */
+  if (!str_complete_id || (err_array_id != DEVIDD_SUCCESS)
+      || (err_get_desc != LIBUSB_SUCCESS))
+  {
+    free(result);
+    free(str_complete_id);
+    free_array_id(&array_id);
+    return NULL;
+  }
+
+  /* Fill all the fields of devusb, exept complete_id */
+  if (fill_simple_id(&result, &usb_infos, device) != DEVIDD_SUCCESS)
+    err = DEVIDD_ERR_OTHER;
+
+  /* Fill devusb field complete_id, by concatenation of all the others fields */
+  result->complete_id = fill_complete_id(array_id, result);
+  if (!result->complete_id)
+    err = DEVIDD_ERR_OTHER;
+
+  /* Free the elements that are no more needed */
+  free_array_id(&array_id);
+  free(str_complete_id);
+
+  /* As all ressources were freed, handle errors */
+  if (err != DEVIDD_SUCCESS)
   {
     free(result);
     return NULL;
   }
 
-  result->serial = device_serial_get(device, &usb_infos);
-  result->bus = libusb_get_bus_number(device);
-  result->ports_nb = device_ports_get(device, &result->ports);
+  assert(result != NULL && "result is null");
 
   return result;
 }
+
 
 /**
  * \brief devusb internal function that check if the device is accessible by the
@@ -199,7 +291,7 @@ static int hotplug_callback(struct libusb_context *ctx __attribute__((unused)),
 
     return 1;
   }
-  syslog(LOG_INFO, "New device detected : %s\n", device->serial);
+  syslog(LOG_DEBUG, "New device detected : %s\n", device->complete_id);
 
   if (!device_is_valid(device))
   {
