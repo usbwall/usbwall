@@ -180,19 +180,21 @@ int usbwall_run(void)
   if (!cfg)
     return 1; // no configs found
 
-  char *username = username_get();
+  struct linked_list *usernames = usernames_get();
 
   do
   {
     if (notifs_lookup(&cfg))
       break; // program terminaison requested
 
-    if (!username)
+    if (!usernames)
       continue;
 
-    handle_login(cfg, username);
-    free(username);
-  } while ((username = wait_for_logging()));
+    list_for_each(node_ptr, usernames)
+      handle_login(cfg, node_ptr->data);
+
+    list_destroy(usernames, 1);
+  } while ((usernames = wait_for_logging()));
 
   close_devusb();
   destroy_ldap_cfg(cfg);

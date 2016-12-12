@@ -142,29 +142,35 @@ static struct berval **extract_devids(LDAP *ldap_ptr,
   return res;
 }
 
-char *username_get(void)
+struct linked_list *usernames_get(void)
 {
   int utmp_fd = open("/var/run/utmp", O_RDONLY);
   if (utmp_fd != -1)
   {
+    struct linked_list *usernames = list_make();
     struct utmp log;
     while (read(utmp_fd, &log, sizeof(struct utmp)) == sizeof(struct utmp))
       if (log.ut_type == USER_PROCESS)
       {
         close(utmp_fd);
         char *username = strdup(log.ut_name);
-        syslog(LOG_DEBUG, "Fetched current username : %s", username);
-
-        return username;
+        list_add_back(usernames, username);
+        syslog(LOG_DEBUG, "Fetched username : %s", username);
       }
     close(utmp_fd);
+
+    if (!usernames->first)
+      syslog(LOG_WARNING, "User not found!");
+
+    return usernames;
   }
-  syslog(LOG_WARNING, "Current username can't be fetched!");
+  syslog(LOG_WARNING,
+         "Current username can't be fetched! : utmp not available");
 
   return NULL;
 }
 
-char *wait_for_logging(void)
+struct linked_list *wait_for_logging()
 {
   /* Wait for the event from PAM */
   enum event message_event = accept_user();
@@ -192,7 +198,7 @@ char *wait_for_logging(void)
       break;
   }
 
-  return error ? NULL : username_get();
+  return error ? NULL : usernames_get();
 }
 
 struct linked_list *devids_get(const char *username,

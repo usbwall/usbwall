@@ -317,7 +317,7 @@ struct linked_list *devices_get(void)
     struct devusb *element = device_to_devusb(device_list[i]);
     if (!element)
     {
-      syslog(LOG_DEBUG, "Corrupted devusb on iteration %d", i);
+      syslog(LOG_DEBUG, "Corrupted devusb on iteration %zd", i);
       break;
     }
     list_add_back(devusb_list, element);
