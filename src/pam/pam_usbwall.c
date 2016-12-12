@@ -18,31 +18,64 @@
  * been
  * enabled
  *
- * \param argc  unused
- * \param argv  unused
+ * \param argc  number of arguments
+ * \param argv  arguments array
  *
  * \return non zero value if the debug mode is activated
  */
-static int fetch_debug(int argc __attribute__((unused)),
-                       const char **argv __attribute__((unused)))
+static int fetch_debug(int argc, const char **argv)
 {
-  /**
-   * \todo
-   * TODO: The function will allways return 1
-   **/
+  for (int i = 0; i < argc; ++i)
+    if (!strcmp(argv[i], "debug"))
+      return 1;
 
-  return 1;
+  return 0;
 }
 
 /**
  * \brief pam usbwall module internal function used to send an event to the
  * daemon.
  *
- * \param fd  The filedescriptor of the socket used for IPC
+ * \param evt  The event to be sended to the daemon
+ * \param debug  1 if debug is activated
+ *
+ * \return PAM_ABORT if an error occured. PAM_SUCCESS otherwhise.
  */
-static void notify_daemon(int fd, enum event evt)
+static int notify_daemon(enum event evt, int debug)
 {
+  struct sockaddr_un addr;
+
+  int fd = socket(AF_UNIX, SOCK_STREAM, 0);
+  if (fd == -1)
+  {
+    if (debug)
+      syslog(LOG_ERR, "Unix socket can not be instanciated");
+
+    return PAM_ABORT;
+  }
+
+  memset(&addr, 0, sizeof(addr));
+  addr.sun_family = AF_UNIX;
+
+  strncpy(addr.sun_path + 1, socket_path + 1, sizeof(addr.sun_path) - 1);
+
+  if (connect(fd, (struct sockaddr *)&addr, sizeof(addr)) == -1)
+  {
+    if (debug)
+      syslog(LOG_ERR, "Initialization error - can not connect to daemon");
+
+    return PAM_ABORT;
+  }
+
   send(fd, &evt, sizeof(enum event), 0);
+
+  close(fd);
+
+  if (debug)
+    syslog(LOG_DEBUG, "Send notification to the daemon of a new connection");
+
+  return PAM_SUCCESS;
+
 }
 
 /**
@@ -54,36 +87,13 @@ static void notify_daemon(int fd, enum event evt)
  * \param argv  arguments array
  *
  * \return PAM_SUCCESS if no error occured.
- */
+*/
 PAM_EXTERN int pam_sm_open_session(pam_handle_t *pamh __attribute__((unused)),
                                    int flags __attribute__((unused)),
                                    int argc,
                                    const char **argv)
 {
-  // Unix Domain Socket
-  struct sockaddr_un addr;
-  int debug = fetch_debug(argc, argv);
-
-  int fd = socket(AF_UNIX, SOCK_STREAM, 0);
-  if (fd == -1)
-    return PAM_ABORT;
-
-  memset(&addr, 0, sizeof(addr));
-  addr.sun_family = AF_UNIX;
-
-  strncpy(addr.sun_path + 1, socket_path + 1, sizeof(addr.sun_path) - 1);
-
-  if (connect(fd, (struct sockaddr *)&addr, sizeof(addr)) == -1)
-  {
-    if (debug)
-      syslog(LOG_ERR, "Initialization error - can not connect to daemon");
-    return PAM_ABORT;
-  }
-
-  notify_daemon(fd, USER_CONNECT);
-  close(fd);
-
-  return PAM_SUCCESS;
+  return notify_daemon(USER_CONNECT, fetch_debug(argc, argv));
 }
 
 /**
@@ -91,8 +101,8 @@ PAM_EXTERN int pam_sm_open_session(pam_handle_t *pamh __attribute__((unused)),
  *
  * \param pamh  unused
  * \param flags  unused
- * \param argc  unused
- * \param argv  unused
+ * \param argc  number of arguments
+ * \param argv  arguments array
  *
  * \return PAM_SUCCESS if no error occured.
  */
@@ -101,28 +111,5 @@ PAM_EXTERN int pam_sm_close_session(pam_handle_t *pamh __attribute__((unused)),
                                     int argc,
                                     const char **argv)
 {
-  // Unix Domain Socket
-  struct sockaddr_un addr;
-  int debug = fetch_debug(argc, argv);
-
-  int fd = socket(AF_UNIX, SOCK_STREAM, 0);
-  if (fd == -1)
-    return PAM_ABORT;
-
-  memset(&addr, 0, sizeof(addr));
-  addr.sun_family = AF_UNIX;
-
-  strncpy(addr.sun_path + 1, socket_path + 1, sizeof(addr.sun_path) - 1);
-
-  if (connect(fd, (struct sockaddr *)&addr, sizeof(addr)) == -1)
-  {
-    if (debug)
-      syslog(LOG_ERR, "Initialization error - can not connect to daemon");
-    return PAM_ABORT;
-  }
-
-  notify_daemon(fd, USER_DISCONNECT);
-  close(fd);
-
-  return PAM_SUCCESS;
+  return notify_daemon(USER_DISCONNECT, fetch_debug(argc, argv));
 }
