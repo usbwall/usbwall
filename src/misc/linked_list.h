@@ -50,7 +50,7 @@ void *list_extract(struct linked_list *ll,
                    int (* compare_function)(const void *, const void *));
 /**
  * \brief remove the given node from the list. If the node is not in the linked
- * list, it's an undefined behavior.
+ * list, nothing is done.
  *
  * \param ll  linked_list to remove the node from
  * \param removed_node  the node to be removed

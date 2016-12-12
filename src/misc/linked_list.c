@@ -105,17 +105,19 @@ void list_remove(struct linked_list *ll,
     ll->first = removed_node->next;
     if (ll->last == removed_node)
       ll->last = NULL; // single node case
+  }
+  else
+  {
+    struct ll_node *ptr = ll->first;
+    while (ptr && ptr->next != removed_node)
+      ptr = ptr->next;
 
-    return;
+    if (!ptr)
+      return; // the node is not in the list
+
+    ptr->next = removed_node->next;
   }
 
-  struct ll_node *ptr = ll->first;
-  while (ptr && ptr->next != removed_node)
-    ptr = ptr->next;
-
-  assert(ptr && "The removed node need to be in the list.");
-
-  ptr->next = removed_node->next;
   if (destruction)
   {
     free(removed_node->data);
