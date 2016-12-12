@@ -164,10 +164,11 @@ char *username_get(void)
   return NULL;
 }
 
-char *wait_for_logging(int socket_fd)
+char *wait_for_logging(void)
 {
   /* Wait for the event from PAM */
-  enum event message_event = accept_user(socket_fd);
+  enum event message_event = accept_user();
+
   /* Handle enum here */
   int error = 0;
   switch (message_event)

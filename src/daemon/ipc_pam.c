@@ -12,27 +12,38 @@
 #include <unistd.h>
 
 /**
+ * \brief internal global variable corresponding to the file descriptor
+ * associated with the UDS connection
+ */
+static int uds_fd;
+
+/**
  * \brief Simple ipc_pam internal function to log an error and return -1
  *
  * \param err_msg  error message to be displayed in the syslog
  *
- * \return allways -1
+ * \return allways 1
  */
 static int die(const char *err_msg)
 {
   syslog(LOG_ERR, "%s\n", err_msg);
 
-  return -1;
+  return 1;
 }
 
-enum event accept_user(int socket_fd)
+enum event accept_user(void)
 {
+  assert(uds_fd > 0);
+
   enum event message_event;
   int client_fd = 0;
 
+  perror("TEST");
   syslog(LOG_DEBUG, "Waiting for a user from pam module ...");
-  if ((client_fd = accept(socket_fd, NULL, NULL)) == -1)
+  if ((client_fd = accept(uds_fd, NULL, NULL)) == -1)
+  {
     return ERROR;
+  }
 
   if (recv(client_fd, &message_event, sizeof(enum event), 0) == -1)
     return ERROR;
@@ -40,7 +51,7 @@ enum event accept_user(int socket_fd)
   return message_event;
 }
 
-int init_socket(void)
+int init_ipc_pam(void)
 {
   /* Unix Domain Socket */
   struct sockaddr_un addr;
@@ -60,7 +71,22 @@ int init_socket(void)
   if (listen(fd, 5) == -1)
     return die("Initialization error - listen Unix Domain Socket failed");
 
-  syslog(LOG_DEBUG, "Unix Domain Socket succefully initialized.");
+  /* set the global variable*/
+  uds_fd = fd;
 
-  return fd;
+  syslog(LOG_DEBUG, "Unix Domain Socket succefully initialized");
+
+  return 0;
+}
+
+void close_ipc_pam(void)
+{
+  if (uds_fd > 0)
+    shutdown(uds_fd, SHUT_RDWR);
+}
+
+void destroy_ipc_pam(void)
+{
+  if (uds_fd > 0)
+    uds_fd = close(uds_fd);
 }

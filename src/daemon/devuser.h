@@ -19,14 +19,13 @@ char *username_get(void);
 
 /**
  * \brief Wait for a user to login and return his name.
- * \param socket_fd Unix Domain Socket used to receive notifications
  * \return current user name. Return NULL on error.
  *
  * The function wait for an event from the pam module,
  * it will block until something is received.
  * Then, username_get is called and the user name is returned.
  */
-char *wait_for_logging(int socket_fd);
+char *wait_for_logging(void);
 
 /**
  * \brief Extract the list of usb serial ids allowed by

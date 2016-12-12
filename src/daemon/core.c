@@ -96,6 +96,7 @@ static int notifs_lookup(struct ldap_cfg **cfg)
   if (g_terminaison)
   {
     syslog(LOG_INFO, "Terminaison notif received, terminating program");
+
     return 1;
   }
 
@@ -157,6 +158,7 @@ static void signal_handler(int signo)
   if (signo == SIGTERM)
   {
     syslog(LOG_INFO, "SIGTERM received");
+    close_ipc_pam(); // it will close all connections with pam
     g_terminaison = 1;
   }
   else if (signo == SIGHUP)
@@ -171,8 +173,7 @@ int usbwall_run(void)
   if (init_devusb())
     return 1; // devusb initialization error
 
-  int domain_socket_fd = init_socket();
-  if (domain_socket_fd == -1)
+  if (init_ipc_pam())
     return 1; // Unix Domain Socket initialization error
 
   struct ldap_cfg *cfg = make_ldap_cfg(cfg_file_find());
@@ -191,10 +192,11 @@ int usbwall_run(void)
 
     handle_login(cfg, username);
     free(username);
-  } while ((username = wait_for_logging(domain_socket_fd)));
+  } while ((username = wait_for_logging()));
 
   close_devusb();
   destroy_ldap_cfg(cfg);
+  destroy_ipc_pam();
 
   return 0;
 }
