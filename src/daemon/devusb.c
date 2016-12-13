@@ -272,7 +272,7 @@ int init_devusb(void)
                                       * used instead of 0, but the enum value is
                                       * not recognized on the all OS
                                       **/
-                                     0,
+                                     (libusb_hotplug_flag)0,
                                      LIBUSB_HOTPLUG_MATCH_ANY,
                                      LIBUSB_HOTPLUG_MATCH_ANY,
                                      LIBUSB_HOTPLUG_MATCH_ANY,
