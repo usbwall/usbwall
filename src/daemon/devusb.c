@@ -198,7 +198,7 @@ static int hotplug_callback(struct libusb_context *ctx __attribute__((unused)),
 
     return 1;
   }
-  syslog(LOG_DEBUG, "Device plugged : %s\n", device->serial);
+  syslog(LOG_INFO, "New device detected : %s\n", device->serial);
 
   if (!device_is_valid(device))
   {
@@ -309,7 +309,7 @@ struct linked_list *devices_get(void)
   if (device_list_size < 0)
     syslog(LOG_WARNING,
            "Failed to retrieve device list : %s",
-           libusb_strerror(device_list_size));
+           libusb_strerror((enum libusb_error)device_list_size));
 
   /* iterate over all devices and extract needed infos */
   for (ssize_t i = 0; i < device_list_size; ++i)
