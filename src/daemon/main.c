@@ -11,8 +11,13 @@
 
 #include "core.h"
 
-
-
+/**
+ * \brief create the pidfile associated with the usbwall daemon.
+ *
+ * \param pidfile  path of the pidfile to create
+ *
+ * \return 1 if an error occured, 0 otherwhise.
+ */
 static int create_pidfile(const char *pidfile)
 {
   int fd = open(pidfile,
@@ -47,6 +52,11 @@ static int create_pidfile(const char *pidfile)
   return 0;
 }
 
+/**
+ * \brief remove the pidfile associated with the usbwall daemon.
+ *
+ * \param pidfile  path of the pidfile to delete.
+ */
 static void remove_pidfile(const char *pidfile)
 {
   int fd = open(pidfile, O_RDONLY);
