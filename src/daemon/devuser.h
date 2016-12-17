@@ -28,6 +28,13 @@ struct linked_list *usernames_get(void);
 struct linked_list *wait_for_logging(void);
 
 /**
+ * \brief check if the ldap is accessible and usable.
+ * \param cfg current ldap configuration
+ * \return 1 if an error occured, 0 otherwhise.
+ */
+int devids_check(const struct ldap_cfg *cfg);
+
+/**
  * \brief Extract the list of usb serial ids allowed by
  *    the user.
  * \param username name of the checked user

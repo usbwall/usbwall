@@ -173,9 +173,9 @@ static void signal_handler(int signo)
  * This function should be call only after every modules is initialized
  * correctly. When this function return, the program should start its
  * terminaison procedure
- * \param signo  id number of the signal received
+ * \param cfg  structure containing the configuration of the program
  */
-static void core_loop(struct ldap_cfg *cfg_ptr)
+static void core_loop(struct ldap_cfg *cfg)
 {
   struct linked_list *usernames = usernames_get();
   do
@@ -205,6 +205,16 @@ int usbwall_run(void)
   if (!cfg)
   {
     destroy_ipc_pam();
+
+    return 1;
+  }
+  /* *** */
+
+  /* Initial check for the ldap server */
+  if (devids_check(cfg))
+  {
+    destroy_ipc_pam();
+    destroy_ldap_cfg(cfg);
 
     return 1;
   }

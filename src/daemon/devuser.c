@@ -201,6 +201,22 @@ struct linked_list *wait_for_logging()
   return error ? NULL : usernames_get();
 }
 
+int devids_check(const struct ldap_cfg *cfg)
+{
+  LDAP *ldap_ptr = setup_ldap(cfg);
+  if (!ldap_ptr)
+  {
+    syslog(LOG_ERR, "Initial LDAP connection can't be established.");
+
+    return 1;
+  }
+
+  ldap_unbind_ext(ldap_ptr, NULL, NULL);
+  syslog(LOG_INFO, "LDAP connection verified");
+
+  return 0;
+}
+
 struct linked_list *devids_get(const char *username,
                                const struct ldap_cfg *cfg)
 {
