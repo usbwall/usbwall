@@ -1,6 +1,8 @@
 #include <assert.h>
+#include <fcntl.h>
 #include <stdio.h>
 #include <string.h>
+#include <sys/file.h>
 #include <sys/resource.h>
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -8,6 +10,53 @@
 #include <unistd.h>
 
 #include "core.h"
+
+
+
+static int create_pidfile(const char *pidfile)
+{
+  int fd = open(pidfile,
+                O_CREAT | O_TRUNC | O_WRONLY | O_EXCL,
+                0644);
+  if (fd == -1)
+  {
+    syslog(LOG_ERR, "Failed to create new pidfile at %s", pidfile);
+
+    return 1;
+  }
+
+  if (dprintf(fd, "%zd", (ssize_t)getpid()) <= 0)
+  {
+    syslog(LOG_ERR, "Failed to write to pidfile at %s", pidfile);
+    close(fd);
+
+    return 1;
+  }
+
+  if (flock(fd, LOCK_EX | LOCK_NB))
+  {
+    syslog(LOG_ERR, "Failed to lock pidfile");
+    close(fd);
+
+    return 1;
+  }
+
+  close(fd);
+  syslog(LOG_INFO, "Pidfile created at %s", pidfile);
+
+  return 0;
+}
+
+static void remove_pidfile(const char *pidfile)
+{
+  int fd = open(pidfile, O_RDONLY);
+  if (flock(fd, LOCK_UN | LOCK_NB))
+    syslog(LOG_WARNING, "Failed to unlock the pidfile");
+  close(fd);
+
+  if (remove(pidfile))
+    syslog(LOG_WARNING, "Failed to remove the pidfile");
+}
 
 /**
  * \brief daemonize the process
@@ -32,6 +81,7 @@ static int daemonize(void)
     return 1; // terminate session leader process
 
   umask(0);           // new file permissions
+
   if (chdir("/") < 0) // change working directory
     return 1;
 
@@ -95,9 +145,15 @@ int main(int argc, char *argv[])
     return 1; // a valid signal handling is mandatory
   }
 
+  const char *pidfile = "/var/run/usbwall.pid";
+  if (create_pidfile(pidfile))
+    return 1; // pidfile is mandatory to ensure unique instance
+
   syslog(LOG_INFO, "Usbwall started");
   int rcode = usbwall_run();
   syslog(LOG_INFO, "Usbwall terminated");
+
+  remove_pidfile(pidfile);
 
   closelog();
 
