@@ -168,20 +168,16 @@ static void signal_handler(int signo)
   }
 }
 
-int usbwall_run(void)
+/**
+ * \brief core internal function used to isolate the main loop.
+ * This function should be call only after every modules is initialized
+ * correctly. When this function return, the program should start its
+ * terminaison procedure
+ * \param signo  id number of the signal received
+ */
+static void core_loop(struct ldap_cfg *cfg_ptr)
 {
-  if (init_devusb())
-    return 1; // devusb initialization error
-
-  if (init_ipc_pam())
-    return 1; // Unix Domain Socket initialization error
-
-  struct ldap_cfg *cfg = make_ldap_cfg(cfg_file_find());
-  if (!cfg)
-    return 1; // no configs found
-
   struct linked_list *usernames = usernames_get();
-
   do
   {
     if (notifs_lookup(&cfg))
@@ -195,10 +191,42 @@ int usbwall_run(void)
 
     list_destroy(usernames, 1);
   } while ((usernames = wait_for_logging()));
+}
 
+int usbwall_run(void)
+{
+  /* Initialization of the IPC_PAM module */
+  if (init_ipc_pam())
+    return 1;
+  /* *** */
+
+  /* Creation of the configuration structure */
+  struct ldap_cfg *cfg = make_ldap_cfg(cfg_file_find());
+  if (!cfg)
+  {
+    destroy_ipc_pam();
+
+    return 1;
+  }
+  /* *** */
+
+  /* Initialization of the Devusb module */
+  if (init_devusb())
+  {
+    destroy_ipc_pam();
+    destroy_ldap_cfg(cfg);
+
+    return 1;
+  }
+  /* *** */
+
+  core_loop(cfg);
+
+  /* terminaison of modules */
   close_devusb();
   destroy_ldap_cfg(cfg);
   destroy_ipc_pam();
+  /* *** */
 
   return 0;
 }
