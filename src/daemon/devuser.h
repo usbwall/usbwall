@@ -7,7 +7,7 @@
 
 #include <misc/linked_list.h>
 
-#include "ldap_config.h"
+#include "config.h"
 
 /**
  * \brief Retrieve the current user name.
@@ -32,7 +32,7 @@ struct linked_list *wait_for_logging(void);
  * \param cfg current ldap configuration
  * \return 1 if an error occured, 0 otherwhise.
  */
-int devids_check(const struct ldap_cfg *cfg);
+int devids_check(const struct config *cfg);
 
 /**
  * \brief Extract the list of usb serial ids allowed by
@@ -47,7 +47,7 @@ int devids_check(const struct ldap_cfg *cfg);
  * case of a connection problem, NULL is returned.
  */
 struct linked_list *devids_get(const char *username,
-                               const struct ldap_cfg *cfg);
+                               const struct config *cfg);
 
 /**
  * \brief Take a devid and a list of devids and check if the given devid

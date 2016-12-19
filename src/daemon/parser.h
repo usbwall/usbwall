@@ -2,7 +2,7 @@
 
 #include <stdio.h>
 
-#include "ldap_config.h"
+#include "config.h"
 
 /**
  * \brief parse a configuration file and return configuration structure.
@@ -11,4 +11,4 @@
  *
  * \return structure filled with the parsed values
  */
-struct ldap_cfg *parse_config(FILE *istream);
+struct config *parse_config(FILE *istream);

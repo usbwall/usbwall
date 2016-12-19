@@ -11,7 +11,7 @@
 
 #include "devuser.h"
 #include "ipc_pam.h"
-#include "ldap_config.h"
+#include "config.h"
 #include "usb_access.h"
 
 /* Globals */
@@ -89,7 +89,7 @@ static struct linked_list *filter_devices(struct linked_list *allowed_devices,
  * The function will lookup globals, usually setted by signal handler and
  * show that a change need to be made to the program state.
  */
-static int notifs_lookup(struct ldap_cfg **cfg)
+static int notifs_lookup(struct config **cfg)
 {
   assert(cfg && *cfg);
 
@@ -103,7 +103,7 @@ static int notifs_lookup(struct ldap_cfg **cfg)
   if (g_cfgupdate)
   {
     syslog(LOG_INFO, "Update notif received, updating config");
-    *cfg = make_ldap_cfg(cfg_file_find());
+    *cfg = make_config(cfg_file_find());
     if (*cfg == NULL)
     {
       syslog(LOG_WARNING, "Configuration update failed, terminating program");
@@ -125,7 +125,7 @@ static int notifs_lookup(struct ldap_cfg **cfg)
  * of authorized devices from devuser, and update the access of devices in the
  * sysfs.
  */
-static void handle_login(struct ldap_cfg *cfg, const char *username)
+static void handle_login(struct config *cfg, const char *username)
 {
   assert(cfg && username);
 
@@ -175,7 +175,7 @@ static void signal_handler(int signo)
  * terminaison procedure
  * \param cfg  structure containing the configuration of the program
  */
-static void core_loop(struct ldap_cfg *cfg)
+static void core_loop(struct config *cfg)
 {
   struct linked_list *usernames = usernames_get();
   do
@@ -201,7 +201,7 @@ int usbwall_run(void)
   /* *** */
 
   /* Creation of the configuration structure */
-  struct ldap_cfg *cfg = make_ldap_cfg(cfg_file_find());
+  struct config *cfg = make_config(cfg_file_find());
   if (!cfg)
   {
     destroy_ipc_pam();
@@ -214,7 +214,7 @@ int usbwall_run(void)
   if (devids_check(cfg))
   {
     destroy_ipc_pam();
-    destroy_ldap_cfg(cfg);
+    destroy_config(cfg);
 
     return 1;
   }
@@ -224,7 +224,7 @@ int usbwall_run(void)
   if (init_devusb())
   {
     destroy_ipc_pam();
-    destroy_ldap_cfg(cfg);
+    destroy_config(cfg);
 
     return 1;
   }
@@ -234,7 +234,7 @@ int usbwall_run(void)
 
   /* terminaison of modules */
   close_devusb();
-  destroy_ldap_cfg(cfg);
+  destroy_config(cfg);
   destroy_ipc_pam();
   /* *** */
 

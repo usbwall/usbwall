@@ -27,7 +27,7 @@
  *
  * \return the LDAP connection handler pointer. NULL if an error occured
  */
-static LDAP *setup_ldap(const struct ldap_cfg *cfg)
+static LDAP *setup_ldap(const struct config *cfg)
 {
   assert(cfg);
 
@@ -87,7 +87,7 @@ static LDAP *setup_ldap(const struct ldap_cfg *cfg)
  */
 static struct berval **extract_devids(LDAP *ldap_ptr,
                                       const char *username,
-                                      const struct ldap_cfg *cfg)
+                                      const struct config *cfg)
 {
   assert(ldap_ptr && username && cfg);
 
@@ -201,7 +201,7 @@ struct linked_list *wait_for_logging()
   return error ? NULL : usernames_get();
 }
 
-int devids_check(const struct ldap_cfg *cfg)
+int devids_check(const struct config *cfg)
 {
   LDAP *ldap_ptr = setup_ldap(cfg);
   if (!ldap_ptr)
@@ -218,7 +218,7 @@ int devids_check(const struct ldap_cfg *cfg)
 }
 
 struct linked_list *devids_get(const char *username,
-                               const struct ldap_cfg *cfg)
+                               const struct config *cfg)
 {
   assert(username && cfg);
 

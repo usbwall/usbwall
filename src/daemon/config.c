@@ -1,4 +1,4 @@
-#include "ldap_config.h"
+#include "config.h"
 
 #include <assert.h>
 #include <stdio.h>
@@ -18,7 +18,16 @@ const char *cfg_file_find(void)
   return "/etc/usbwall.cfg";
 }
 
-static int check_cfg(const struct ldap_cfg *cfg)
+/**
+ * \brief config internal function checking if a config structure is correctly
+ * field.
+ *
+ * \param cfg  config to be checked
+ *
+ * \return 0 if the structure is correct, 1 in the case of an incomplete or
+ * invalid config.
+ */
+static int check_cfg(const struct config *cfg)
 {
   assert(cfg);
 
@@ -53,7 +62,7 @@ static int check_cfg(const struct ldap_cfg *cfg)
   return result;
 }
 
-struct ldap_cfg *make_ldap_cfg(const char *cfg_file)
+struct config *make_config(const char *cfg_file)
 {
   assert(cfg_file);
 
@@ -66,7 +75,7 @@ struct ldap_cfg *make_ldap_cfg(const char *cfg_file)
   }
   syslog(LOG_INFO, "Found configuration file at %s", cfg_file);
 
-  struct ldap_cfg *config = parse_config(stream);
+  struct config *config = parse_config(stream);
   fclose(stream);
 
   if (!config)
@@ -78,7 +87,7 @@ struct ldap_cfg *make_ldap_cfg(const char *cfg_file)
 
   if (check_cfg(config))
   {
-    destroy_ldap_cfg(config);
+    destroy_config(config);
 
     return  NULL;
   }
@@ -86,7 +95,7 @@ struct ldap_cfg *make_ldap_cfg(const char *cfg_file)
   return config;
 }
 
-void destroy_ldap_cfg(struct ldap_cfg *cfg)
+void destroy_config(struct config *cfg)
 {
   assert(cfg);
 

@@ -4,7 +4,7 @@ set(DAEMON_SRC
   devusb.c
   devuser.c
   ipc_pam.c
-  ldap_config.c
+  config.c
   main.c
   parser.c
   usb_access.c

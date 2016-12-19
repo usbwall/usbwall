@@ -115,7 +115,7 @@ static char *parse_line(const char *line, const char *field)
  * should be stored
  * \param value  the value to store
  */
-static void store_cfg_value(struct ldap_cfg *config,
+static void store_cfg_value(struct config *config,
                             const char *field,
                             char *value)
 {
@@ -154,11 +154,11 @@ static void store_cfg_value(struct ldap_cfg *config,
   *destination = value;
 }
 
-struct ldap_cfg *parse_config(FILE *istream)
+struct config *parse_config(FILE *istream)
 {
   assert(istream);
 
-  struct ldap_cfg *config = calloc(1, sizeof(struct ldap_cfg));
+  struct config *config = calloc(1, sizeof(struct config));
   if (!config)
     return NULL;
 

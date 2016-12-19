@@ -1,5 +1,5 @@
 /**
- * \file ldap_config.h
+ * \file config.h
  * \brief handle for ldap configuration parsing and storage
  */
 #pragma once
@@ -8,8 +8,9 @@
  * \brief contain every needed informations about the ldap
  * configuration
  */
-struct ldap_cfg
+struct config
 {
+  /* LDAP configuration */
   char *uri;     /**< uri of the ldap */
   char *basedn;  /**< base domain name to access users on ldap */
   char *binddn;  /**< bind domain name to connect to ldap */
@@ -26,12 +27,12 @@ const char *cfg_file_find(void);
 /**
  * \brief parse, and extract information from the configuration file
  * \param cfg_file path of the configuration file
- * \return ldap_cfg struct containing ldap configurations, NULL in case of error
+ * \return config struct containing ldap configurations, NULL in case of error
  */
-struct ldap_cfg *make_ldap_cfg(const char *cfg_file);
+struct config *make_config(const char *cfg_file);
 
 /**
- * \brief destroy and free ldap_cfg struct
- * \param cfg ldap_cfg to be destroyed
+ * \brief destroy and free config struct
+ * \param cfg config to be destroyed
  */
-void destroy_ldap_cfg(struct ldap_cfg *cfg);
+void destroy_config(struct config *cfg);
