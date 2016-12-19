@@ -12,7 +12,12 @@
  */
 #define MAX_LINE_LEN 256
 
-static const char *fields[] =
+/**
+ * \brief Internal parser global variable containing the name of the fields
+ * of a configuration structure. It is quite useful to iterate over every
+ * field of the structure.
+ */
+static const char *g_fields[] =
 {
   "uri",
   "basedn",
@@ -119,7 +124,7 @@ static void store_cfg_value(struct config *config,
                             const char *field,
                             char *value)
 {
-  if (field == fields[4]) // version
+  if (field == g_fields[4]) // version
   {
     /* special case, the field should be an integer */
     char *err_ptr = NULL;
@@ -135,13 +140,13 @@ static void store_cfg_value(struct config *config,
   /* the field is a string, select the pointer corresponding to the structure
    * field given in argument */
   char **destination = NULL;
-  if (field == fields[0]) // uri
+  if (field == g_fields[0]) // uri
     destination = &config->uri;
-  else if (field == fields[1]) // basedn
+  else if (field == g_fields[1]) // basedn
     destination = &config->basedn;
-  else if (field == fields[2]) // binddn
+  else if (field == g_fields[2]) // binddn
     destination = &config->binddn;
-  else if (field == fields[3]) // bindpw
+  else if (field == g_fields[3]) // bindpw
     destination = &config->bindpw;
 
   /* check if the field was already given a value */
@@ -173,9 +178,9 @@ struct config *parse_config(FILE *istream)
 
     char *value = NULL;
     /* iterate over each field name of the config structure */
-    for (int field_idx = 0; fields[field_idx]; ++field_idx)
+    for (int field_idx = 0; g_fields[field_idx]; ++field_idx)
     {
-      const char *field = fields[field_idx];
+      const char *field = g_fields[field_idx];
       if ((value = parse_line(buffer, field)))
       {
         /* store attributes to config */
