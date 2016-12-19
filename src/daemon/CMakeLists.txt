@@ -6,6 +6,7 @@ set(DAEMON_SRC
   ipc_pam.c
   ldap_config.c
   main.c
+  parser.c
   usb_access.c
   )
 

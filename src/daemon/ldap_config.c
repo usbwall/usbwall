@@ -3,76 +3,9 @@
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <syslog.h>
 
-/**
- * \brief maximum size of a configuration line, in characters
- */
-#define MAX_LINE_LEN 256
-
-/**
- * \brief Internal ldap_config function that take a string and delete comments
- * from it
- *
- * \param line  line to be modified
- */
-static void skip_comments(char *line)
-{
-  /**
-   * \todo
-   * FIXME: Bug if a sharp is used as a full character, like in
-   * a password. Thanks to Sylvain for reporting this bug.
-   */
-  char *comment_start = strchr(line, '#');
-
-  if (comment_start)
-    *comment_start = '\0';
-}
-
-/**
- * \brief Internal ldap_config function to parse a line for a string and
- * allocated the destination to the good
- * size and copy the string in the destination.
- *
- * \param line  The line to be parsed
- * \param format  the format string used to detect the substring to copy
- * \param destination  the pointer to malloc and to fill with the substring copy
- *
- * \return non zero value in case of error of unsuccesful parsing.
- *
- * The function is used to replace the use of sscanf with the m flag, that
- * produced warnings. The function will just call sscanf with the given format
- * string, allocated the destination with the good size and put the parsed
- * substring in destination, if one is found.
- */
-static int scanstr(const char *line, const char *format, char **destination)
-{
-  assert(line && format && destination);
-
-  char buffer[MAX_LINE_LEN] = { '\0' };
-
-  int parse_success = sscanf(line, format, buffer);
-  if (parse_success != 1)
-    return 0;
-
-  /* We need to check if the value was duplicated. If it is, then we free it
-   * and rewrite it = the last given value prevale! */
-  if (*destination)
-  {
-    syslog(LOG_NOTICE, "Value %s is shadowed!", *destination);
-    free(*destination);
-  }
-
-  const size_t len = strlen(buffer);
-  *destination = malloc(len + 1);
-  if (!*destination)
-    return 0;
-
-  memcpy(*destination, buffer, len + 1);
-
-  return 1;
-}
+#include "parser.h"
 
 const char *cfg_file_find(void)
 {
@@ -83,6 +16,41 @@ const char *cfg_file_find(void)
    */
 
   return "/etc/usbwall.cfg";
+}
+
+static int check_cfg(const struct ldap_cfg *cfg)
+{
+  assert(cfg);
+
+  int result = 0;
+
+  if (!cfg->uri)
+  {
+    syslog(LOG_ERR, "URI field is missing in configuration");
+    result = 1;
+  }
+  if (!cfg->basedn)
+  {
+    syslog(LOG_ERR, "Basedn field is missing in configuration");
+    result = 1;
+  }
+  if (!cfg->binddn)
+  {
+    syslog(LOG_ERR, "Binddn field is missing in configuration");
+    result = 1;
+  }
+  if (!cfg->bindpw)
+  {
+    syslog(LOG_ERR, "Bindpw field is missing in configuration");
+    result = 1;
+  }
+  if (cfg->version == 0)
+  {
+    syslog(LOG_ERR, "Version field is invalid in configuration");
+    result = 1;
+  }
+
+  return result;
 }
 
 struct ldap_cfg *make_ldap_cfg(const char *cfg_file)
@@ -98,36 +66,22 @@ struct ldap_cfg *make_ldap_cfg(const char *cfg_file)
   }
   syslog(LOG_INFO, "Found configuration file at %s", cfg_file);
 
-  struct ldap_cfg *config = calloc(1, sizeof(struct ldap_cfg));
+  struct ldap_cfg *config = parse_config(stream);
+  fclose(stream);
+
   if (!config)
   {
-    fclose(stream);
+    syslog(LOG_ERR, "Configuration is not valid!");
 
     return NULL;
   }
 
-  /* parsing configurations from the file */
-  syslog(LOG_DEBUG, "Parsing configuration file");
-  char *buffer = NULL;
-  size_t buff_size = 0;
-  while (getline(&buffer, &buff_size, stream) != -1)
+  if (check_cfg(config))
   {
-    skip_comments(buffer);
+    destroy_ldap_cfg(config);
 
-    /* store attributes to config */
-    if (!scanstr(buffer, " uri %s ", &config->uri)
-        && !scanstr(buffer, " basedn %s ", &config->basedn)
-        && !scanstr(buffer, " binddn %s ", &config->binddn)
-        && !scanstr(buffer, " bindpw %s ", &config->bindpw)
-        && !sscanf(buffer, " version %hd ", &config->version))
-      syslog(LOG_WARNING,
-             "config syntax error, this line is invalid: %s",
-             buffer);
+    return  NULL;
   }
-  syslog(LOG_DEBUG, "Configuration parsing finished");
-
-  free(buffer);
-  fclose(stream);
 
   return config;
 }
