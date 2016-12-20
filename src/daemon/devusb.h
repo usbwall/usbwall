@@ -23,8 +23,10 @@ struct devusb
 };
 
 /**
- * \brief initialize devusb. Must be called before every other functions.
- * \return return non 0 value in case of error
+ * \brief initialize devusb. Must be called before every other functions. Be
+ * sure that the project configuration has been initialized before a call to
+ * this function.
+ * \return return non 0 value in case of error.
  *
  * The function will initialize devusb, that is try to load libusb and
  * configure it. It will also start a second thread to listen for device

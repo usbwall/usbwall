@@ -7,8 +7,6 @@
 
 #include <misc/linked_list.h>
 
-#include "config.h"
-
 /**
  * \brief Retrieve the current user name.
  * \return users names connected on the system. Return NULL on error.
@@ -28,17 +26,19 @@ struct linked_list *usernames_get(void);
 struct linked_list *wait_for_logging(void);
 
 /**
- * \brief check if the ldap is accessible and usable.
- * \param cfg current ldap configuration
+ * \brief check if the ldap is accessible and usable. Be
+ * sure that the project configuration has been initialized
+ * before a call to this function.
+ *  Making devids accessible.
  * \return 1 if an error occured, 0 otherwhise.
  */
-int devids_check(const struct config *cfg);
+int devids_check(void);
 
 /**
  * \brief Extract the list of usb serial ids allowed by
- *    the user.
+ *  the user. Be sure that the project configuration has
+ *  been initialized before a call to this function.
  * \param username name of the checked user
- * \param cfg current ldap configuration
  * \return Linked list containing serial ids as char *.
  *  NULL if an error occured.
  *
@@ -46,8 +46,7 @@ int devids_check(const struct config *cfg);
  * retrieved the devids from the given username. In the
  * case of a connection problem, NULL is returned.
  */
-struct linked_list *devids_get(const char *username,
-                               const struct config *cfg);
+struct linked_list *devids_get(const char *username);
 
 /**
  * \brief Take a devid and a list of devids and check if the given devid

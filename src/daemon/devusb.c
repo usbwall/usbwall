@@ -14,8 +14,9 @@
 #include <syslog.h>
 #include <unistd.h>
 
-#include "usb_access.h"
+#include "config.h"
 #include "devuser.h"
+#include "usb_access.h"
 
 /**
  * \brief maximum possible size of a device serial id.
@@ -191,6 +192,8 @@ static int hotplug_callback(struct libusb_context *ctx __attribute__((unused)),
                             libusb_hotplug_event event __attribute__((unused)),
                             void *user_data __attribute__((unused)))
 {
+  const struct config *cfg = configuration_get();
+  syslog(LOG_DEBUG, "TEST %hd", cfg->version);
   struct devusb *device = device_to_devusb(dev);
   if (!device)
   {
@@ -246,6 +249,8 @@ static void *wait_for_hotplug(void *arg __attribute__((unused)))
 
 int init_devusb(void)
 {
+  assert(configuration_get());
+
   if (libusb_init(NULL) != LIBUSB_SUCCESS)
   {
     syslog(LOG_ERR, "Init error - libusb can not be initiated");

@@ -82,17 +82,14 @@ static struct linked_list *filter_devices(struct linked_list *allowed_devices,
 
 /**
  * \brief core internal function to handle globals lookup.
- * \param cfg the configuration structure. Modified only if an update
  * notification is received
  * \return 1 if the program need to terminate, 0 else way.
  *
  * The function will lookup globals, usually setted by signal handler and
  * show that a change need to be made to the program state.
  */
-static int notifs_lookup(struct config **cfg)
+static int notifs_lookup(void)
 {
-  assert(cfg && *cfg);
-
   if (g_terminaison)
   {
     syslog(LOG_INFO, "Terminaison notif received, terminating program");
@@ -103,8 +100,7 @@ static int notifs_lookup(struct config **cfg)
   if (g_cfgupdate)
   {
     syslog(LOG_INFO, "Update notif received, updating config");
-    *cfg = make_config(cfg_file_find());
-    if (*cfg == NULL)
+    if (update_configuration(cfg_file_find()))
     {
       syslog(LOG_WARNING, "Configuration update failed, terminating program");
 
@@ -118,22 +114,21 @@ static int notifs_lookup(struct config **cfg)
 
 /**
  * \brief core internal function to handle a user connection
- * \param cfg the configuration structure, needed to use devuser functions
  * \param username the login of the connected user.
  *
  * The function will get plugged device list from devusb, it will get the list
  * of authorized devices from devuser, and update the access of devices in the
  * sysfs.
  */
-static void handle_login(struct config *cfg, const char *username)
+static void handle_login(const char *username)
 {
-  assert(cfg && username);
+  assert(username);
 
   struct linked_list *device_list = devices_get();
   if (!device_list)
     return;
 
-  struct linked_list *devids = devids_get(username, cfg);
+  struct linked_list *devids = devids_get(username);
   if (!devids)
     return;
 
@@ -173,21 +168,20 @@ static void signal_handler(int signo)
  * This function should be call only after every modules is initialized
  * correctly. When this function return, the program should start its
  * terminaison procedure
- * \param cfg  structure containing the configuration of the program
  */
-static void core_loop(struct config *cfg)
+static void core_loop(void)
 {
   struct linked_list *usernames = usernames_get();
   do
   {
-    if (notifs_lookup(&cfg))
+    if (notifs_lookup())
       break; // program terminaison requested
 
     if (!usernames)
       continue;
 
     list_for_each(node_ptr, usernames)
-      handle_login(cfg, node_ptr->data);
+      handle_login(node_ptr->data);
 
     list_destroy(usernames, 1);
   } while ((usernames = wait_for_logging()));
@@ -201,8 +195,7 @@ int usbwall_run(void)
   /* *** */
 
   /* Creation of the configuration structure */
-  struct config *cfg = make_config(cfg_file_find());
-  if (!cfg)
+  if (update_configuration(cfg_file_find()))
   {
     destroy_ipc_pam();
 
@@ -211,10 +204,10 @@ int usbwall_run(void)
   /* *** */
 
   /* Initial check for the ldap server */
-  if (devids_check(cfg))
+  if (devids_check())
   {
     destroy_ipc_pam();
-    destroy_config(cfg);
+    destroy_configuration();
 
     return 1;
   }
@@ -224,17 +217,17 @@ int usbwall_run(void)
   if (init_devusb())
   {
     destroy_ipc_pam();
-    destroy_config(cfg);
+    destroy_configuration();
 
     return 1;
   }
   /* *** */
 
-  core_loop(cfg);
+  core_loop();
 
   /* terminaison of modules */
   close_devusb();
-  destroy_config(cfg);
+  destroy_configuration();
   destroy_ipc_pam();
   /* *** */
 

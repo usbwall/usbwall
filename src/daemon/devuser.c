@@ -11,6 +11,7 @@
 #include <unistd.h>
 #include <utmp.h>
 
+#include "config.h"
 #include "ipc_pam.h"
 
 /**
@@ -201,8 +202,9 @@ struct linked_list *wait_for_logging()
   return error ? NULL : usernames_get();
 }
 
-int devids_check(const struct config *cfg)
+int devids_check(void)
 {
+  const struct config *cfg = configuration_get();
   LDAP *ldap_ptr = setup_ldap(cfg);
   if (!ldap_ptr)
   {
@@ -217,10 +219,10 @@ int devids_check(const struct config *cfg)
   return 0;
 }
 
-struct linked_list *devids_get(const char *username,
-                               const struct config *cfg)
+struct linked_list *devids_get(const char *username)
 {
-  assert(username && cfg);
+  assert(username);
+  const struct config *cfg = configuration_get();
 
   LDAP *ldap_ptr = setup_ldap(cfg); // init the connection
   if (!ldap_ptr)

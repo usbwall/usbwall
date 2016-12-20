@@ -7,16 +7,7 @@
 
 #include "parser.h"
 
-const char *cfg_file_find(void)
-{
-  /**
-   * \todo
-   * TODO: search for more than one place for the config file
-   * It's optional but conveniant for the user.
-   */
-
-  return "/etc/usbwall.cfg";
-}
+static struct config *g_configuration = NULL;
 
 /**
  * \brief config internal function checking if a config structure is correctly
@@ -62,7 +53,42 @@ static int check_cfg(const struct config *cfg)
   return result;
 }
 
-struct config *make_config(const char *cfg_file)
+/**
+ * \brief config internal function that free the given configuration
+ * structure. The cfg pointer should not be NULL.
+ *
+ * \param cfg  the structure to be freed.
+ */
+static void destroy_config(struct config *cfg)
+{
+  assert(cfg);
+
+  free(cfg->uri);
+  free(cfg->basedn);
+  free(cfg->binddn);
+  free(cfg->bindpw);
+  free(cfg);
+}
+
+const struct config *configuration_get(void)
+{
+  assert(g_configuration);
+
+  return g_configuration;
+}
+
+const char *cfg_file_find(void)
+{
+  /**
+   * \todo
+   * TODO: search for more than one place for the config file
+   * It's optional but conveniant for the user.
+   */
+
+  return "/etc/usbwall.cfg";
+}
+
+int update_configuration(const char *cfg_file)
 {
   assert(cfg_file);
 
@@ -71,7 +97,7 @@ struct config *make_config(const char *cfg_file)
   {
     syslog(LOG_ERR, "Configuration file not accessible : %s", cfg_file);
 
-    return NULL;
+    return 1;
   }
   syslog(LOG_INFO, "Found configuration file at %s", cfg_file);
 
@@ -82,26 +108,27 @@ struct config *make_config(const char *cfg_file)
   {
     syslog(LOG_ERR, "Configuration is not valid!");
 
-    return NULL;
+    return 1;
   }
 
   if (check_cfg(config))
   {
     destroy_config(config);
 
-    return  NULL;
+    return  1;
   }
 
-  return config;
+  destroy_configuration();
+  g_configuration = config;
+
+  return 0;
 }
 
-void destroy_config(struct config *cfg)
+void destroy_configuration(void)
 {
-  assert(cfg);
+  if (!g_configuration)
+    return;
 
-  free(cfg->uri);
-  free(cfg->basedn);
-  free(cfg->binddn);
-  free(cfg->bindpw);
-  free(cfg);
+  destroy_config(g_configuration);
+  g_configuration = NULL;
 }
