@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <errno.h>
 #include <fcntl.h>
 #include <stdio.h>
 #include <string.h>
@@ -16,18 +17,30 @@
  *
  * \param pidfile  path of the pidfile to create
  *
- * \return 1 if an error occured, 0 otherwhise.
+ * \return the file descriptor corresponding to the pidfile, -1
+ * if an error occured.
  */
 static int create_pidfile(const char *pidfile)
 {
   int fd = open(pidfile,
-                O_CREAT | O_TRUNC | O_WRONLY | O_EXCL,
+                O_CREAT | O_TRUNC | O_WRONLY,
                 0644);
   if (fd == -1)
   {
     syslog(LOG_ERR, "Failed to create new pidfile at %s", pidfile);
 
-    return 1;
+    return -1;
+  }
+
+  if (flock(fd, LOCK_EX | LOCK_NB))
+  {
+    if (errno == EWOULDBLOCK)
+      syslog(LOG_ERR, "An instance of usbwalld is already running!");
+    else
+      syslog(LOG_ERR, "Failed to lock pidfile");
+    close(fd);
+
+    return -1;
   }
 
   if (dprintf(fd, "%zd", (ssize_t)getpid()) <= 0)
@@ -35,34 +48,30 @@ static int create_pidfile(const char *pidfile)
     syslog(LOG_ERR, "Failed to write to pidfile at %s", pidfile);
     close(fd);
 
-    return 1;
+    return -1;
   }
 
-  if (flock(fd, LOCK_EX | LOCK_NB))
-  {
-    syslog(LOG_ERR, "Failed to lock pidfile");
-    close(fd);
-
-    return 1;
-  }
-
-  close(fd);
   syslog(LOG_INFO, "Pidfile created at %s", pidfile);
 
-  return 0;
+  return fd;
 }
 
 /**
  * \brief remove the pidfile associated with the usbwall daemon.
  *
  * \param pidfile  path of the pidfile to delete.
+ * \param pidfile_fd  filedescriptor of the pidfile
+ *
+ * The function remove the pidfile from the filesystem. But, it
+ * will also unlock it and close the associated filedescriptor
  */
-static void remove_pidfile(const char *pidfile)
+static void remove_pidfile(const char *pidfile, int pidfile_fd)
 {
-  int fd = open(pidfile, O_RDONLY);
-  if (flock(fd, LOCK_UN | LOCK_NB))
+  assert(pidfile && pidfile_fd >= 3);
+
+  if (flock(pidfile_fd, LOCK_UN | LOCK_NB))
     syslog(LOG_WARNING, "Failed to unlock the pidfile");
-  close(fd);
+  close(pidfile_fd);
 
   if (remove(pidfile))
     syslog(LOG_WARNING, "Failed to remove the pidfile");
@@ -156,14 +165,15 @@ int main(int argc, char *argv[])
   }
 
   const char *pidfile = "/var/run/usbwall.pid";
-  if (create_pidfile(pidfile))
+  int pidfile_fd = -1;
+  if ((pidfile_fd = create_pidfile(pidfile)) == -1)
     return 1; // pidfile is mandatory to ensure unique instance
 
   syslog(LOG_INFO, "Usbwall started");
   int rcode = usbwall_run();
   syslog(LOG_INFO, "Usbwall terminated");
 
-  remove_pidfile(pidfile);
+  remove_pidfile(pidfile, pidfile_fd);
 
   closelog();
 

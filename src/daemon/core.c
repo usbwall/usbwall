@@ -204,13 +204,13 @@ int usbwall_run(void)
   /* *** */
 
   /* Initial check for the ldap server */
-  if (devids_check())
-  {
-    destroy_ipc_pam();
-    destroy_configuration();
-
-    return 1;
-  }
+  /* if (devids_check()) */
+  /* { */
+  /*   destroy_ipc_pam(); */
+  /*   destroy_configuration(); */
+  /*  */
+  /*   return 1; */
+  /* } */
   /* *** */
 
   /* Initialization of the Devusb module */
