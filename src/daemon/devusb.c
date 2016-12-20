@@ -192,8 +192,6 @@ static int hotplug_callback(struct libusb_context *ctx __attribute__((unused)),
                             libusb_hotplug_event event __attribute__((unused)),
                             void *user_data __attribute__((unused)))
 {
-  const struct config *cfg = configuration_get();
-  syslog(LOG_DEBUG, "TEST %hd", cfg->version);
   struct devusb *device = device_to_devusb(dev);
   if (!device)
   {
@@ -211,7 +209,16 @@ static int hotplug_callback(struct libusb_context *ctx __attribute__((unused)),
     return 1;
   }
 
-  int authorized_status = check_devid(device->serial, devices_get());
+  struct linked_list *users = usernames_get();
+  int authorized_status = 0;
+
+  list_for_each(user_node_ptr, users)
+    if (check_devid(device->serial, devids_get(user_node_ptr->data)))
+    {
+      authorized_status = 1;
+      break;
+    }
+  list_destroy(users, 1);
 
   int rcode = 0;
   if ((rcode = update_device_access(device, authorized_status)))
