@@ -76,6 +76,7 @@ int device_is_valid(struct devusb *device)
 {
   assert(device);
 
+  /* Is a device without serial invalid?? */ 
   return device->ports_nb && device->bus && device->serial;
 }
 
