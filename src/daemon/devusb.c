@@ -19,6 +19,7 @@
 #include "usb_access.h"
 #include "complete_id.h"
 #include "../misc/error_handler.h"
+#include "format_validity.h"
 
 /**
  * \brief maximum possible size of a device serial id.
@@ -89,10 +90,16 @@ static char *device_serial_get(struct libusb_device *device,
     {
       /**
        * \todo
-       * TODO : Some serials extracted from descriptors may not be unique, and
+       * Some serials extracted from descriptors may not be unique, and
        * some are just useless garbage. We need to find a way to identify those
        * bad serial ids.
        */
+
+      if (check_serial_format((char *) tmp_dev_serial) != DEVIDD_SUCCESS)
+      {
+        return NULL;
+      }
+
       const size_t len = (size_t)ret;
       serial = malloc(len + 1);
       if (serial)
