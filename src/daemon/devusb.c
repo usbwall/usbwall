@@ -123,9 +123,9 @@ static uint8_t device_ports_get(struct libusb_device *device, uint8_t **ports)
 
   uint8_t result[MAX_PORTS_NB];
   int res = libusb_get_port_numbers(device, result, MAX_PORTS_NB);
-  if (res < 0 || res > 255)
+  if (res < 0 || res > 7)
   {
-      syslog(LOG_WARNING, "Too many ports for the device!");
+      syslog(LOG_WARNING, "Cannot get ports of device!");
 
       return 0;
   }
