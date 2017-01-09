@@ -152,8 +152,15 @@ static char *get_machine_name(void)
 
   name = malloc(BUF_MACH);
 
-  if (gethostname(name, BUF_MACH) != 0)
+  if (name == NULL)
+  {
     return NULL;
+  }
+
+  if (gethostname(name, BUF_MACH) != 0)
+  {
+    return NULL;
+  }
 
   return name;
 }
