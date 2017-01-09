@@ -7,6 +7,7 @@
 
 #include <misc/linked_list.h>
 
+
 /**
  * \brief Retrieve the current user name.
  * \return users names connected on the system. Return NULL on error.

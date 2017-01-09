@@ -17,7 +17,13 @@
 /**
  * \brief maximum possible size of a user login
  */
-#define LOGIN_MAX_LEN 32
+# define LOGIN_MAX_LEN 32
+
+
+/**
+ * \brief maximum possible size of device id (devid)
+ */
+# define DEVID_MAX_LEN 1024
 
 /**
  * \brief internal devuser function that start and configure a connection with
@@ -248,7 +254,7 @@ struct linked_list *devids_get(const char *username)
   return devids;
 }
 
-int check_devid(const char *devid, struct linked_list *devids)
+/*int check_devid(const char *devid, struct linked_list *devids)
 {
   assert(devid && devids);
 
@@ -258,4 +264,60 @@ int check_devid(const char *devid, struct linked_list *devids)
     (int (*)(const void *, const void *))strcmp;
 
   return !!list_extract(devids, devid, compare_function);
+}*/
+
+
+int32_t check_devid(char *devid, struct linked_list *rules)
+{
+  char *not_read_devid;
+  char *not_read_rule;
+  char *field_devid;
+  char *field_rule;
+  struct ll_node *rule = rules->first;
+
+  /* TODO: check if devid format is valid */
+
+  not_read_devid = malloc(strlen(devid));
+  if (not_read_devid == NULL)
+  {
+    return DEVIDD_ERR_MEM;
+  }
+
+  not_read_rule = malloc(DEVID_MAX_LEN);
+  if (not_read_rule == NULL)
+  { 
+    free(not_read_devid);
+    return DEVIDD_ERR_MEM; 
+  }
+
+  while (rule)
+  {
+    not_read_rule = strdup(rule); 
+    not_read_devid = strdup(devid);
+
+    while (not_read_rule)
+    {
+      /* Retrieve the next field of rule/devid */
+      field_rule = strtok(not_read_rule, ":");
+      field_devid = strtok(not_read_devid, ":");
+
+      /* If no break happened (corresponding to a mismach)
+         and the rule is reaching its end, devid correspond
+         to at least one rule => devid authorized */
+      if (field_rule == NULL)
+      {
+        return DEVIDD_SUCCESS; 
+      }
+
+      /* Offset = length of last token + separator ":" */
+      not_read_rule += strlen(field_rule) + 1;
+      not_read_devid += strlen(field_devid) + 1;
+
+      /* If rule's field is not equal to "*" nor to devid field,
+         we don't need to continue: the entire rule cannot match */
+      if (strcmp(field_rule, "*") && strcmp(field_rule, field_devid))
+        break;
+    }
+    rule = rule->next; 
+  }
 }
