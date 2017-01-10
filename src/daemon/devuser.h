@@ -51,14 +51,28 @@ int devids_check(void);
  */
 struct linked_list *devids_get(const char *username);
 
+
+
 /**
- * \brief Take a devid and a list of devids and check if the given devid
- * is contained in devids. That said, it check if the devid is allowed
+ * \brief Take devid and a rule, and check if the devid match the given rule.
+ *
+ * \param not_parsed_rule the rule to parse
+ * \param not_parsed_devid the devid to parse and match with the given rule
+ *
+ * \return match which is set to DEVIDD_SUCCESS if devid matched the given
+ *  rule, DEVIDD_ERR otherwise
+ */
+int32_t check_one_rule(char **not_parsed_rule, char **not_parsed_devid);
+
+/**
+ * \brief Take a devid and a list of rules and check if the given devid
+ * match at least one rule. That said, it checks if the devid is allowed
  * for the current user.
  *
  * \param devid  the devid to be checked
- * \param devids  list of devids (char *) allowed for the current user
+ * \param rules  list of rules (char *) for the current user
  *
- * \return 1 if the device is allowed, 0 otherwhise
+ * \return is_auth, local variable set to DEVIDD_SUCCESS in case of
+ * device authorization 
  */
 int32_t check_devid(const char * const devid, struct linked_list *rules);
