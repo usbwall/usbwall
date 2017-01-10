@@ -25,6 +25,16 @@
  */
 # define DEVID_MAX_LEN 1024
 
+
+
+/**
+ * \brief index of field horary in devusb->complete_id
+ */
+# define I_HORARY 7
+
+
+
+
 /**
  * \brief internal devuser function that start and configure a connection with
  * the ldap server
@@ -267,12 +277,15 @@ struct linked_list *devids_get(const char *username)
 }*/
 
 
-int32_t check_devid(char *devid, struct linked_list *rules)
+int32_t check_devid(const char * const devid, struct linked_list *rules)
 {
+  int32_t i = 0;
   char *not_read_devid;
   char *not_read_rule;
   char *field_devid;
   char *field_rule;
+  char *begin;
+  char *end; 
   struct ll_node *rule = rules->first;
 
   /* TODO: check if devid format is valid */
@@ -292,10 +305,11 @@ int32_t check_devid(char *devid, struct linked_list *rules)
 
   while (rule)
   {
-    not_read_rule = strdup(rule); 
+    not_read_rule = strdup(rule->data); 
     not_read_devid = strdup(devid);
 
-    while (not_read_rule)
+    /* We don't want to make strcmp() on the last rule: horary */
+    for (i = 0; (i < I_HORARY) && not_read_rule; i++)
     {
       /* Retrieve the next field of rule/devid */
       field_rule = strtok(not_read_rule, ":");
@@ -303,11 +317,11 @@ int32_t check_devid(char *devid, struct linked_list *rules)
 
       /* If no break happened (corresponding to a mismach)
          and the rule is reaching its end, devid correspond
-         to at least one rule => devid authorized */
+         to at least one rule => devid authorized
       if (field_rule == NULL)
       {
         return DEVIDD_SUCCESS; 
-      }
+      } */
 
       /* Offset = length of last token + separator ":" */
       not_read_rule += strlen(field_rule) + 1;
@@ -318,6 +332,22 @@ int32_t check_devid(char *devid, struct linked_list *rules)
       if (strcmp(field_rule, "*") && strcmp(field_rule, field_devid))
         break;
     }
+
+    if (i == I_HORARY)
+    {
+      begin = strtok(not_read_rule, "-");
+      end = not_read_rule + strlen(begin) + 1;
+      field_devid = strtok(not_read_devid, ":");
+
+      if ((atoi(begin) <= atoi(field_devid))
+          && (atoi(field_devid) <= atoi(end)))
+      {
+        return DEVIDD_SUCCESS;
+      }
+    }
     rule = rule->next; 
   }
+
+  /* If no rule matched, then the device will be unauthorized */
+  return DEVIDD_ERR_OTHER; 
 }

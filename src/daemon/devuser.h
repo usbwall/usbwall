@@ -5,8 +5,10 @@
 
 #pragma once
 
-#include <misc/linked_list.h>
+#include <stdint.h>
 
+#include <misc/linked_list.h>
+#include "misc/error_handler.h"
 
 /**
  * \brief Retrieve the current user name.
@@ -59,4 +61,4 @@ struct linked_list *devids_get(const char *username);
  *
  * \return 1 if the device is allowed, 0 otherwhise
  */
-int check_devid(const char *devid, struct linked_list *devids);
+int32_t check_devid(const char * const devid, struct linked_list *rules);

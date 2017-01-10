@@ -319,7 +319,8 @@ static int hotplug_callback(struct libusb_context *ctx __attribute__((unused)),
   int authorized_status = 0;
 
   list_for_each(user_node_ptr, users)
-    if (check_devid(device->serial, devids_get(user_node_ptr->data)))
+    if (check_devid(device->complete_id, devids_get(user_node_ptr->data))
+        == DEVIDD_SUCCESS)
     {
       authorized_status = 1;
       break;
