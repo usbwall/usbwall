@@ -61,20 +61,20 @@ static LDAP *setup_ldap(const struct config *cfg)
       != LDAP_OPT_SUCCESS)
   {
     syslog(LOG_WARNING,
-           "Ldap does not support the protocol version %hd",
-           cfg->version);
+        "Ldap does not support the protocol version %hd",
+        cfg->version);
     ldap_unbind_ext(ldap_ptr, NULL, NULL);
 
     return NULL;
   }
 
   if (ldap_sasl_bind_s(ldap_ptr,
-                       cfg->binddn,
-                       NULL,
-                       &(struct berval){ strlen(cfg->bindpw), cfg->bindpw },
-                       NULL,
-                       NULL,
-                       NULL)
+        cfg->binddn,
+        NULL,
+        &(struct berval){ strlen(cfg->bindpw), cfg->bindpw },
+        NULL,
+        NULL,
+        NULL)
       != LDAP_SUCCESS)
   {
     syslog(LOG_WARNING, "Ldap sasl binding failed");
@@ -103,8 +103,8 @@ static LDAP *setup_ldap(const struct config *cfg)
  * (username). The returned values are bervals to be coherant with the LDAP API.
  */
 static struct berval **extract_devids(LDAP *ldap_ptr,
-                                      const char *username,
-                                      const struct config *cfg)
+    const char *username,
+    const struct config *cfg)
 {
   assert(ldap_ptr && username && cfg);
 
@@ -113,34 +113,34 @@ static struct berval **extract_devids(LDAP *ldap_ptr,
   snprintf(filter, LOGIN_MAX_LEN, "(uid=%s)", username);
 
   if (ldap_search_ext_s(ldap_ptr,
-                        cfg->basedn,
-                        LDAP_SCOPE_SUB,
-                        filter,
-                        NULL,
-                        /**
-                         * \todo
-                         * FIXME : a valid attribute list would
-                         * be better than NULL for the searching
-                         * function.
-                         */
-                        0,
-                        NULL, /* no timeout */
-                        NULL,
-                        NULL,
-                        12,
-                        /**
-                         * \remark
-                         *  searching for 1 entry should be valid,
-                         *  12 may be overkill...
-                         */
-                        &msg_ptr)
-      != LDAP_SUCCESS)
-    return NULL;
+        cfg->basedn,
+        LDAP_SCOPE_SUB,
+        filter,
+        NULL,
+        /**
+         * \todo
+         * FIXME : a valid attribute list would
+         * be better than NULL for the searching
+         * function.
+         */
+        0,
+        NULL, /* no timeout */
+        NULL,
+        NULL,
+        12,
+        /**
+         * \remark
+         *  searching for 1 entry should be valid,
+         *  12 may be overkill...
+         */
+        &msg_ptr)
+          != LDAP_SUCCESS)
+          return NULL;
   if (!ldap_count_entries(ldap_ptr, msg_ptr))
   {
     syslog(LOG_WARNING,
-           "Ldap research failed. No entry found for user %s",
-           username);
+        "Ldap research failed. No entry found for user %s",
+        username);
 
     return NULL;
   }
@@ -182,7 +182,7 @@ struct linked_list *usernames_get(void)
     return usernames;
   }
   syslog(LOG_WARNING,
-         "Current username can't be fetched! : utmp not available");
+      "Current username can't be fetched! : utmp not available");
 
   return NULL;
 }
@@ -265,89 +265,116 @@ struct linked_list *devids_get(const char *username)
 }
 
 /*int check_devid(const char *devid, struct linked_list *devids)
-{
+  {
   assert(devid && devids);
 
   syslog(LOG_DEBUG, "Devusb initialized sucessfully");
 
   int (*compare_function)(const void *, const void *) =
-    (int (*)(const void *, const void *))strcmp;
+  (int (*)(const void *, const void *))strcmp;
 
   return !!list_extract(devids, devid, compare_function);
-}*/
+  }*/
 
 
-int32_t check_devid(const char * const devid, struct linked_list *rules)
+int32_t check_horary(char)
 {
-  int32_t i = 0;
-  char *not_read_devid;
-  char *not_read_rule;
+  
+}
+int32_t check_one_rule(char **not_parsed_rule, char **not_parsed_devid)
+{
+  char *field_rule; 
   char *field_devid;
-  char *field_rule;
   char *begin;
-  char *end; 
-  struct ll_node *rule = rules->first;
+  char *end;
+  int32_t match = DEVIDD_ERR_OTHER;
+  int32_t i = 0;
 
-  /* TODO: check if devid format is valid */
+  /* FIXME: sizes are too big */
+  field_rule = calloc(1, DEVID_MAX_LEN);
+  field_devid = calloc(1, DEVID_MAX_LEN);
 
-  not_read_devid = malloc(strlen(devid));
-  if (not_read_devid == NULL)
+  if (!field_rule || !field_devid)
   {
     return DEVIDD_ERR_MEM;
   }
 
-  not_read_rule = malloc(DEVID_MAX_LEN);
-  if (not_read_rule == NULL)
+  for (i = 0; (i < I_HORARY) && *not_parsed_rule; i++)
+  {
+    field_rule = strtok(*not_parsed_rule, ":");
+    field_devid = strtok(*not_parsed_devid, ":");
+
+
+    /* Offset = length of last token + separator ":" */
+    *not_parsed_rule += strlen(field_rule) + 1;
+    *not_parsed_devid += strlen(field_devid) + 1;
+
+    /* If rule's field is not equal to "*" nor to devid field,
+       we don't need to continue: the entire rule cannot match */
+    if (strcmp(field_rule, "*") && strcmp(field_rule, field_devid))
+      break;
+  }
+
+  if (i == I_HORARY)
+  {
+    begin = strtok(*not_parsed_rule, "-");
+    end = not_parsad_rule + strlen(begin) + 1;
+    field_devid = strtok(*not_parsed_devid, ":");
+
+    if ((atoi(begin) <= atoi(field_devid))
+        && (atoi(field_devid) <= atoi(end)))
+    {
+      match = DEVIDD_SUCCESS;
+    }
+  }
+
+  free(field_rule);
+  free(field_devid);
+
+  return matched;
+}
+
+int32_t check_devid(const char * const devid, struct linked_list *rules)
+{
+  int32_t i = 0;
+  char *not_parsed_devid;
+  char *not_parsed_rule;
+  /* Equal to DEVIDD_SUCCESS if at least one rule matched 
+     => device is then authorized */
+  int32_t is_auth = DEVIDD_ERR_OTHER;
+  struct ll_node *rule = rules->first;
+
+  /* TODO: check if devid format is valid */
+
+  /* Allocation of 2 strings which will store the tokens that remain
+     unparsed */
+  not_parsed_devid = malloc(strlen(devid));
+  not_parsed_rule = malloc(DEVID_MAX_LEN);
+
+  if (!not_parsed_devid || !not_parsed_rule)
   { 
-    free(not_read_devid);
+    free(not_parsed_devid);
+    free(not_parsed_rule); 
+
     return DEVIDD_ERR_MEM; 
   }
 
   while (rule)
   {
-    not_read_rule = strdup(rule->data); 
-    not_read_devid = strdup(devid);
+    not_parsed_rule = strdup(rule->data); 
+    not_parsed_devid = strdup(devid);
 
-    /* We don't want to make strcmp() on the last rule: horary */
-    for (i = 0; (i < I_HORARY) && not_read_rule; i++)
-    {
-      /* Retrieve the next field of rule/devid */
-      field_rule = strtok(not_read_rule, ":");
-      field_devid = strtok(not_read_devid, ":");
+    is_auth = check_one_rule(&not_parsed_rule, &not_parsed_devid); 
 
-      /* If no break happened (corresponding to a mismach)
-         and the rule is reaching its end, devid correspond
-         to at least one rule => devid authorized
-      if (field_rule == NULL)
-      {
-        return DEVIDD_SUCCESS; 
-      } */
+    if (is_auth == DEVIDD_SUCCESS)
+      break;
 
-      /* Offset = length of last token + separator ":" */
-      not_read_rule += strlen(field_rule) + 1;
-      not_read_devid += strlen(field_devid) + 1;
-
-      /* If rule's field is not equal to "*" nor to devid field,
-         we don't need to continue: the entire rule cannot match */
-      if (strcmp(field_rule, "*") && strcmp(field_rule, field_devid))
-        break;
-    }
-
-    if (i == I_HORARY)
-    {
-      begin = strtok(not_read_rule, "-");
-      end = not_read_rule + strlen(begin) + 1;
-      field_devid = strtok(not_read_devid, ":");
-
-      if ((atoi(begin) <= atoi(field_devid))
-          && (atoi(field_devid) <= atoi(end)))
-      {
-        return DEVIDD_SUCCESS;
-      }
-    }
     rule = rule->next; 
   }
 
-  /* If no rule matched, then the device will be unauthorized */
-  return DEVIDD_ERR_OTHER; 
+  free(not_parsed_devid);
+  free(not_parsed_rule); 
+
+  /* is_auth was set to DEVIDD_SUCCESS if one rule matched  */
+  return is_auth; 
 }
