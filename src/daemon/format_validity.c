@@ -134,7 +134,7 @@ int32_t check_horaries_format(char *field)
   for (i = 0; i < len; i++)
   {
     /* If not a digit, the character is unvalid */
-    if (isdigit(field[i]) == 0)
+    if (isdigit(field[i]) == 0 && field[i] != '-')
     {
       return DEVIDD_ERR_OTHER;
     }
@@ -210,7 +210,7 @@ int32_t check_rule_format(char *rule)
   char *token;
   int32_t valid = DEVIDD_SUCCESS;
 
-  token = malloc(DEVID_MAX_LEN);
+  token = calloc(1, DEVID_MAX_LEN);
   if (token == NULL)
   {
     return DEVIDD_ERR_MEM;
