@@ -334,12 +334,11 @@ int32_t check_one_rule(char **not_parsed_rule, char **not_parsed_devid)
 int32_t check_devid(const char * const devid, struct linked_list *rules)
 {
   int32_t i = 0;
-  char *not_parsed_devid;
-  char *not_parsed_rule;
-  /* Equal to DEVIDD_SUCCESS if at least one rule matched 
-     => device is then authorized */
-  int32_t is_auth = DEVIDD_ERR_OTHER;
-  struct ll_node *rule = rules->first;
+  char *not_parsed_devid; /* Store tokens from devid that remain unparsed */
+  char *not_parsed_rule; /* Store tokens from rule that remain unparsed */
+  int32_t is_auth = DEVIDD_ERR_OTHER; /* Set to DEVIDD_SUCCESS if device is
+                                         authorized */
+  struct ll_node *rule = rules->first; /* Rule point 
 
   /* Check if devid format is valid */
   if (check_rule_format(devid) != DEVIDD_SUCCESS)
