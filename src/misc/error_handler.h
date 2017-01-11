@@ -13,7 +13,7 @@ enum devidd_err
   DEVIDD_ERR_IO, /* Input/Output error */
   DEVIDD_ERR_EAGAIN, /* Ressource temporarily unavailable */
   DEVIDD_ERR_PERM, /* Operation not permitted */
-  DEVIDD_ERR_OTHER
+  DEVIDD_ERR /* Generic error */
 };
 
 int32_t devidd_log(char *module, int32_t err_val, int32_t level);
