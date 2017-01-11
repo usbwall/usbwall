@@ -25,12 +25,26 @@
 
 int32_t check_serial_format(char *serial);
 
-int32_t check_vendor_product_format(char *str); /* uint16_t id */
+int32_t check_vendor_product_format(char *str);
 
 int32_t check_bcd_format(char *bcd);
 
-/* Notice that bus and port doesn't need to be checked: the only rule is that
-they must have less than 3 digits. But uint8_t already forces them to be so. */
+int32_t check_machine_format(char *machine);
+
+int32_t check_bus_port_format(char *str);
+
+int32_t check_horaries_format(char *field);
+
+int32_t check_field_format(char *field, int32_t i);
+
+int32_t check_rule_format(char *rule);
+
+
+
+/* Notice that integer doesn't need to be checked: for instance, 
+ * the only rule for bus and port integers is that
+ * they must have less than 3 digits. But uint8_t already
+ * forces them to be so. */
 
 
 #endif /* !FORMAT_VALIDITY_H */
