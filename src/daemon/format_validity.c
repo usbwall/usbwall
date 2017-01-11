@@ -91,7 +91,7 @@ int32_t check_vendor_product_format(char *str)
 
 int32_t check_machine_format(char *machine)
 {
-  if (machine != LEN_FIELD)
+  if (strlen(machine) != LEN_FIELD)
     return DEVIDD_ERR_OTHER;
 
   return DEVIDD_SUCCESS;
@@ -101,12 +101,12 @@ int32_t check_bus_port_format(char *str)
 {
   int32_t i = 0;
 
-  if (strlen(str) > LEN_BUS_PORT)
+  if (strlen(str) > MAX_BUS_PORT)
   {
     return DEVIDD_ERR_OTHER;
   }
 
-  for (i = 0; i < LEN_BUS_PORT; i++)
+  for (i = 0; i < MAX_BUS_PORT; i++)
   {
     /* A character is valid if and only if its format is hexadecimal
        and if it is not a lowercase */
@@ -121,7 +121,7 @@ int32_t check_bus_port_format(char *str)
 int32_t check_horaries_format(char *field)
 {
   int32_t i;
-  uint32_t len; 
+  int32_t len; 
   int32_t dash = DEVIDD_ERR_OTHER;
 
   len = strlen(field);
@@ -149,31 +149,54 @@ int32_t check_horaries_format(char *field)
 }
 int32_t check_field_format(char *field, int32_t i)
 {
+  int32_t validity = DEVIDD_SUCCESS;
+
   switch(i)
   {
     case FIELD_MACHINE:
-      check_machine_format(field);
+      if (check_machine_format(field) != DEVIDD_SUCCESS)
+      {
+        validity = DEVIDD_ERR_OTHER;
+      }
       break;
-
     case FIELD_BUS:
     case FIELD_PORT:
-      check_bus_port_format(field);
+      if (check_bus_port_format(field) != DEVIDD_SUCCESS)
+      {
+        validity = DEVIDD_ERR_OTHER;
+      }
       break;
-
     case FIELD_SERIAL:
-      check_serial_format(field);
-      break;
+      if (check_serial_format(field) != DEVIDD_SUCCESS)
+      {
+        validity = DEVIDD_ERR_OTHER;
+      }
+      break; 
     case FIELD_VENDOR:
     case FIELD_PRODUCT:
-      check_vendor_product_format(field);
+      if (check_vendor_product_format(field) != DEVIDD_SUCCESS)
+      {
+        validity = DEVIDD_ERR_OTHER;
+      }
       break;
     case FIELD_BCD:
-      check_bcd_format(field);
+      if (check_bcd_format(field) != DEVIDD_SUCCESS)
+      {
+        validity = DEVIDD_ERR_OTHER;
+      }
       break;
     case FIELD_HORARY:
-      check_horaries_format(field);
+      if (check_horaries_format(field) != DEVIDD_SUCCESS)
+      {
+        validity = DEVIDD_ERR_OTHER;
+      }
       break;
+    default:
+      validity = DEVIDD_ERR_OTHER;
   }
+
+  return validity; 
+
 }
 
 /* Rule format: 
@@ -185,7 +208,6 @@ int32_t check_rule_format(char *rule)
 {
   int32_t i = 0; 
   char *token;
-  uint32_t field = 1;
   int32_t valid = DEVIDD_SUCCESS;
 
   token = malloc(DEVID_MAX_LEN);
@@ -209,7 +231,7 @@ int32_t check_rule_format(char *rule)
 
     if (strlen(token) > LEN_FIELD)
     {
-      syslog(LOG_ERR, "Rule %s invalid: field "%s" is too long",
+      syslog(LOG_ERR, "Rule %s invalid: field %s is too long",
              rule, token);
       valid = DEVIDD_ERR_OTHER;
       break; 
@@ -226,9 +248,3 @@ int32_t check_rule_format(char *rule)
 
   return valid; 
 }
-
-int32_t check_complete_id_format(char *complete_id)
-{
-   
-}
-

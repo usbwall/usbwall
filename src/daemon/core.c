@@ -66,10 +66,11 @@ static struct linked_list *filter_devices(struct linked_list *allowed_devices,
       continue;
     }
 
-    if (!check_devid(device->serial, devids))
+    if (check_devid(device->complete_id, devids) != DEVIDD_SUCCESS)
     {
-      /* We can't find the serial in the devid list. The device is then not
-       * allowed. Just push it in the forbidden list and remove it from the
+      /* Device id doesn't match any rule from the firewall USB. 
+       * The device is then not allowed. 
+       * Just push it in the forbidden list and remove it from the
        * authorized ones. */
       list_add_back(forbidden_devices, device);
       list_remove(allowed_devices, device_ptr, 0);

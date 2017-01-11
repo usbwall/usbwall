@@ -276,11 +276,6 @@ struct linked_list *devids_get(const char *username)
   return !!list_extract(devids, devid, compare_function);
   }*/
 
-
-int32_t check_horary(char)
-{
-  
-}
 int32_t check_one_rule(char **not_parsed_rule, char **not_parsed_devid)
 {
   char *field_rule; 
@@ -296,6 +291,8 @@ int32_t check_one_rule(char **not_parsed_rule, char **not_parsed_devid)
 
   if (!field_rule || !field_devid)
   {
+    free(field_rule);
+    free(field_devid);
     return DEVIDD_ERR_MEM;
   }
 
@@ -318,7 +315,7 @@ int32_t check_one_rule(char **not_parsed_rule, char **not_parsed_devid)
   if (i == I_HORARY)
   {
     begin = strtok(*not_parsed_rule, "-");
-    end = not_parsad_rule + strlen(begin) + 1;
+    end = *not_parsed_rule + strlen(begin) + 1;
     field_devid = strtok(*not_parsed_devid, ":");
 
     if ((atoi(begin) <= atoi(field_devid))
@@ -331,7 +328,7 @@ int32_t check_one_rule(char **not_parsed_rule, char **not_parsed_devid)
   free(field_rule);
   free(field_devid);
 
-  return matched;
+  return match;
 }
 
 int32_t check_devid(const char * const devid, struct linked_list *rules)
@@ -344,7 +341,12 @@ int32_t check_devid(const char * const devid, struct linked_list *rules)
   int32_t is_auth = DEVIDD_ERR_OTHER;
   struct ll_node *rule = rules->first;
 
-  /* TODO: check if devid format is valid */
+  /* Check if devid format is valid */
+  if (check_rule_format(devid) != DEVIDD_SUCCESS)
+  {
+    syslog(LOG_ERR, "Identifiant of device plugged is invalid");
+    return DEVIDD_ERR_OTHER;
+  }
 
   /* Allocation of 2 strings which will store the tokens that remain
      unparsed */
@@ -361,6 +363,11 @@ int32_t check_devid(const char * const devid, struct linked_list *rules)
 
   while (rule)
   {
+    if (check_rule_format(rule) != DEVIDD_SUCCESS)
+    {
+      break;
+    }
+
     not_parsed_rule = strdup(rule->data); 
     not_parsed_devid = strdup(devid);
 
