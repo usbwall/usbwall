@@ -110,6 +110,7 @@ include_directories(.)
 ###########################
 
 add_subdirectory(daemon)
+add_subdirectory(devidd_ctl)
 add_subdirectory(misc)
 add_subdirectory(pam)
 

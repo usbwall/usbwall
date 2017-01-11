@@ -20,6 +20,7 @@
 #include "complete_id.h"
 #include "../misc/error_handler.h"
 #include "format_validity.h"
+#include "../devidd_ctl/server.h"
 
 /**
  * \brief maximum possible size of a device serial id.

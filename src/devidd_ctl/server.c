@@ -166,15 +166,3 @@ int32_t serv_core(void)
   return DEVIDD_SUCCESS;
 }
 
-
-int main(void) /* FIXME */
-{
-  if (serv_core() != DEVIDD_SUCCESS)
-  {
-    return DEVIDD_ERR;
-  }
-
-  return 0;
-}
-
-

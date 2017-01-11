@@ -140,11 +140,3 @@ int32_t client_core(void)
 
   return DEVIDD_SUCCESS;
 }
-
-int main(void) /* FIXME */
-{
-  if (client_core())
-    return DEVIDD_ERR;
-
-  return 0;
-}
