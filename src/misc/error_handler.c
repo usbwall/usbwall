@@ -3,12 +3,7 @@
 #include <errno.h>
 #include "error_handler.h"
 
-static const char* err_array[] =
+int32_t devidd_log(char *module __attribute__((unused)), int32_t err_val __attribute__((unused)), int32_t level __attribute__((unused)))
 {
-  "Success",
-  "Error memory allocation",
-  "Error Input/Output",
-  "Ressource temporary unavailable",
-  "Operation not permitted",
-  "Other"
-};
+  return 0;
+}

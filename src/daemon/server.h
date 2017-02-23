@@ -14,7 +14,7 @@ int32_t serv_recv(int32_t *sock_fd, char **buf,
 int32_t serv_send(int32_t *sock_fd, char **buf,
                   struct sockaddr_in *serv_addr);
 
-int32_t serv_core(void);
+void *serv_core(void *arg __attribute__((unused)));
 
 
 #endif /* !SERVER_H */

@@ -1,5 +1,3 @@
-#define _DEFAULT_SOURCE
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
@@ -9,6 +7,7 @@
 #include <netinet/in.h>
 #include <errno.h>
 #include <sys/stat.h>
+#include <libgen.h>
 
 #include "server.h"
 #include "../misc/error_handler.h"
@@ -27,7 +26,7 @@ int32_t serv_socket(int32_t *sock_fd)
   {
     syslog(LOG_ERR, "%s, %d: Cannot create socket for server",
            basename(__FILE__), __LINE__);
-    return DEVIDD_ERR;
+    return DEVIDD_ERR_OTHER;
   }
 
   return DEVIDD_SUCCESS;
@@ -52,7 +51,7 @@ int32_t serv_bind(int32_t *sock_fd, struct sockaddr_in *serv_addr)
     printf("[serv_bind]:%s\n", strerror(errno));
     syslog(LOG_ERR, "%s, %d: Cannot bind server socket",
            basename(__FILE__), __LINE__);
-    return DEVIDD_ERR;
+    return DEVIDD_ERR_OTHER;
   }
 
   return DEVIDD_SUCCESS;
@@ -77,9 +76,9 @@ int32_t serv_recv(int32_t *sock_fd, char **buf,
   {
     syslog(LOG_ERR, "%s, %d: Cannot receive from client to server",
            basename(__FILE__), __LINE__);
-    return DEVIDD_ERR;
+    return DEVIDD_ERR_OTHER;
   }
-  
+
   /* buf[r] = '\0'; */
 
   return DEVIDD_SUCCESS;
@@ -88,7 +87,7 @@ int32_t serv_recv(int32_t *sock_fd, char **buf,
 
 int32_t serv_send(int32_t *sock_fd, char **buf,
                   struct sockaddr_in *serv_addr)
-{  
+{
   int32_t s = 0; /* Return value for sendto() */
   uint32_t size_serv = sizeof (*serv_addr);
   /* Send data to the client */
@@ -102,24 +101,26 @@ int32_t serv_send(int32_t *sock_fd, char **buf,
     printf("[serv_send]:%s\n", strerror(errno));
     syslog(LOG_ERR, "%s, %d: Cannot send from server to client",
            basename(__FILE__), __LINE__);
-    return DEVIDD_ERR;
+    return DEVIDD_ERR_OTHER;
   }
 
   return DEVIDD_SUCCESS;
 }
 
 
-int32_t serv_core(void)
+void *serv_core(void *arg __attribute__((unused)))
 {
   int32_t sock_fd = 0; /* Server socket */
-  char *buf; /* Buffer received from the client */
+  uint32_t error = 0; /* Error handler */
+  char *buf = NULL; /* Buffer received from the client */
   struct sockaddr_in serv_addr; /* Server address */
 
   /* Create socket for server and bind it */
   if ((serv_socket(&sock_fd) != DEVIDD_SUCCESS)
       || (serv_bind(&sock_fd, &serv_addr) != DEVIDD_SUCCESS))
   {
-    return DEVIDD_ERR;
+    /* return DEVIDD_ERR_OTHER; */
+    return NULL;
   }
 
   buf = calloc(1, BUF_LEN);
@@ -128,30 +129,32 @@ int32_t serv_core(void)
     syslog(LOG_ERR, "%s, %d: Memory allocation error",
            basename(__FILE__), __LINE__);
 
-    return DEVIDD_ERR_MEM;
+    /* return DEVIDD_ERR_OTHER_MEM; */
+    return NULL;
   }
 
-  while(1)
+  while (!error)
   {
     /* syslog(LOG_ERR, "[SERVER] Buffer before reception: %s", buf);*/
     if (serv_recv(&sock_fd, &buf, &serv_addr) != DEVIDD_SUCCESS)
     {
-      free(buf);
-      return DEVIDD_ERR;
+      /* return DEVIDD_ERR_OTHER; */
+      error = DEVIDD_ERR_OTHER;
+      break;
     }
 
     /* FIXME: treatment */
     printf("Client: %s\n", buf);
     buf = strdup("Because.");
-    
+
     //syslog(LOG_ERR, "[SERVER] Buffer sent to client: %s", buf);
 
     if (serv_send(&sock_fd, &buf, &serv_addr) != DEVIDD_SUCCESS)
     {
-      free(buf);
-      return DEVIDD_ERR;
+      /* return DEVIDD_ERR_OTHER; */
+      error = DEVIDD_ERR_OTHER;
+      break;
     }
-
   }
 
   free(buf);
@@ -160,9 +163,12 @@ int32_t serv_core(void)
   {
     syslog(LOG_ERR, "%s, %d: Cannot close server socket",
            basename(__FILE__), __LINE__);
-    return DEVIDD_ERR;
+    /* return DEVIDD_ERR_OTHER; */
+      error = DEVIDD_ERR_OTHER;
+    return NULL;
   }
 
-  return DEVIDD_SUCCESS;
+  /* return DEVIDD_SUCCESS; */
+  return NULL;
 }
 

@@ -1,5 +1,5 @@
-#ifndef COMMON_H
-# define COMMON_H
+#ifndef ERROR_HANDLER_H
+# define ERROR_HANDLER_H
 
 #include <stdint.h>
 #include <syslog.h>
@@ -13,10 +13,20 @@ enum devidd_err
   DEVIDD_ERR_IO, /* Input/Output error */
   DEVIDD_ERR_EAGAIN, /* Ressource temporarily unavailable */
   DEVIDD_ERR_PERM, /* Operation not permitted */
-  DEVIDD_ERR /* Generic error */
+  DEVIDD_ERR_OTHER /* Generic error */
 };
 
-int32_t devidd_log(char *module, int32_t err_val, int32_t level);
-  
+/* static const char* err_array[] = */
+/* { */
+/*   "Success", */
+/*   "Error memory allocation", */
+/*   "Error Input/Output", */
+/*   "Ressource temporary unavailable", */
+/*   "Operation not permitted", */
+/*   "Other" */
+/* }; */
 
-#endif /* !COMMON_H */
+int32_t devidd_log(char *module, int32_t err_val, int32_t level);
+
+
+#endif /* !ERROR_HANDLER_H */

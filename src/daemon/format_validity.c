@@ -11,12 +11,12 @@
  * - min: 12 characters
  * - max: 126 characters
  * - type: 0-9, A-F
- */ 
+ */
 
 int32_t check_serial_format(char *serial)
 {
   uint32_t i = 0;
-  uint32_t len = 0; 
+  uint32_t len = 0;
 
   /* Check lenght validity */
   len = strlen(serial);
@@ -32,7 +32,7 @@ int32_t check_serial_format(char *serial)
     if (!isxdigit(serial[i]) || islower(serial[i]))
     {
       return DEVIDD_ERR_OTHER;
-    } 
+    }
   }
   return DEVIDD_SUCCESS;
 }
@@ -58,7 +58,7 @@ int32_t check_vendor_product_format(char *str)
     if (!isxdigit(str[i]) || islower(str[i]))
     {
       return DEVIDD_ERR_OTHER;
-    } 
+    }
   }
   return DEVIDD_SUCCESS;
 }
@@ -68,7 +68,7 @@ int32_t check_vendor_product_format(char *str)
  * - type: 0-1
  */
  int32_t check_bcd_format(char *bcd)
- { 
+ {
   int32_t i = 0;
 
   if (strlen(bcd) != LEN_BCD)
@@ -83,7 +83,7 @@ int32_t check_vendor_product_format(char *str)
     if ((bcd[i] != '0') && (bcd[i] != '1'))
     {
       return DEVIDD_ERR_OTHER;
-    } 
+    }
   }
   return DEVIDD_SUCCESS;
  }
@@ -113,15 +113,15 @@ int32_t check_bus_port_format(char *str)
     if (!isdigit(str[i]))
     {
       return DEVIDD_ERR_OTHER;
-    } 
+    }
   }
   return DEVIDD_SUCCESS;
 }
 
 int32_t check_horaries_format(char *field)
 {
-  int32_t i;
-  int32_t len; 
+  uint32_t i;
+  uint32_t len;
   int32_t dash = DEVIDD_ERR_OTHER;
 
   len = strlen(field);
@@ -144,7 +144,7 @@ int32_t check_horaries_format(char *field)
     }
   }
 
-  /* If no dash was found, dash is set to DEVIDD_ERR */ 
+  /* If no dash was found, dash is set to DEVIDD_ERR */
   return dash;
 }
 int32_t check_field_format(char *field, int32_t i)
@@ -171,7 +171,7 @@ int32_t check_field_format(char *field, int32_t i)
       {
         validity = DEVIDD_ERR_OTHER;
       }
-      break; 
+      break;
     case FIELD_VENDOR:
     case FIELD_PRODUCT:
       if (check_vendor_product_format(field) != DEVIDD_SUCCESS)
@@ -195,18 +195,18 @@ int32_t check_field_format(char *field, int32_t i)
       validity = DEVIDD_ERR_OTHER;
   }
 
-  return validity; 
+  return validity;
 
 }
 
-/* Rule format: 
+/* Rule format:
    (accept:user):machine:bus:port:serial:vendor:product:bcd:horary
    - 8 fields
    - length field: max 64
- */ 
-int32_t check_rule_format(char *rule)
+ */
+int32_t check_rule_format(char * rule)
 {
-  int32_t i = 0; 
+  int32_t i = 0;
   char *token;
   int32_t valid = DEVIDD_SUCCESS;
 
@@ -234,7 +234,7 @@ int32_t check_rule_format(char *rule)
       syslog(LOG_ERR, "Rule %s invalid: field %s is too long",
              rule, token);
       valid = DEVIDD_ERR_OTHER;
-      break; 
+      break;
     }
   }
   if (i != NB_FIELD_COMPLETE_ID)
@@ -246,5 +246,5 @@ int32_t check_rule_format(char *rule)
 
   free(token);
 
-  return valid; 
+  return valid;
 }

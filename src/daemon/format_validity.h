@@ -1,7 +1,7 @@
 #ifndef FORMAT_VALIDITY_H
 # define FORMAT_VALIDITY_H
 
-#include <stdint.h> 
+#include <stdint.h>
 
 # define LEN_FIELD 64
 # define NB_FIELD_COMPLETE_ID 8
@@ -29,7 +29,7 @@
   *
   * \param serial the serial identifier to be checked
   *
-  * \return DEVIDD_SUCCESS on success (format validity), 
+  * \return DEVIDD_SUCCESS on success (format validity),
   * DEVIDD_ERR on failure
   *
   */
@@ -43,7 +43,7 @@ int32_t check_serial_format(char *serial);
   * \param str the vendor or product identifier to be checked,
   * in string format
   *
-  * \return DEVIDD_SUCCESS on success (format validity), 
+  * \return DEVIDD_SUCCESS on success (format validity),
   * DEVIDD_ERR on failure
   *
   */
@@ -57,7 +57,7 @@ int32_t check_vendor_product_format(char *str);
   * \param bcd the bcd_device identifier to be checked,
   * in string format
   *
-  * \return DEVIDD_SUCCESS on success (format validity), 
+  * \return DEVIDD_SUCCESS on success (format validity),
   * DEVIDD_ERR on failure
   *
   */
@@ -66,31 +66,31 @@ int32_t check_bcd_format(char *bcd);
 /**
   * \brief Check if machine format is valid.
   *
-  * \param serial the machine identifier to be checked
+  * \param machine the machine identifier to be checked
   *
-  * \return DEVIDD_SUCCESS on success (format validity, 
+  * \return DEVIDD_SUCCESS on success (format validity,
   * DEVIDD_ERR on failure
   *
   */
 int32_t check_machine_format(char *machine);
 
 /**
-  * \brief Check if bus or port string format is valid, i.e: 
+  * \brief Check if bus or port string format is valid, i.e:
   * identifier length is between 0 and 3 characters,
   * and all characters are digits encoded in decimal format
   * ([0-9]{3}).
   *
-  * \param str the bus or port identifier to be checked, 
+  * \param str the bus or port identifier to be checked,
   * in string format
   *
-  * \return DEVIDD_SUCCESS on success (format validity, 
+  * \return DEVIDD_SUCCESS on success (format validity,
   * DEVIDD_ERR on failure
   *
   */
 int32_t check_bus_port_format(char *str);
 
 /**
-  * \brief Check if horary string format is valid, i.e: horary 
+  * \brief Check if horary string format is valid, i.e: horary
   * is splited into two fields separated by a dash, and all characters
   * except the dash are digits encoded in hexadecimal format.
   *
@@ -103,7 +103,7 @@ int32_t check_bus_port_format(char *str);
 int32_t check_horaries_format(char *field);
 
 /**
-  * \brief Check if a given field of a rule or devid 
+  * \brief Check if a given field of a rule or devid
   * has valid format (for instance: serial, machine...)
   *
   * \param field the field to be checked
@@ -116,8 +116,8 @@ int32_t check_field_format(char *field, int32_t i);
 
 /**
   * \brief Check if rule format format is correct, by
-  * lexing the rule into separated fields, and 
-  * parsing each field. Number of fields is also checked. 
+  * lexing the rule into separated fields, and
+  * parsing each field. Number of fields is also checked.
   *
   * \param rule the rule to be checked
   *
@@ -129,7 +129,7 @@ int32_t check_rule_format(char *rule);
 
 
 
-/* Notice that integer doesn't need to be checked: for instance, 
+/* Notice that integer doesn't need to be checked: for instance,
  * the only rule for bus and port integers is that
  * they must have less than 3 digits. But uint8_t already
  * forces them to be so. */

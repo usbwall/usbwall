@@ -73,6 +73,6 @@ int32_t check_one_rule(char **not_parsed_rule, char **not_parsed_devid);
  * \param rules  list of rules (char *) for the current user
  *
  * \return is_auth, local variable set to DEVIDD_SUCCESS in case of
- * device authorization 
+ * device authorization
  */
-int32_t check_devid(const char * const devid, struct linked_list *rules);
+int32_t check_devid(char *devid, struct linked_list *rules);

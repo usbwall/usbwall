@@ -13,6 +13,8 @@
 #include <string.h>
 #include <syslog.h>
 #include <unistd.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
 
 #include "config.h"
 #include "devuser.h"
@@ -20,7 +22,7 @@
 #include "complete_id.h"
 #include "../misc/error_handler.h"
 #include "format_validity.h"
-#include "../devidd_ctl/server.h"
+#include "server.h"
 
 /**
  * \brief maximum possible size of a device serial id.
@@ -54,7 +56,7 @@ static int g_wait_for_hotplugs;
 static pthread_t g_hotplug_thread;
 
 /**
- * \brief devusb internal global used to reference the server_core thread, 
+ * \brief devusb internal global used to reference the server_core thread,
  * which launch the devidd_ctl server.
  * It is started in the module init and exited in the module exit.
  */
@@ -421,10 +423,10 @@ int init_devusb(void)
   /* start the wait_for_hotplug thread */
   pthread_create(&g_hotplug_thread, NULL, wait_for_hotplug, NULL);
 
-  /* FIXME: return code not checked */ 
+  /* FIXME: return code not checked */
 
   /* Start the server_core thread that launch the devidd_ctl server */
-  pthread_create(&g_devidd_ctl_thread, NULL, server_core, NULL);
+  pthread_create(&g_devidd_ctl_thread, NULL, &serv_core, NULL);
   syslog(LOG_DEBUG, "Devusb initialized sucessfully");
 
   return 0;

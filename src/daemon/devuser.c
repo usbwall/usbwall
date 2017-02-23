@@ -13,6 +13,8 @@
 
 #include "config.h"
 #include "ipc_pam.h"
+#include "format_validity.h"
+
 
 /**
  * \brief maximum possible size of a user login
@@ -278,7 +280,7 @@ struct linked_list *devids_get(const char *username)
 
 int32_t check_one_rule(char **not_parsed_rule, char **not_parsed_devid)
 {
-  char *field_rule; 
+  char *field_rule;
   char *field_devid;
   char *begin;
   char *end;
@@ -331,14 +333,19 @@ int32_t check_one_rule(char **not_parsed_rule, char **not_parsed_devid)
   return match;
 }
 
-int32_t check_devid(const char * const devid, struct linked_list *rules)
+int32_t check_devid(char *devid, struct linked_list *rules)
 {
-  int32_t i = 0;
+  /* int32_t i = 0; */
   char *not_parsed_devid; /* Store tokens from devid that remain unparsed */
   char *not_parsed_rule; /* Store tokens from rule that remain unparsed */
   int32_t is_auth = DEVIDD_ERR_OTHER; /* Set to DEVIDD_SUCCESS if device is
                                          authorized */
-  struct ll_node *rule = rules->first; /* Rule point 
+  struct ll_node *rule = NULL; /* Rule point */
+
+  if (rules != NULL)
+    rule = rules->first;
+
+  /* FIXME needs to malloc string devid to give it to check_rule_format that destroy it with strtok */
 
   /* Check if devid format is valid */
   if (check_rule_format(devid) != DEVIDD_SUCCESS)
@@ -353,34 +360,34 @@ int32_t check_devid(const char * const devid, struct linked_list *rules)
   not_parsed_rule = malloc(DEVID_MAX_LEN);
 
   if (!not_parsed_devid || !not_parsed_rule)
-  { 
+  {
     free(not_parsed_devid);
-    free(not_parsed_rule); 
+    free(not_parsed_rule);
 
-    return DEVIDD_ERR_MEM; 
+    return DEVIDD_ERR_MEM;
   }
 
   while (rule)
   {
-    if (check_rule_format(rule) != DEVIDD_SUCCESS)
+    if (check_rule_format(rule->data) != DEVIDD_SUCCESS) /* FIXME Code was : check_rule_format(rule), but that didn't make any sense. This needs checking */
     {
       break;
     }
 
-    not_parsed_rule = strdup(rule->data); 
+    not_parsed_rule = strdup(rule->data);
     not_parsed_devid = strdup(devid);
 
-    is_auth = check_one_rule(&not_parsed_rule, &not_parsed_devid); 
+    is_auth = check_one_rule(&not_parsed_rule, &not_parsed_devid);
 
     if (is_auth == DEVIDD_SUCCESS)
       break;
 
-    rule = rule->next; 
+    rule = rule->next;
   }
 
   free(not_parsed_devid);
-  free(not_parsed_rule); 
+  free(not_parsed_rule);
 
   /* is_auth was set to DEVIDD_SUCCESS if one rule matched  */
-  return is_auth; 
+  return is_auth;
 }
