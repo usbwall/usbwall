@@ -57,7 +57,8 @@ endif()
 
 ### Define mandatory CFLAGS
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D_XOPEN_SOURCE=800 -fPIC")
+# _DEFAULT_SOURCE is used for function inet_aton()
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D_DEFAULT_SOURCE -D_XOPEN_SOURCE=800 -fPIC")
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD")
 #FreeBSD specific code
@@ -122,6 +123,8 @@ find_package(LDAP    REQUIRED)
 find_package(Threads REQUIRED)
 add_executable(usbwalld
   $<TARGET_OBJECTS:misc_obj> $<TARGET_OBJECTS:usbwalld_obj>)
+add_executable(deviddctl
+  $<TARGET_OBJECTS:devidd_ctl_obj>)
 target_link_libraries(usbwalld ldap)
 target_link_libraries(usbwalld usb-1.0)
 target_link_libraries(usbwalld ${CMAKE_THREAD_LIBS_INIT})

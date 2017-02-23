@@ -10,6 +10,7 @@ set(DAEMON_SRC
   usb_access.c
   complete_id.c
   format_validity.c
+  server.c
   )
 
 add_library(usbwalld_obj OBJECT ${DAEMON_SRC})
