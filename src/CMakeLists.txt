@@ -4,32 +4,123 @@ include(CheckCCompilerFlag)
 ### Check for global CFLAGS compiler support
 ###########################
 
-check_c_compiler_flag(-Weverything HAS_WEVERYTHING_CFLAG)
-if (HAS_WEVERYTHING_CFLAG)
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Weverything")
-endif()
+set(MY_COMPILE_OPTIONS
+# "W"
+"Waggregate-return"
+"Wall"
+"Warray-bounds"
+"Wbad-function-cast"
+"Wcast-align"
+"Wcast-qual"
+"Wchar-subscripts"
+"Wcomment"
+"Wconversion"
+# "Wdeclaration-after-statement"
+"Wdisabled-optimization"
+"Wdouble-promotion"
+"Werror"
+"Weverything"
+"Wextra"
+"Wfloat-equal"
+"Wformat"
+"Wformat-nonliteral"
+"Wformat-security"
+"Wformat-y2k"
+"Wignored-qualifiers"
+"Wimplicit"
+"Wimplicit-function-declaration"
+"Wimplicit-int"
+"Winit-self"
+"Winline"
+"Winvalid-pch"
+"Wjump-misses-init"
+"Wlogical-op"
+"Wlong-long"
+"Wmain"
+"Wmissing-braces"
+"Wmissing-declarations"
+"Wmissing-field-initializers"
+"Wmissing-format-attribute"
+"Wmissing-include-dirs"
+"Wmissing-noreturn"
+"Wmissing-parameter-type"
+"Wmissing-prototypes"
+"Wmultichar"
+"Wnested-externs"
+"Wno-endif-labels"
+"Wno-multichar"
+"Wnonnull"
+"Wold-style-declaration"
+"Wold-style-definition"
+"Woverlength-strings"
+"Wpacked"
+"Wpacked-bitfield-compat"
+"Wpadded"
+"Wparentheses"
+"Wpointer-arith"
+"Wpointer-sign"
+"Wredundant-decls"
+"Wreturn-type"
+"Wsequence-point"
+"Wshadow"
+"Wsign-compare"
+"Wsign-conversion"
+# "Wstack-protector"
+"Wstrict-aliasing=3"
+"Wstrict-overflow=5"
+"Wstrict-prototypes"
+"Wsuggest-attribute=const"
+"Wsuggest-attribute=noreturn"
+"Wsuggest-attribute=pure"
+"Wswitch"
+#"Wswitch-default"
+"Wswitch-enum"
+"Wsync-nand"
+"Wtraditional-conversions"
+"Wtrampolines"
+"Wtrigraphs"
+"Wundef"
+"Wuninitialized"
+"Wunknown-pragmas"
+"Wunreachable-code"
+"Wunsafe-loop-optimizations"
+"Wunsuffixed-float-constants"
+"Wunused"
+"Wunused-function"
+"Wunused-label"
+"Wunused-local-typedefs"
+"Wunused-parameter"
+"Wunused-value"
+"Wunused-variable"
+"Wvariadic-macros"
+"Wvector-operation-performance"
+"Wvla"
+"Wvolatile-register-var"
+"Wwrite-strings"
+"ffreestanding"
+"fno-builtin"
+"fno-common"
+"fstack-protector-all"
+"fstack-protector"
+"fPIC"
+"mno-gpopt"
+"pedantic"
+"std=c99"
+"strict-aliasing"
+)
 
-check_c_compiler_flag(-std=c99 HAS_STDC99_CFLAG)
-if (HAS_STDC99_CFLAG)
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99")
-endif()
+foreach(TESTED_OPTION ${MY_COMPILE_OPTIONS})
+  # Replace - by _ because CMake variable can't have - in their name
+  string(REPLACE "-" "_" MY_FLAG ${TESTED_OPTION})
+  check_c_compiler_flag(-${TESTED_OPTION} HAS_${MY_FLAG})
+  if (HAS_${MY_FLAG})
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -${TESTED_OPTION}")
+  endif()
+endforeach()
 
-check_c_compiler_flag(-Wall HAS_WALL_CFLAG)
-if (HAS_WALL_CFLAG)
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall")
-endif()
-
-check_c_compiler_flag(-Wextra HAS_WEXTRA_CFLAG)
-if (HAS_WEXTRA_CFLAG)
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wextra")
-endif()
-
-check_c_compiler_flag(-pedantic HAS_PEDANTIC_CFLAG)
-if (HAS_PEDANTIC_CFLAG)
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pedantic")
-endif()
-
+###
 ### Disabled compile flags because of code incompatibility (yet)
+###
 
 # Used for skip strutures alignement requirement
 check_c_compiler_flag(-Wno-padded HAS_PADDED_CFLAG)
@@ -55,14 +146,25 @@ if (HAS_NOFORMAT_NONLIT_CFLAG)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-format-nonliteral")
 endif()
 
+###
 ### Define mandatory CFLAGS
+###
 
 # _DEFAULT_SOURCE is used for function inet_aton()
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D_DEFAULT_SOURCE -D_XOPEN_SOURCE=800 -fPIC")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D_DEFAULT_SOURCE")
+# _XOPEN_SOURCE=800 is used for ???
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D_XOPEN_SOURCE=800")
+# fPIC is used for ???
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC")
+
+###
+### Define OS Specific CFLAGS
+###
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD")
-#FreeBSD specific code
+# FreeBSD specific code
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D_FREEBSD")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DLDAP_DEPRECATED")
 endif()
 
 ###########################
@@ -71,25 +173,25 @@ endif()
 
 ### Define mandatory DEBUG CFLAGS
 
-set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -g3 -Werror")
+set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -g3 -O0")
 
 ### Check sanitizer support
 
 check_c_compiler_flag(-fsanitize=undefined HAS_SAN_UNDEFINED_CFLAG)
 if (HAS_SAN_UNDEFINED_CFLAG)
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsanitize=undefined")
+    set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -fsanitize=undefined")
 endif()
 check_c_compiler_flag(-fsanitize=address HAS_SAN_ADDR_CFLAG)
 if (has_san_addr_cflag)
-    set(cmake_c_flags "${cmake_c_flags} -fsanitize=address")
+    set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -fsanitize=address")
 endif()
 check_c_compiler_flag(-fsanitize=leak HAS_SAN_LEAK_CFLAG)
 if (has_san_leak_cflag)
-    set(cmake_c_flags "${cmake_c_flags} -fsanitize=leak")
+    set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -fsanitize=leak")
 endif()
 check_c_compiler_flag(-fno-omit-frame-pointer HAS_OMIT_FP_CFLAG)
 if (HAS_OMIT_FP_CFLAG)
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-omit-frame-pointer")
+    set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -fno-omit-frame-pointer")
 endif()
 
 ###########################
@@ -98,7 +200,7 @@ endif()
 
 ### Define mandatory RELEASE CFLAGS
 
-set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -O2")
+set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE}")
 
 ###########################
 ### Add src to the include path
