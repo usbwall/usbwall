@@ -5,109 +5,109 @@ include(CheckCCompilerFlag)
 ###########################
 
 set(MY_COMPILE_OPTIONS
-# "W"
-"Waggregate-return"
-"Wall"
-"Warray-bounds"
-"Wbad-function-cast"
-"Wcast-align"
-"Wcast-qual"
-"Wchar-subscripts"
-"Wcomment"
-"Wconversion"
-# "Wdeclaration-after-statement"
-"Wdisabled-optimization"
-"Wdouble-promotion"
-"Werror"
-"Weverything"
-"Wextra"
-"Wfloat-equal"
-"Wformat"
-"Wformat-nonliteral"
-"Wformat-security"
-"Wformat-y2k"
-"Wignored-qualifiers"
-"Wimplicit"
-"Wimplicit-function-declaration"
-"Wimplicit-int"
-"Winit-self"
-"Winline"
-"Winvalid-pch"
-"Wjump-misses-init"
-"Wlogical-op"
-"Wlong-long"
-"Wmain"
-"Wmissing-braces"
-"Wmissing-declarations"
-"Wmissing-field-initializers"
-"Wmissing-format-attribute"
-"Wmissing-include-dirs"
-"Wmissing-noreturn"
-"Wmissing-parameter-type"
-"Wmissing-prototypes"
-"Wmultichar"
-"Wnested-externs"
-"Wno-endif-labels"
-"Wno-multichar"
-"Wnonnull"
-"Wold-style-declaration"
-"Wold-style-definition"
-"Woverlength-strings"
-"Wpacked"
-"Wpacked-bitfield-compat"
-"Wpadded"
-"Wparentheses"
-"Wpointer-arith"
-"Wpointer-sign"
-"Wredundant-decls"
-"Wreturn-type"
-"Wsequence-point"
-"Wshadow"
-"Wsign-compare"
-"Wsign-conversion"
-# "Wstack-protector"
-"Wstrict-aliasing=3"
-"Wstrict-overflow=5"
-"Wstrict-prototypes"
-"Wsuggest-attribute=const"
-"Wsuggest-attribute=noreturn"
-"Wsuggest-attribute=pure"
-"Wswitch"
-#"Wswitch-default"
-"Wswitch-enum"
-"Wsync-nand"
-"Wtraditional-conversions"
-"Wtrampolines"
-"Wtrigraphs"
-"Wundef"
-"Wuninitialized"
-"Wunknown-pragmas"
-"Wunreachable-code"
-"Wunsafe-loop-optimizations"
-"Wunsuffixed-float-constants"
-"Wunused"
-"Wunused-function"
-"Wunused-label"
-"Wunused-local-typedefs"
-"Wunused-parameter"
-"Wunused-value"
-"Wunused-variable"
-"Wvariadic-macros"
-"Wvector-operation-performance"
-"Wvla"
-"Wvolatile-register-var"
-"Wwrite-strings"
-"ffreestanding"
-"fno-builtin"
-"fno-common"
-"fstack-protector-all"
-"fstack-protector"
-"fPIC"
-"mno-gpopt"
-"pedantic"
-"std=c99"
-"strict-aliasing"
-)
+  # "W"
+  "Waggregate-return"
+  "Wall"
+  "Warray-bounds"
+  "Wbad-function-cast"
+  "Wcast-align"
+  "Wcast-qual"
+  "Wchar-subscripts"
+  "Wcomment"
+  "Wconversion"
+  # "Wdeclaration-after-statement"
+  "Wdisabled-optimization"
+  "Wdouble-promotion"
+  "Werror"
+  "Weverything"
+  "Wextra"
+  "Wfloat-equal"
+  "Wformat"
+  "Wformat-nonliteral"
+  "Wformat-security"
+  "Wformat-y2k"
+  "Wignored-qualifiers"
+  "Wimplicit"
+  "Wimplicit-function-declaration"
+  "Wimplicit-int"
+  "Winit-self"
+  "Winline"
+  "Winvalid-pch"
+  "Wjump-misses-init"
+  "Wlogical-op"
+  "Wlong-long"
+  "Wmain"
+  "Wmissing-braces"
+  "Wmissing-declarations"
+  "Wmissing-field-initializers"
+  "Wmissing-format-attribute"
+  "Wmissing-include-dirs"
+  "Wmissing-noreturn"
+  "Wmissing-parameter-type"
+  "Wmissing-prototypes"
+  "Wmultichar"
+  "Wnested-externs"
+  "Wno-endif-labels"
+  "Wno-multichar"
+  "Wnonnull"
+  "Wold-style-declaration"
+  "Wold-style-definition"
+  "Woverlength-strings"
+  "Wpacked"
+  "Wpacked-bitfield-compat"
+  "Wpadded"
+  "Wparentheses"
+  "Wpointer-arith"
+  "Wpointer-sign"
+  "Wredundant-decls"
+  "Wreturn-type"
+  "Wsequence-point"
+  "Wshadow"
+  "Wsign-compare"
+  "Wsign-conversion"
+  # "Wstack-protector"
+  "Wstrict-aliasing=3"
+  "Wstrict-overflow=5"
+  "Wstrict-prototypes"
+  "Wsuggest-attribute=const"
+  "Wsuggest-attribute=noreturn"
+  "Wsuggest-attribute=pure"
+  "Wswitch"
+  #"Wswitch-default"
+  "Wswitch-enum"
+  "Wsync-nand"
+  "Wtraditional-conversions"
+  "Wtrampolines"
+  "Wtrigraphs"
+  "Wundef"
+  "Wuninitialized"
+  "Wunknown-pragmas"
+  "Wunreachable-code"
+  "Wunsafe-loop-optimizations"
+  "Wunsuffixed-float-constants"
+  "Wunused"
+  "Wunused-function"
+  "Wunused-label"
+  "Wunused-local-typedefs"
+  "Wunused-parameter"
+  "Wunused-value"
+  "Wunused-variable"
+  "Wvariadic-macros"
+  "Wvector-operation-performance"
+  "Wvla"
+  "Wvolatile-register-var"
+  "Wwrite-strings"
+  "ffreestanding"
+  "fno-builtin"
+  "fno-common"
+  "fstack-protector-all"
+  "fstack-protector"
+  "fPIC"
+  "mno-gpopt"
+  "pedantic"
+  "std=c99"
+  "strict-aliasing"
+  )
 
 foreach(TESTED_OPTION ${MY_COMPILE_OPTIONS})
   # Replace - by _ because CMake variable can't have - in their name
@@ -122,29 +122,23 @@ endforeach()
 ### Disabled compile flags because of code incompatibility (yet)
 ###
 
-# Used for skip strutures alignement requirement
-check_c_compiler_flag(-Wno-padded HAS_PADDED_CFLAG)
-if (HAS_PADDED_CFLAG)
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-padded")
-endif()
+set(MY_DISABLED_COMPILE_OPTIONS
+  "Wno-discarded-qualifiers"		# Permit building with calls to basename() using __FILE__ which is a const value
+  "Wno-padded"				# Used for skip strutures alignement requirement
+  "Wno-vla"				# Skip check for variable length in arrays
+  "Wno-disabled-macro-expansion"	# Using sigaction create this warning
+  "Wno-format-nonliteral"		# Skip the check for functions calls to with non litteral format string
+  )
 
-# Skip check for variable length in arrays
-check_c_compiler_flag(-Wno-vla HAS_NOVLA_CFLAG)
-if (HAS_NOVLA_CFLAG)
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-vla")
-endif()
+foreach(TESTED_OPTION ${MY_DISABLED_COMPILE_OPTIONS})
+  # Replace - by _ because CMake variable can't have - in their name
+  string(REPLACE "-" "_" MY_FLAG ${TESTED_OPTION})
+  check_c_compiler_flag(-${TESTED_OPTION} HAS_${MY_FLAG})
+  if (HAS_${MY_FLAG})
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -${TESTED_OPTION}")
+  endif()
+endforeach()
 
-# Using sigaction create this warning
-check_c_compiler_flag(-Wno-disabled-macro-expansion HAS_NOMACEXP_CFLAG)
-if (HAS_NOMACEXP_CFLAG)
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-disabled-macro-expansion")
-endif()
-
-# Skip the check for functions calls to with non litteral format string
-check_c_compiler_flag(-Wno-format-nonliteral HAS_NOFORMAT_NONLIT_CFLAG)
-if (HAS_NOFORMAT_NONLIT_CFLAG)
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-format-nonliteral")
-endif()
 
 ###
 ### Define mandatory CFLAGS
