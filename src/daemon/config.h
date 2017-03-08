@@ -24,12 +24,14 @@ struct config
  *
  * \return structure containing configurations variables of the project.
  */
+__attribute__((pure))
 const struct config *configuration_get(void);
 
 /**
  * \brief find the path where file containing the ldap configuration should be.
  * \return path to the configuration file
  */
+__attribute__((const))
 const char *cfg_file_find(void);
 
 /**

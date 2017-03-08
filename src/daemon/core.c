@@ -44,14 +44,17 @@ static int g_cfgupdate = 0;
 static struct linked_list *filter_devices(struct linked_list *allowed_devices,
                                           struct linked_list *devids)
 {
+  struct linked_list *corrupted_devices = NULL;
+  struct linked_list *forbidden_devices = NULL;
+
   assert(allowed_devices && devids);
 
-  struct linked_list *corrupted_devices = list_make();
-  if (!corrupted_devices)
+  corrupted_devices = list_make();
+  if (corrupted_devices == NULL)
     return NULL;
 
-  struct linked_list *forbidden_devices = list_make();
-  if (!forbidden_devices)
+  forbidden_devices = list_make();
+  if (forbidden_devices == NULL)
     return NULL;
 
   list_for_each(device_ptr, allowed_devices)
@@ -68,8 +71,8 @@ static struct linked_list *filter_devices(struct linked_list *allowed_devices,
 
     if (check_devid(device->complete_id, devids) != DEVIDD_SUCCESS)
     {
-      /* Device id doesn't match any rule from the firewall USB. 
-       * The device is then not allowed. 
+      /* Device id doesn't match any rule from the firewall USB.
+       * The device is then not allowed.
        * Just push it in the forbidden list and remove it from the
        * authorized ones. */
       list_add_back(forbidden_devices, device);
@@ -123,17 +126,21 @@ static int notifs_lookup(void)
  */
 static void handle_login(const char *username)
 {
+  struct linked_list *device_list = NULL;
+  struct linked_list *devids = NULL;
+  struct linked_list *forbid = NULL;
+
   assert(username);
 
-  struct linked_list *device_list = devices_get();
+  device_list = devices_get();
   if (!device_list)
     return;
 
-  struct linked_list *devids = devids_get(username);
+  devids = devids_get(username);
   if (!devids)
     return;
 
-  struct linked_list *forbid = filter_devices(device_list, devids);
+  forbid = filter_devices(device_list, devids);
   if (!forbid)
     return;
 

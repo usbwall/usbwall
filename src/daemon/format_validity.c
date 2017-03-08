@@ -3,7 +3,6 @@
 #include <ctype.h>
 #include <stdlib.h>
 
-
 #include "format_validity.h"
 #include "../misc/error_handler.h"
 
@@ -12,7 +11,7 @@
  * - max: 126 characters
  * - type: 0-9, A-F
  */
-
+__attribute__((pure))
 int32_t check_serial_format(char *serial)
 {
   uint32_t i = 0;
@@ -41,7 +40,7 @@ int32_t check_serial_format(char *serial)
  * - fixed size: 4
  * - type: 0-9, A-F
  */
-
+__attribute__((pure))
 int32_t check_vendor_product_format(char *str)
 {
   int32_t i = 0;
@@ -67,28 +66,29 @@ int32_t check_vendor_product_format(char *str)
  * - fixed size: 16
  * - type: 0-1
  */
- int32_t check_bcd_format(char *bcd)
- {
+__attribute__((pure))
+int32_t check_bcd_format(char *bcd)
+{
   int32_t i = 0;
 
   if (strlen(bcd) != LEN_BCD)
-  {
-    return DEVIDD_ERR_OTHER;
-  }
-
-  for (i = 0; i < LEN_BCD; i++)
-  {
-    /* A character is valid if and only if its format is hexadecimal
-       and if it is not a lowercase */
-    if ((bcd[i] != '0') && (bcd[i] != '1'))
     {
       return DEVIDD_ERR_OTHER;
     }
-  }
+
+  for (i = 0; i < LEN_BCD; i++)
+    {
+      /* A character is valid if and only if its format is hexadecimal
+	 and if it is not a lowercase */
+      if ((bcd[i] != '0') && (bcd[i] != '1'))
+	{
+	  return DEVIDD_ERR_OTHER;
+	}
+    }
   return DEVIDD_SUCCESS;
- }
+}
 
-
+__attribute__((pure))
 int32_t check_machine_format(char *machine)
 {
   if (strlen(machine) != LEN_FIELD)
@@ -97,6 +97,7 @@ int32_t check_machine_format(char *machine)
   return DEVIDD_SUCCESS;
 }
 
+__attribute__((pure))
 int32_t check_bus_port_format(char *str)
 {
   int32_t i = 0;
@@ -118,6 +119,7 @@ int32_t check_bus_port_format(char *str)
   return DEVIDD_SUCCESS;
 }
 
+__attribute__((pure))
 int32_t check_horaries_format(char *field)
 {
   uint32_t i;
@@ -147,6 +149,8 @@ int32_t check_horaries_format(char *field)
   /* If no dash was found, dash is set to DEVIDD_ERR */
   return dash;
 }
+
+__attribute__((pure))
 int32_t check_field_format(char *field, int32_t i)
 {
   int32_t validity = DEVIDD_SUCCESS;
@@ -207,7 +211,7 @@ int32_t check_field_format(char *field, int32_t i)
 int32_t check_rule_format(char * rule)
 {
   int32_t i = 0;
-  char *token;
+  char *token = NULL;
   int32_t valid = DEVIDD_SUCCESS;
 
   token = calloc(1, DEVID_MAX_LEN);
@@ -227,7 +231,9 @@ int32_t check_rule_format(char * rule)
       token = strtok(NULL, ":");
     }
 
-    check_field_format(token, i);
+    valid = check_field_format(token, i);
+    if (valid != DEVIDD_SUCCESS)
+      break;
 
     if (strlen(token) > LEN_FIELD)
     {

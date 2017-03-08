@@ -12,9 +12,11 @@
  */
 static struct ll_node *node_make(void *data)
 {
+  struct ll_node *node = NULL;
+
   assert(data);
 
-  struct ll_node *node = malloc(sizeof(struct ll_node));
+  node = malloc(sizeof(struct ll_node));
   if (!node)
     return NULL;
 
@@ -81,10 +83,12 @@ void *list_extract(struct linked_list *ll,
                    const void *data,
                    int (* compare_function)(const void *, const void *))
 {
+  struct ll_node *ptr = NULL;
+
   assert(ll);
   assert(data && "Data can't be NULL.");
 
-  struct ll_node *ptr = ll->first;
+  ptr = ll->first;
   while (ptr && compare_function(ptr->data, data))
     ptr = ptr->next;
 

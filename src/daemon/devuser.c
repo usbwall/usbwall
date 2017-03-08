@@ -189,7 +189,7 @@ struct linked_list *usernames_get(void)
   return NULL;
 }
 
-struct linked_list *wait_for_logging()
+struct linked_list *wait_for_logging(void)
 {
   /* Wait for the event from PAM */
   enum event message_event = accept_user();

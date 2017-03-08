@@ -45,4 +45,5 @@ void set_usb_default_access(int value);
  *
  * \return 0 if not valid, 1 otherwhise
  */
+__attribute__((pure))
 int device_is_valid(struct devusb *device);

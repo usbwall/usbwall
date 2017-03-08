@@ -53,6 +53,7 @@ static void skip_comments(char *line)
  *
  * \return 1 if the line is empty, 0 elseways.
  */
+__attribute__((pure))
 static int line_is_empty(const char *line)
 {
   while (isspace(*line))

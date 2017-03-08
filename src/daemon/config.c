@@ -70,6 +70,7 @@ static void destroy_config(struct config *cfg)
   free(cfg);
 }
 
+__attribute__((pure))
 const struct config *configuration_get(void)
 {
   assert(g_configuration);
@@ -77,6 +78,7 @@ const struct config *configuration_get(void)
   return g_configuration;
 }
 
+__attribute__((const))
 const char *cfg_file_find(void)
 {
   /**
@@ -85,7 +87,11 @@ const char *cfg_file_find(void)
    * It's optional but conveniant for the user.
    */
 
+#ifdef _FreeBSD
+  return "/usr/local/etc/usbwall.cfg";
+#else
   return "/etc/usbwall.cfg";
+#endif
 }
 
 int update_configuration(const char *cfg_file)

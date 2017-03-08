@@ -72,11 +72,12 @@ static char *ports_to_string(uint8_t *ports, uint8_t ports_nb)
   return strcpy(ports_str, result);
 }
 
+__attribute__((pure))
 int device_is_valid(struct devusb *device)
 {
   assert(device);
 
-  /* Is a device without serial invalid?? */ 
+  /* Is a device without serial invalid?? */
   return device->ports_nb && device->bus && device->serial;
 }
 

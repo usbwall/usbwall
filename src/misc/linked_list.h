@@ -73,6 +73,6 @@ void list_destroy(struct linked_list *ll, int data_destruction);
  * \param pos  name of the iterator node.
  * \param ll  linked_list to iterate on.
  */
-#define list_for_each(pos, ll) \
-      struct ll_node *pos; \
-      for (pos = ll->first; pos; pos = pos->next)
+#define list_for_each(pos, ll)				\
+  struct ll_node *pos;					\
+  for (pos = ll->first; pos; pos = pos->next)

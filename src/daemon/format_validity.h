@@ -33,6 +33,7 @@
   * DEVIDD_ERR on failure
   *
   */
+__attribute__((pure))
 int32_t check_serial_format(char *serial);
 
 /**
@@ -47,6 +48,7 @@ int32_t check_serial_format(char *serial);
   * DEVIDD_ERR on failure
   *
   */
+__attribute__((pure))
 int32_t check_vendor_product_format(char *str);
 
 /**
@@ -61,6 +63,7 @@ int32_t check_vendor_product_format(char *str);
   * DEVIDD_ERR on failure
   *
   */
+__attribute__((pure))
 int32_t check_bcd_format(char *bcd);
 
 /**
@@ -72,6 +75,7 @@ int32_t check_bcd_format(char *bcd);
   * DEVIDD_ERR on failure
   *
   */
+__attribute__((pure))
 int32_t check_machine_format(char *machine);
 
 /**
@@ -87,6 +91,7 @@ int32_t check_machine_format(char *machine);
   * DEVIDD_ERR on failure
   *
   */
+__attribute__((pure))
 int32_t check_bus_port_format(char *str);
 
 /**
@@ -100,6 +105,7 @@ int32_t check_bus_port_format(char *str);
   * (format validity) or DEVIDD_ERR on failure
   *
   */
+__attribute__((pure))
 int32_t check_horaries_format(char *field);
 
 /**
@@ -112,6 +118,7 @@ int32_t check_horaries_format(char *field);
   * \return validity, variable setted to DEVIDD_SUCCESS on success
   * (format validity), and DEVIDD_ERR on failure
   */
+__attribute__((pure))
 int32_t check_field_format(char *field, int32_t i);
 
 /**
