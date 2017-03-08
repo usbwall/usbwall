@@ -14,7 +14,7 @@
  * \brief Retrieve the current user name.
  * \return users names connected on the system. Return NULL on error.
  *
- * usernames is extracted from utmp.
+ * usernames is extracted from utmpx (Standard for accessing usernames on Unix systems).
  */
 struct linked_list *usernames_get(void);
 

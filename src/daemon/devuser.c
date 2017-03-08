@@ -1,5 +1,3 @@
-#include "devuser.h"
-
 #include <assert.h>
 #include <fcntl.h>
 #include <ldap.h>
@@ -9,11 +7,12 @@
 #include <sys/stat.h>
 #include <syslog.h>
 #include <unistd.h>
-#include <utmp.h>
+#include <utmpx.h>
 
 #include "config.h"
 #include "ipc_pam.h"
 #include "format_validity.h"
+#include "devuser.h"
 
 
 /**
@@ -163,20 +162,24 @@ static struct berval **extract_devids(LDAP *ldap_ptr,
 
 struct linked_list *usernames_get(void)
 {
-  int utmp_fd = open("/var/run/utmp", O_RDONLY);
-  if (utmp_fd != -1)
+  int utmpx_fd = open("/var/run/utmp", O_RDONLY);
+
+  if (utmpx_fd != -1)
   {
     struct linked_list *usernames = list_make();
-    struct utmp log;
-    while (read(utmp_fd, &log, sizeof(struct utmp)) == sizeof(struct utmp))
-      if (log.ut_type == USER_PROCESS)
+    struct utmpx log;
+
+    while (read(utmpx_fd, &log, sizeof(struct utmpx)) == sizeof(struct utmpx))
       {
-        close(utmp_fd);
-        char *username = strdup(log.ut_name);
-        list_add_back(usernames, username);
-        syslog(LOG_DEBUG, "Fetched username : %s", username);
+	if (log.ut_type == USER_PROCESS)
+	  {
+	    close(utmpx_fd);
+	    char *username = strdup(log.ut_user);
+	    list_add_back(usernames, username);
+	    syslog(LOG_DEBUG, "Fetched username : %s", username);
+	  }
       }
-    close(utmp_fd);
+    close(utmpx_fd);
 
     if (!usernames->first)
       syslog(LOG_WARNING, "User not found!");
@@ -184,7 +187,7 @@ struct linked_list *usernames_get(void)
     return usernames;
   }
   syslog(LOG_WARNING,
-      "Current username can't be fetched! : utmp not available");
+      "Current username can't be fetched! : utmpx not available");
 
   return NULL;
 }
