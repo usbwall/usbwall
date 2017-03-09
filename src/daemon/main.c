@@ -10,6 +10,7 @@
 #include <syslog.h>
 #include <unistd.h>
 
+#include "misc/error_handler.h"
 #include "core.h"
 
 /**
@@ -161,13 +162,13 @@ int main(int argc, char *argv[])
   {
     syslog(LOG_ERR, "Signal handling init failed.");
 
-    return 1; // a valid signal handling is mandatory
+    return 1; /* a valid signal handling is mandatory */
   }
 
   const char *pidfile = "/var/run/usbwall.pid";
   int pidfile_fd = -1;
   if ((pidfile_fd = create_pidfile(pidfile)) == -1)
-    return 1; // pidfile is mandatory to ensure unique instance
+    return DEVIDD_ERR_OTHER; /* pidfile is mandatory to ensure unique instance */
 
   syslog(LOG_INFO, "Usbwall started");
   int rcode = usbwall_run();

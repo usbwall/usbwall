@@ -1,5 +1,3 @@
-#include "ipc_pam.h"
-
 #include <assert.h>
 #include <errno.h>
 #include <stdio.h>
@@ -12,6 +10,7 @@
 #include <unistd.h>
 
 #include "uds.h"
+#include "ipc_pam.h"
 
 /**
  * \brief internal global variable corresponding to the file descriptor
@@ -24,7 +23,7 @@ static int uds_fd;
  *
  * \param err_msg  error message to be displayed in the syslog
  *
- * \return allways 1
+ * \return always 1
  */
 static int die(const char *err_msg)
 {
