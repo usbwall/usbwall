@@ -12,7 +12,8 @@
 #include <libgen.h>
 
 #include "client.h"
-#include "../misc/error_handler.h"
+#include "misc/error_handler.h"
+#include "misc/debug.h"
 
 
 int32_t client_socket(int32_t *sock_fd)
@@ -23,7 +24,7 @@ int32_t client_socket(int32_t *sock_fd)
   if (*sock_fd < 0)
   {
     syslog(LOG_ERR, "%s, %d: Cannot create socket for client",
-        basename(__FILE__), __LINE__);
+        __FILENAME__, __LINE__);
     return DEVIDD_ERR_OTHER;
   }
 
@@ -43,7 +44,7 @@ int32_t client_bind(int32_t *sock_fd __attribute__((unused)), struct sockaddr_in
   if (i == 0)
   {
     syslog(LOG_ERR, "%s, %d: Cannot convert server address string \
-        into binary address", basename(__FILE__), __LINE__);
+        into binary address", __FILENAME__, __LINE__);
 
     return DEVIDD_ERR_OTHER;
   }
@@ -64,7 +65,7 @@ int32_t client_send(int32_t *sock_fd, char **buf, struct sockaddr_in *serv_addr)
   if (s < 0)
   {
     syslog(LOG_ERR, "%s, %d: Cannot send from client to server // %s",
-        basename(__FILE__), __LINE__, strerror(errno));
+        __FILENAME__, __LINE__, strerror(errno));
     return DEVIDD_ERR_OTHER;
   }
 
@@ -83,7 +84,7 @@ int32_t client_recv(int32_t *sock_fd, char **buf, struct sockaddr_in *serv_addr)
   if (r < 0)
   {
     syslog(LOG_ERR, "%s, %d: Cannot receive from server to client",
-        basename(__FILE__), __LINE__);
+        __FILENAME__, __LINE__);
     return DEVIDD_ERR_OTHER;
   }
 
@@ -101,7 +102,7 @@ int32_t client_core(void)
   if (!buf)
   {
     syslog(LOG_ERR, "%s, %d: Cannot close client socket",
-        basename(__FILE__), __LINE__);
+        __FILENAME__, __LINE__);
 
     return DEVIDD_ERR_MEM;
   }
@@ -133,7 +134,7 @@ int32_t client_core(void)
   if (close(sock_fd) < 0)
   {
     syslog(LOG_ERR, "%s, %d: Cannot close client socket",
-        basename(__FILE__), __LINE__);
+        __FILENAME__, __LINE__);
 
     return DEVIDD_ERR_OTHER;
   }

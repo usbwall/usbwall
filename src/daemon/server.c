@@ -10,7 +10,8 @@
 #include <libgen.h>
 
 #include "server.h"
-#include "../misc/error_handler.h"
+#include "misc/error_handler.h"
+#include "misc/debug.h"
 
 
 /**
@@ -25,7 +26,7 @@ int32_t serv_socket(int32_t *sock_fd)
   if (*sock_fd < 0)
   {
     syslog(LOG_ERR, "%s, %d: Cannot create socket for server",
-           basename(__FILE__), __LINE__);
+           __FILENAME__, __LINE__);
     return DEVIDD_ERR_OTHER;
   }
 
@@ -50,7 +51,7 @@ int32_t serv_bind(int32_t *sock_fd, struct sockaddr_in *serv_addr)
   {
     printf("[serv_bind]:%s\n", strerror(errno));
     syslog(LOG_ERR, "%s, %d: Cannot bind server socket",
-           basename(__FILE__), __LINE__);
+           __FILENAME__, __LINE__);
     return DEVIDD_ERR_OTHER;
   }
 
@@ -74,7 +75,7 @@ int32_t serv_recv(int32_t *sock_fd, char **buf,
   if (r < 0)
   {
     syslog(LOG_ERR, "%s, %d: Cannot receive from client to server",
-           basename(__FILE__), __LINE__);
+           __FILENAME__, __LINE__);
     return DEVIDD_ERR_OTHER;
   }
 
@@ -99,7 +100,7 @@ int32_t serv_send(int32_t *sock_fd, char **buf,
   {
     printf("[serv_send]:%s\n", strerror(errno));
     syslog(LOG_ERR, "%s, %d: Cannot send from server to client",
-           basename(__FILE__), __LINE__);
+           __FILENAME__, __LINE__);
     return DEVIDD_ERR_OTHER;
   }
 
@@ -126,7 +127,7 @@ void *serv_core(void *arg __attribute__((unused)))
   if (!buf)
   {
     syslog(LOG_ERR, "%s, %d: Memory allocation error",
-           basename(__FILE__), __LINE__);
+           __FILENAME__, __LINE__);
 
     /* return DEVIDD_ERR_OTHER_MEM; */
     return NULL;
@@ -161,7 +162,7 @@ void *serv_core(void *arg __attribute__((unused)))
   if (close(sock_fd) < 0)
   {
     syslog(LOG_ERR, "%s, %d: Cannot close server socket",
-           basename(__FILE__), __LINE__);
+           __FILENAME__, __LINE__);
     /* return DEVIDD_ERR_OTHER; */
       error = DEVIDD_ERR_OTHER;
     return NULL;
