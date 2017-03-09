@@ -52,7 +52,7 @@ session optional pam_usbwall.so debug
 the host.
 - replace *pam_usbwall.so* by the name of the module you moved in the modules
 folder.
-- *debug* if an optional argument that specify if the debug mode is activated or
+- *debug* is an optional argument that specify if the debug mode is activated or
 not.
 
 ## Contributors
