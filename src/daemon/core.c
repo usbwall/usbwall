@@ -108,7 +108,7 @@ static int notifs_lookup(void)
     {
       syslog(LOG_WARNING, "Configuration update failed, terminating program");
 
-      return 1; // no configs found
+      return 1; /* no configs found */
     }
     g_cfgupdate = 0;
   }
@@ -161,7 +161,7 @@ static void signal_handler(int signo)
   if (signo == SIGTERM)
   {
     syslog(LOG_INFO, "SIGTERM received");
-    close_ipc_pam(); // it will close all connections with pam
+    close_ipc_pam(); /* it will close all connections with pam */
     g_terminaison = 1;
   }
   else if (signo == SIGHUP)
@@ -183,7 +183,7 @@ static void core_loop(void)
   do
   {
     if (notifs_lookup())
-      break; // program terminaison requested
+      break; /* program terminaison requested */
 
     if (!usernames)
       continue;

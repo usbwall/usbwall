@@ -3,8 +3,10 @@
 #include <netinet/in.h>
 
 #include "client.h"
-#include "../misc/error_handler.h"
+#include "misc/error_handler.h"
+#include "misc/debug.h"
 #include "main.h"
+
 
 int usage(void)
 {

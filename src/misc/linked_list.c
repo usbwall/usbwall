@@ -108,7 +108,7 @@ void list_remove(struct linked_list *ll,
   {
     ll->first = removed_node->next;
     if (ll->last == removed_node)
-      ll->last = NULL; // single node case
+      ll->last = NULL; /* single node case */
   }
   else
   {
@@ -117,7 +117,7 @@ void list_remove(struct linked_list *ll,
       ptr = ptr->next;
 
     if (!ptr)
-      return; // the node is not in the list
+      return; /* the node is not in the list */
 
     ptr->next = removed_node->next;
   }

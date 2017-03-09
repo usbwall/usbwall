@@ -5,7 +5,7 @@ include(CheckCCompilerFlag)
 ###########################
 
 set(MY_COMPILE_OPTIONS
-  # "W"
+  "W"
   "Waggregate-return"
   "Wall"
   "Warray-bounds"
@@ -15,7 +15,7 @@ set(MY_COMPILE_OPTIONS
   "Wchar-subscripts"
   "Wcomment"
   "Wconversion"
-  # "Wdeclaration-after-statement"
+  # "Wdeclaration-after-statement" # Macro "list_for_each" allocate a struct in code place...
   "Wdisabled-optimization"
   "Wdouble-promotion"
   "Werror"
@@ -123,11 +123,11 @@ endforeach()
 ###
 
 set(MY_DISABLED_COMPILE_OPTIONS
-  "Wno-discarded-qualifiers"		# Permit building with calls to basename() using __FILE__ which is a const value
+#  "Wno-discarded-qualifiers"		# Permit building with calls to basename() using __FILE__ which is a const value
   "Wno-padded"				# Used for skip strutures alignement requirement
-  "Wno-vla"				# Skip check for variable length in arrays
+  "Wno-vla"				# Skip check for variable length in arrays because C90 does not accept them
   "Wno-disabled-macro-expansion"	# Using sigaction create this warning
-  "Wno-format-nonliteral"		# Skip the check for functions calls to with non litteral format string
+#  "Wno-format-nonliteral"		# Skip the check for functions calls to with non litteral format string
   "Wno-reserved-id-macro"		# Reserved macro exists in ldap.h on FreeBSD implementation
    )
 
