@@ -57,9 +57,9 @@ not.
 
 ## Contributors
 
-Arthur d'Avray   (arthur.davray@epita.fr)
-Mathilde Beylier (mathilde.beylier@epita.fr)
-Sylvain Leroy    (sylvain@unmondelibre.fr)
+Arthur d'Avray   (arthur.davray@epita.fr)  
+Mathilde Beylier (mathilde.beylier@epita.fr)  
+Sylvain Leroy    (sylvain@unmondelibre.fr)  
 Damien Pradier   (damien.pradier@epita.fr)
 
 This project was also inspired from the previous libpam-devid project made by
