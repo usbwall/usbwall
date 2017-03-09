@@ -1,7 +1,5 @@
-#include "uds.h"
-#include "event.h"
-
-#include <security/pam_ext.h>
+#include <sys/types.h>
+#include <security/pam_appl.h>
 #include <security/pam_modules.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -12,11 +10,13 @@
 #include <syslog.h>
 #include <unistd.h>
 
+#include "uds.h"
+#include "event.h"
+
 
 /**
  * \brief pam usbwall module internal function to check if the debug mode has
- * been
- * enabled
+ * been enabled
  *
  * \param argc  number of arguments
  * \param argv  arguments array

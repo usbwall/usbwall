@@ -1,9 +1,7 @@
-#include "devusb.h"
-
-#ifdef _FREEBSD
-#include <libusb.h>
+#if defined(__FreeBSD__)
+  #include <libusb.h>
 #else
-#include <libusb-1.0/libusb.h>
+  #include <libusb-1.0/libusb.h>
 #endif
 
 #include <assert.h>
@@ -23,6 +21,7 @@
 #include "../misc/error_handler.h"
 #include "format_validity.h"
 #include "server.h"
+#include "devusb.h"
 
 /**
  * \brief maximum possible size of a device serial id.
@@ -316,8 +315,7 @@ static int hotplug_callback(struct libusb_context *ctx __attribute__((unused)),
 
     return 1;
   }
-  const char *msg = device->serial ? device->serial : "identification failed";
-  syslog(LOG_INFO, "New device detected : %s\n", msg);
+  syslog(LOG_DEBUG, "New device detected : %s\n", device->complete_id);
 
   if (!device_is_valid(device))
   {
@@ -384,12 +382,14 @@ int init_devusb(void)
     return 1;
   }
 
+#if !defined(__FreeBSD__)
   if (!libusb_has_capability(LIBUSB_CAP_HAS_HOTPLUG))
   {
     syslog(LOG_ERR, "Init error - your system does not support hotplug");
 
     return 1;
   }
+#endif
 
   libusb_set_debug(NULL, LIBUSB_LOG_LEVEL_WARNING);
 

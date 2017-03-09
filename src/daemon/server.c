@@ -60,8 +60,7 @@ int32_t serv_bind(int32_t *sock_fd, struct sockaddr_in *serv_addr)
 int32_t serv_recv(int32_t *sock_fd, char **buf,
                   struct sockaddr_in *serv_addr)
 {
-
-  int32_t r = 0; /* Return value for recvfrom() */
+  ssize_t r = 0; /* Return value for recvfrom() */
   uint32_t size_serv = sizeof (serv_addr); /* Size of serv_addr */
 
   /* Receive data from client
@@ -88,7 +87,7 @@ int32_t serv_recv(int32_t *sock_fd, char **buf,
 int32_t serv_send(int32_t *sock_fd, char **buf,
                   struct sockaddr_in *serv_addr)
 {
-  int32_t s = 0; /* Return value for sendto() */
+  ssize_t s = 0; /* Return value for sendto() */
   uint32_t size_serv = sizeof (*serv_addr);
   /* Send data to the client */
   s = sendto(*sock_fd, *buf, BUF_LEN, 0,

@@ -8,10 +8,13 @@ find_path(LDAP_INCLUDE_DIR
   NAMES ldap.h
   PATH_SUFFIXES include)
 
-find_library(LDAP_LIBRARIES
+find_library(LDAP_LIBRARY
   NAMES ldap
   PATH_SUFFIXES lib)
 
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(LDAP DEFAULT_MSG
-                                  LDAP_LIBRARIES LDAP_INCLUDE_DIR)
+                                  LDAP_LIBRARY LDAP_INCLUDE_DIR)
+
+set(LDAP_LIBRARIES ${LDAP_LIBRARY} )
+set(LDAP_INCLUDE_DIRS ${LDAP_INCLUDE_DIR} )

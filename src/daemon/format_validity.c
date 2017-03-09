@@ -15,7 +15,7 @@ __attribute__((pure))
 int32_t check_serial_format(char *serial)
 {
   uint32_t i = 0;
-  uint32_t len = 0;
+  size_t len = 0;
 
   /* Check lenght validity */
   len = strlen(serial);
@@ -122,8 +122,8 @@ int32_t check_bus_port_format(char *str)
 __attribute__((pure))
 int32_t check_horaries_format(char *field)
 {
-  uint32_t i;
-  uint32_t len;
+  uint32_t i = 0;
+  size_t len = 0;
   int32_t dash = DEVIDD_ERR_OTHER;
 
   len = strlen(field);

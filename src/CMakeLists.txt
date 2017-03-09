@@ -128,7 +128,8 @@ set(MY_DISABLED_COMPILE_OPTIONS
   "Wno-vla"				# Skip check for variable length in arrays
   "Wno-disabled-macro-expansion"	# Using sigaction create this warning
   "Wno-format-nonliteral"		# Skip the check for functions calls to with non litteral format string
-  )
+  "Wno-reserved-id-macro"		# Reserved macro exists in ldap.h on FreeBSD implementation
+   )
 
 foreach(TESTED_OPTION ${MY_DISABLED_COMPILE_OPTIONS})
   # Replace - by _ because CMake variable can't have - in their name
@@ -146,8 +147,6 @@ endforeach()
 
 # _DEFAULT_SOURCE is used for function inet_aton()
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D_DEFAULT_SOURCE")
-# _XOPEN_SOURCE=800 is used for ???
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D_XOPEN_SOURCE=800")
 # fPIC is used for ???
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC")
 
@@ -156,9 +155,10 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC")
 ###
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD")
-# FreeBSD specific code
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D_FREEBSD")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DLDAP_DEPRECATED")
+# FreeBSD specific options
+   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DLDAP_DEPRECATED")
+   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D_WITH_DPRINTF")
+   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D_WITH_GETLINE")
 endif()
 
 ###########################
@@ -203,6 +203,15 @@ set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE}")
 include_directories(.)
 
 ###########################
+### Find external packages (include dir and lib dir)
+###########################
+
+find_package(USB1    REQUIRED)
+find_package(LDAP    REQUIRED)
+find_package(Threads REQUIRED)
+find_package(PAM REQUIRED)
+
+###########################
 ### continue to subdirectories
 ###########################
 
@@ -214,21 +223,32 @@ add_subdirectory(pam)
 ###########################
 ### Construction of usbwalld
 ###########################
-find_package(USB1    REQUIRED)
-find_package(LDAP    REQUIRED)
-find_package(Threads REQUIRED)
+
+if (${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD")
+# FreeBSD local lib directory
+   link_directories(/usr/local/lib)
+endif()
+
+###########################
+### Construction of usbwalld
+###########################
+
 add_executable(usbwalld
   $<TARGET_OBJECTS:misc_obj> $<TARGET_OBJECTS:usbwalld_obj>)
 add_executable(deviddctl
   $<TARGET_OBJECTS:devidd_ctl_obj>)
 target_link_libraries(usbwalld ldap)
-target_link_libraries(usbwalld usb-1.0)
+if (${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD")
+# FreeBSD libusb name
+   target_link_libraries(usbwalld usb)
+else()
+   target_link_libraries(usbwalld usb-1.0)
+endif()
 target_link_libraries(usbwalld ${CMAKE_THREAD_LIBS_INIT})
 
 ###########################
 ### Construction of pam_usbwall
 ###########################
 
-find_package(PAM REQUIRED)
 add_library(pam_usbwall SHARED $<TARGET_OBJECTS:pam_obj>)
 target_link_libraries(pam_usbwall pam)

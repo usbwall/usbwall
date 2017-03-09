@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include <unistd.h>
 #include <string.h>
+#include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
@@ -52,7 +53,7 @@ int32_t client_bind(int32_t *sock_fd __attribute__((unused)), struct sockaddr_in
 
 int32_t client_send(int32_t *sock_fd, char **buf, struct sockaddr_in *serv_addr)
 {
-  int32_t s; /* Return value for sendto() */
+  ssize_t s = 0; /* Return value for sendto() */
 
   *buf = strdup("why?\n");
 
@@ -72,7 +73,7 @@ int32_t client_send(int32_t *sock_fd, char **buf, struct sockaddr_in *serv_addr)
 
 int32_t client_recv(int32_t *sock_fd, char **buf, struct sockaddr_in *serv_addr)
 {
-  int32_t r; /* Return value for recvfrom() */
+  ssize_t r = 0; /* Return value for recvfrom() */
   uint32_t len = sizeof (*serv_addr);
 
   /* Receive from server */
