@@ -100,9 +100,11 @@ set(MY_COMPILE_OPTIONS
   "ffreestanding"
   "fno-builtin"
   "fno-common"
+  "fstack-check"
   "fstack-protector-all"
   "fstack-protector"
   "fPIC"
+  "fPIE"
   "mno-gpopt"
   "pedantic"
   "std=c99"
@@ -147,8 +149,6 @@ endforeach()
 
 # _DEFAULT_SOURCE is used for function inet_aton()
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D_DEFAULT_SOURCE")
-# fPIC is used for ???
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC")
 
 ###
 ### Define OS Specific CFLAGS

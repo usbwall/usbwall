@@ -37,3 +37,11 @@ CMakeFiles
 CMakeCache.txt
 out
 _build
+
+# Package and tarball
+*.tar.gz
+*.tar.bz2
+*.tar.xz
+*.tgz
+*.tbz
+*.txz
