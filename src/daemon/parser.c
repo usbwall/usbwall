@@ -1,11 +1,11 @@
-#include "parser.h"
-
 #include <assert.h>
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <syslog.h>
+
+#include "parser.h"
 
 /**
  * \brief maximum size of a configuration line, in characters

@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <inttypes.h>
 #include <unistd.h>
 #include <string.h>
 #include <time.h>
@@ -72,7 +73,7 @@ int32_t struct_to_string_array(char **array_id, struct devusb *devusb)
       || (sprintf(array_id[5], "%x", devusb->product) <= 0)
       || (sprintf(array_id[6], "%x", devusb->bcd_device) <= 0)
       || (sprintf(array_id[1], "%u", devusb->bus) <= 0)
-      || (sprintf(array_id[7], "%lld", devusb->last_co) <= 0))
+      || (sprintf(array_id[7], "%" PRId64, devusb->last_co) <= 0))
     return devidd_log("devidd", DEVIDD_ERR_IO, LOG_ERR);
 
   return DEVIDD_SUCCESS;

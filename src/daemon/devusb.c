@@ -402,7 +402,7 @@ int init_devusb(void)
    * \todo
    * FIXME ????
    */
-  Libusb_set_debug(NULL, LIBUSB_LOG_LEVEL_WARNING);
+  libusb_set_debug(NULL, LIBUSB_LOG_LEVEL_WARNING);
 
   g_wait_for_hotplugs = 1;
   int rcode =
