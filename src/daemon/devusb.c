@@ -22,10 +22,14 @@
  * \brief maximum possible size of a device serial id.
  */
 #define SERIAL_MAX_SIZE 64
+
+#if !(defined(__FreeBSD__) || defined(__DragonFly__))
 /**
  * \brief interval time in second where usb plugging event are checked
  */
 #define HOTPLUG_CHECK_INTV 3
+#endif
+
 /**
  * \brief Maximum port numbers for a device. The USB3 standard say 7
  * is the current max depth. It should never be set above 255!
