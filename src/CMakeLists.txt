@@ -154,7 +154,8 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D_DEFAULT_SOURCE")
 ### Define OS Specific CFLAGS
 ###
 
-if (${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD")
+if (${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD"
+    OR ${CMAKE_SYSTEM_NAME} MATCHES "DragonFly")
 # FreeBSD specific options
    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DLDAP_DEPRECATED")
    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D_WITH_DPRINTF")
@@ -224,7 +225,8 @@ add_subdirectory(pam)
 ### Construction of usbwalld
 ###########################
 
-if (${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD")
+if (${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD"
+    OR ${CMAKE_SYSTEM_NAME} MATCHES "DragonFly")
 # FreeBSD local lib directory
    link_directories(/usr/local/lib)
 endif()
@@ -238,7 +240,8 @@ add_executable(usbwalld
 add_executable(deviddctl
   $<TARGET_OBJECTS:devidd_ctl_obj>)
 target_link_libraries(usbwalld ldap)
-if (${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD")
+if (${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD"
+    OR ${CMAKE_SYSTEM_NAME} MATCHES "DragonFly")
 # FreeBSD libusb name
    target_link_libraries(usbwalld usb)
 else()

@@ -1,4 +1,6 @@
-#include "config.h"
+#if defined(__unix__) || (defined(__APPLE__) && defined(__MACH__))
+  #include <sys/param.h>
+#endif
 
 #include <assert.h>
 #include <stdio.h>
@@ -6,6 +8,7 @@
 #include <syslog.h>
 
 #include "parser.h"
+#include "config.h"
 
 static struct config *g_configuration = NULL;
 
@@ -87,7 +90,11 @@ const char *cfg_file_find(void)
    * It's optional but conveniant for the user.
    */
 
-#ifdef _FreeBSD
+  /**
+   * \todo
+   * FIXME : This value MUST be takken from a config file, NOT hardcoded
+   */
+#if defined(BSD)
   return "/usr/local/etc/usbwall.cfg";
 #else
   return "/etc/usbwall.cfg";

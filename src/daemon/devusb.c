@@ -1,7 +1,11 @@
-#if defined(__FreeBSD__)
+#if defined(__unix__) || (defined(__APPLE__) && defined(__MACH__))
+  #include <sys/param.h>
+#if defined(BSD)
   #include <libusb.h>
-#else
+#endif
+#if defined(__linux__)
   #include <libusb-1.0/libusb.h>
+#endif
 #endif
 
 #include <assert.h>
@@ -38,6 +42,7 @@
 #define MAX_PORTS_NB 7
 
 /* Globals */
+#if !(defined(__FreeBSD__) || defined(__DragonFly__))
 /**
  * \brief devusb internal global used to register/deregister the hotplug
  * callback.
@@ -53,6 +58,7 @@ static int g_wait_for_hotplugs;
  * It is started in the module init and exited in the module exit.
  */
 static pthread_t g_hotplug_thread;
+#endif
 
 /**
  * \brief devusb internal global used to reference the server_core thread,
@@ -288,6 +294,7 @@ static struct devusb *device_to_devusb(struct libusb_device *device)
 }
 
 
+#if !(defined(__FreeBSD__) || defined(__DragonFly__))
 /**
  * \brief devusb internal function that check if the device is accessible by the
  * current user and
@@ -370,6 +377,7 @@ static void *wait_for_hotplug(void *arg __attribute__((unused)))
 
   pthread_exit(NULL);
 }
+#endif
 
 int init_devusb(void)
 {
@@ -382,16 +390,19 @@ int init_devusb(void)
     return 1;
   }
 
-#if !defined(__FreeBSD__)
+#if !(defined(__FreeBSD__) || defined(__DragonFly__))
   if (!libusb_has_capability(LIBUSB_CAP_HAS_HOTPLUG))
   {
     syslog(LOG_ERR, "Init error - your system does not support hotplug");
 
     return 1;
   }
-#endif
 
-  libusb_set_debug(NULL, LIBUSB_LOG_LEVEL_WARNING);
+  /**
+   * \todo
+   * FIXME ????
+   */
+  Libusb_set_debug(NULL, LIBUSB_LOG_LEVEL_WARNING);
 
   g_wait_for_hotplugs = 1;
   int rcode =
@@ -425,6 +436,7 @@ int init_devusb(void)
   pthread_create(&g_hotplug_thread, NULL, wait_for_hotplug, NULL);
 
   /* FIXME: return code not checked */
+#endif
 
   /* Start the server_core thread that launch the devidd_ctl server */
   pthread_create(&g_devidd_ctl_thread, NULL, &serv_core, NULL);
@@ -464,9 +476,15 @@ struct linked_list *devices_get(void)
 
 void close_devusb(void)
 {
+#if !(defined(__FreeBSD__) || defined(__DragonFly__))
   g_wait_for_hotplugs = 0;
   pthread_join(g_hotplug_thread, NULL);
   libusb_hotplug_deregister_callback(NULL, g_callback_handler);
+#endif
+
   libusb_exit(NULL);
+
   syslog(LOG_DEBUG, "Devusb closed");
+
+  return;
 }
