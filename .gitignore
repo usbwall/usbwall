@@ -45,3 +45,6 @@ _build
 *.tgz
 *.tbz
 *.txz
+
+# Editors files
+*~
