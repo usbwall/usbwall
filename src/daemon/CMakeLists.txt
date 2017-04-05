@@ -13,7 +13,8 @@ set(DAEMON_SRC
   server.c
   )
 
-include_directories(${LDAP_INCLUDE_DIR})
+include_directories(${USB1_INCLUDE_DIRS})
+include_directories(${LDAP_INCLUDE_DIRS})
 
 add_library(usbwalld_obj OBJECT ${DAEMON_SRC})
 

@@ -131,6 +131,9 @@ set(MY_DISABLED_COMPILE_OPTIONS
   "Wno-disabled-macro-expansion"	# Using sigaction create this warning
 #  "Wno-format-nonliteral"		# Skip the check for functions calls to with non litteral format string
   "Wno-reserved-id-macro"		# Reserved macro exists in ldap.h on FreeBSD implementation
+  "Wno-unused-function"			# PAM under NetBSD implementation has static function included from .h files...
+  "Wno-char-subscripts"			# NetBSD FIXME
+  "Wno-format-nonliteral"		# NetBSD FIXME
    )
 
 foreach(TESTED_OPTION ${MY_DISABLED_COMPILE_OPTIONS})
@@ -212,6 +215,14 @@ find_package(LDAP    REQUIRED)
 find_package(Threads REQUIRED)
 find_package(PAM REQUIRED)
 
+message("-- USB1 include directory : ${USB1_INCLUDE_DIRS}")
+message("-- LDAP include directory : ${LDAP_INCLUDE_DIRS}")
+message("-- PAM include directory : ${PAM_INCLUDE_DIRS}")
+
+message("-- USB1 library directory : ${USB1_LIBRARIES}")
+message("-- LDAP library directory : ${LDAP_LIBRARIES}")
+message("-- PAM library directory : ${PAM_LIBRARIES}")
+
 ###########################
 ### continue to subdirectories
 ###########################
@@ -231,6 +242,8 @@ if (${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD"
    link_directories(/usr/local/lib)
 endif()
 
+link_directories()
+
 ###########################
 ### Construction of usbwalld
 ###########################
@@ -239,14 +252,14 @@ add_executable(usbwalld
   $<TARGET_OBJECTS:misc_obj> $<TARGET_OBJECTS:usbwalld_obj>)
 add_executable(deviddctl
   $<TARGET_OBJECTS:devidd_ctl_obj>)
-target_link_libraries(usbwalld ldap)
-if (${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD"
-    OR ${CMAKE_SYSTEM_NAME} MATCHES "DragonFly")
-# FreeBSD libusb name
-   target_link_libraries(usbwalld usb)
-else()
-   target_link_libraries(usbwalld usb-1.0)
-endif()
+target_link_libraries(usbwalld ${USB1_LIBRARIES} ${LDAP_LIBRARIES})
+# if (${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD"
+#     OR ${CMAKE_SYSTEM_NAME} MATCHES "DragonFly")
+# # FreeBSD libusb name
+#    target_link_libraries(usbwalld usb)
+# else()
+#    target_link_libraries(usbwalld usb-1.0)
+# endif()
 target_link_libraries(usbwalld ${CMAKE_THREAD_LIBS_INIT})
 
 ###########################
