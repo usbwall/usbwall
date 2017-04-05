@@ -15,3 +15,6 @@ find_library(USB1_LIBRARIES
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(USB1 DEFAULT_MSG
                                   USB1_LIBRARIES USB1_INCLUDE_DIR)
+
+set(USB1_LIBRARIES ${USB1_LIBRARY} )
+set(USB1_INCLUDE_DIRS ${USB1_INCLUDE_DIR} )
