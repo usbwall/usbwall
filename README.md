@@ -16,6 +16,8 @@ the authorized devices from LDAP.
 - libldap
 - libpam
 
+See INSTALL file for more information on dependencies installation.
+
 ## Build the project
 
 A bootstrap script has been made to help you build the project. You can simply

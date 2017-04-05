@@ -1,0 +1,45 @@
+# INSTALL
+
+## Dependencies using distribution packages
+
+Packages names may differ from those given behind depending on the version of your distribution.
+
+### Linux/Debian
+
+#### Compilation dependencies
+
+~~~sh
+sudo apt install cmake libusb-1.0-0-dev
+~~~
+
+#### Runtime dependencies
+
+~~~sh
+sudo apt install libusb-1.0-0
+~~~
+
+### FreeBSD
+
+#### Compilation dependencies
+
+~~~sh
+sudo pkg install
+~~~
+
+#### Runtime dependencies
+
+~~~sh
+~~~
+
+### NetBSD
+
+#### Compilation dependencies
+
+~~~sh
+sudo pkgin install cmake libusb1
+~~~
+
+#### Runtime dependencies
+
+~~~sh
+~~~
