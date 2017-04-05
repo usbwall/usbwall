@@ -1,8 +1,8 @@
-BUILD_DIR=_build
-BIN_DIR=out
-PROJECT=usbwall
-VERSION=$(shell git tag | tail -n 1 | cut -d'v' -f2-)
-FORMAT=tar.gz
+BUILD_DIR = _build
+BIN_DIR   = out
+PROJECT   = usbwall
+VERSION  != git tag | tail -n 1 | cut -d'v' -f2-
+FORMAT    = tar.gz
 
 all:
 	+make -C $(BUILD_DIR)
