@@ -4,7 +4,7 @@ include(CheckCCompilerFlag)
 ### Check for global CFLAGS compiler support
 ###########################
 
-set(MY_COMPILE_OPTIONS
+set(MY_COMPILE_WARNINGS
   "W"
   "Waggregate-return"
   "Wall"
@@ -18,8 +18,6 @@ set(MY_COMPILE_OPTIONS
   # "Wdeclaration-after-statement" # Macro "list_for_each" allocate a struct in code place...
   "Wdisabled-optimization"
   "Wdouble-promotion"
-  "Werror"
-  "Weverything"
   "Wextra"
   "Wfloat-equal"
   "Wformat"
@@ -97,19 +95,38 @@ set(MY_COMPILE_OPTIONS
   "Wvla"
   "Wvolatile-register-var"
   "Wwrite-strings"
+  )
+
+set(MY_COMPILE_OPTIONS
   "ffreestanding"
   "fno-builtin"
   "fno-common"
   "fstack-check"
   "fstack-protector-all"
   "fstack-protector"
+  "fstrict-aliasing"
   "fPIC"
   "fPIE"
   "mno-gpopt"
   "pedantic"
   "std=c99"
-  "strict-aliasing"
-  )
+  "Werror"
+   )
+
+# Set -Weverything if possible, else just try to use as many warnings as possibly known
+check_c_compiler_flag(-Weverything HAS_WEVERYTHING)
+if (HAS_WEVERYTHING)
+ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Weverything")
+else()
+foreach(TESTED_OPTION ${MY_COMPILE_WARNINGS})
+  # Replace - by _ because CMake variable can't have - in their name
+  string(REPLACE "-" "_" MY_FLAG ${TESTED_OPTION})
+  check_c_compiler_flag(-${TESTED_OPTION} HAS_${MY_FLAG})
+  if (HAS_${MY_FLAG})
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -${TESTED_OPTION}")
+  endif()
+endforeach()
+endif()
 
 foreach(TESTED_OPTION ${MY_COMPILE_OPTIONS})
   # Replace - by _ because CMake variable can't have - in their name
@@ -124,7 +141,7 @@ endforeach()
 ### Disabled compile flags because of code incompatibility (yet)
 ###
 
-set(MY_DISABLED_COMPILE_OPTIONS
+set(MY_DISABLED_COMPILE_WARNINGS
 #  "Wno-discarded-qualifiers"		# Permit building with calls to basename() using __FILE__ which is a const value
   "Wno-padded"				# Used for skip strutures alignement requirement
   "Wno-vla"				# Skip check for variable length in arrays because C90 does not accept them
@@ -136,7 +153,7 @@ set(MY_DISABLED_COMPILE_OPTIONS
   "Wno-format-nonliteral"		# NetBSD FIXME
    )
 
-foreach(TESTED_OPTION ${MY_DISABLED_COMPILE_OPTIONS})
+foreach(TESTED_OPTION ${MY_DISABLED_COMPILE_WARNINGS})
   # Replace - by _ because CMake variable can't have - in their name
   string(REPLACE "-" "_" MY_FLAG ${TESTED_OPTION})
   check_c_compiler_flag(-${TESTED_OPTION} HAS_${MY_FLAG})
@@ -173,8 +190,9 @@ endif()
 
 set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -g3 -O0")
 
-### Check sanitizer support
+if (${CMAKE_BUILD_TYPE} MATCHES "DEBUG")
 
+### Check sanitizer support
 check_c_compiler_flag(-fsanitize=undefined HAS_SAN_UNDEFINED_CFLAG)
 if (HAS_SAN_UNDEFINED_CFLAG)
     set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -fsanitize=undefined")
@@ -190,6 +208,8 @@ endif()
 check_c_compiler_flag(-fno-omit-frame-pointer HAS_OMIT_FP_CFLAG)
 if (HAS_OMIT_FP_CFLAG)
     set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -fno-omit-frame-pointer")
+endif()
+
 endif()
 
 ###########################
