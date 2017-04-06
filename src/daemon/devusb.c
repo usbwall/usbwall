@@ -1,13 +1,3 @@
-#if defined(__unix__) || (defined(__APPLE__) && defined(__MACH__))
-  #include <sys/param.h>
-#if defined(BSD)
-  #include <libusb.h>
-#endif
-#if defined(__linux__)
-  #include <libusb-1.0/libusb.h>
-#endif
-#endif
-
 #include <assert.h>
 #include <pthread.h>
 #include <stdio.h>
@@ -17,6 +7,7 @@
 #include <unistd.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <libusb.h>
 
 #include "config.h"
 #include "devuser.h"
