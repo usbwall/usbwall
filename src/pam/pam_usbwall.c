@@ -49,7 +49,7 @@ static int notify_daemon(enum event evt, int debug)
   if (fd == -1)
   {
     if (debug)
-      syslog(LOG_ERR, "Unix socket can not be instanciated");
+      syslog(LOG_ERR, "Unix socket can not be instantiated");
 
     return PAM_ABORT;
   }

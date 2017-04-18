@@ -77,7 +77,7 @@ int init_ipc_pam(void)
   /* set the global variable*/
   uds_fd = fd;
 
-  syslog(LOG_DEBUG, "Unix Domain Socket succefully initialized");
+  syslog(LOG_DEBUG, "Unix Domain Socket successfully initialized");
 
   return 0;
 }

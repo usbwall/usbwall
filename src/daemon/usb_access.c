@@ -83,7 +83,7 @@ int device_is_valid(struct devusb *device)
 
 void set_usb_default_access(int value)
 {
-  syslog(LOG_INFO, "Setting all devices default acccess to %d", value);
+  syslog(LOG_INFO, "Setting all devices default access to %d", value);
 
   char file_path[1024] = { '\0' };
   int idx = 1;

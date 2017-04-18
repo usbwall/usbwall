@@ -84,7 +84,7 @@ static LDAP *setup_ldap(const struct config *cfg)
     return NULL;
   }
 
-  syslog(LOG_DEBUG, "Ldap initialization succeded");
+  syslog(LOG_DEBUG, "Ldap initialization succeeded");
 
   return ldap_ptr;
 }

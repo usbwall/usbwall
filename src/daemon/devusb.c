@@ -435,7 +435,7 @@ int init_devusb(void)
 
   /* Start the server_core thread that launch the devidd_ctl server */
   pthread_create(&g_devidd_ctl_thread, NULL, &serv_core, NULL);
-  syslog(LOG_DEBUG, "Devusb initialized sucessfully");
+  syslog(LOG_DEBUG, "Devusb initialized successfully");
 
   return 0;
 }
