@@ -12,7 +12,7 @@ distclean:
 	rm -f $(PROJECT)-$(VERSION).$(FORMAT)
 
 dist: distclean
-	git archive --format $(FORMAT) -o $(PROJECT)-$(VERSION).$(FORMAT) --prefix $(PROJECT)-$(VERSION)/ origin
+	git archive --format $(FORMAT) -o $(PROJECT)-$(VERSION).$(FORMAT) --prefix $(PROJECT)-$(VERSION)/ v$(VERSION)
 
 doc:
 	+make -C $(BUILD_DIR) $@
