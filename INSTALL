@@ -2,13 +2,13 @@
 
 ## Dependencies using distribution packages
 
-Packages names may differ from those given behind depending on the version of your distribution.
+Packages names may differ from those given below depending on the version of your distribution.
 
 ### Linux/Debian
 
 #### Compilation dependencies
 
-sudo apt install cmake libusb-1.0-0-dev
+sudo apt install cmake libusb-1.0-0-dev libldap2-dev libpam0g-dev
 
 #### Runtime dependencies
 
@@ -34,4 +34,8 @@ sudo pkgin install cmake libusb1
 
 ### OpenBSD
 
-usbwall is not yet available on OpenBSD because it does not make use of PAM and usbwall cannot work without PAM.
+usbwall is not yet available on OpenBSD because it does not make use of PAM and usbwall cannot work without PAM yet.
+
+## Dependencies from source
+
+usbwall can be configured either with gcc or clang as compiler. Any other compiler might be used, but it has not been tested. Feedback is welcomed if you try using another compiler.
