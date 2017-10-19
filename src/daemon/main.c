@@ -128,27 +128,27 @@ static int parse_args(int argc, char *argv[])
   if (argc >= 2)
   {
     const char *help_msg =
-      "usage :"
-      "\n\t-h [--help] : print the usage help message"
-      "\n\t-d [--daemonize]: start the program as a daemon";
+      "usage :\n"
+      "\t-h [--help] : print the usage help message\n"
+      "\t-d [--daemonize]: start the program as a daemon\n";
 
     if (!strcmp(argv[1], "-d") || !strcmp(argv[1], "--daemonize"))
       return daemonize();
 
     if (!strcmp(argv[1], "-h") || !strcmp(argv[1], "--help"))
     {
-      puts(help_msg);
+      fprintf(stderr, "%s", help_msg);
 
       return 1;
     }
 
-    fprintf(stderr, "Unknown argument %s\n", argv[1]);
-    fputs(help_msg, stderr);
+    fprintf(stderr, "Unknown argument %s\n%s", argv[1], help_msg);
 
     return 1;
   }
 
   openlog("usbwall", LOG_CONS | LOG_PID, LOG_USER);
+  fprintf(stdout, "Check your syslog files for startup information about usbwall.\n");
 
   return 0;
 }
