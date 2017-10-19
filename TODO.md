@@ -17,6 +17,11 @@
 - File backend
 - SQL backend
 
+### Misc
+
+- Logging to stdout AND syslog/whatever at the same time
+- Drop privileges after daemon is started to a user other than root
+
 ## Ports
 
 - Windows port
