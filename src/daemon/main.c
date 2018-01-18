@@ -14,7 +14,7 @@
 #include "uw_pid.h"
 #include "uw_signal.h"
 #include "core.h"
-
+#include "main.h"
 
 /**
  * \brief daemonize the process
