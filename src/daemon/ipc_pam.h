@@ -1,9 +1,12 @@
-/*
- * \file socket.h
+/**
+ * \file ipc_pam.h
  * \brief Containing function to do IPC between PAM and daemon
  */
+#ifndef IPC_PAM_H
+# define IPC_PAM_H
 
 #pragma once
+
 #include "event.h"
 
 /**
@@ -33,3 +36,5 @@ void close_ipc_pam(void);
  * The daemon is notified when a user connect to the machine.
  */
 enum event accept_user(void);
+
+#endif /* ! IPC_PAM_H  */

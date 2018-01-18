@@ -2,6 +2,9 @@
  * \file config.h
  * \brief handle for ldap configuration parsing and storage
  */
+#ifndef CONFIG_H
+# define CONFIG_H
+
 #pragma once
 
 /**
@@ -49,3 +52,5 @@ int update_configuration(const char *cfg_file);
  * been set yet, the fonction will simply return.
  */
 void destroy_configuration(void);
+
+#endif /* ! CONFIG_H  */

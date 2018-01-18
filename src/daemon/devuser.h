@@ -2,6 +2,8 @@
  * \file devuser.h
  * \brief Contain user management functions
  **/
+#ifndef DEVUSER_H
+# define DEVUSER_H
 
 #pragma once
 
@@ -76,3 +78,5 @@ int32_t check_one_rule(char **not_parsed_rule, char **not_parsed_devid);
  * device authorization
  */
 int32_t check_devid(char *devid, struct linked_list *rules);
+
+#endif /* ! DEVUSER_H  */

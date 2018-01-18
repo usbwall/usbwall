@@ -1,5 +1,11 @@
+/**
+ * \file format_validity.h
+ * \brief handle for ldap configuration parsing and storage
+ */
 #ifndef FORMAT_VALIDITY_H
 # define FORMAT_VALIDITY_H
+
+#pragma once
 
 #include <stdint.h>
 
@@ -143,6 +149,3 @@ int32_t check_rule_format(char *rule);
 
 
 #endif /* !FORMAT_VALIDITY_H */
-
-
-

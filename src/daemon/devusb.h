@@ -2,11 +2,14 @@
  * \file devusb.h
  * \brief Containing functions to manage plugged devices
  */
+#ifndef DEVUSB_H
+# define DEVUSB_H
+
 #pragma once
 
 #include <stdint.h>
 
-#include <misc/linked_list.h>
+#include "misc/linked_list.h"
 
 /* Length of machine string */
 # define BUF_MACH 1024
@@ -59,3 +62,5 @@ void close_devusb(void);
  * is return if an error occured.
  */
 struct linked_list *devices_get(void);
+
+#endif /* ! DEVUSB_H  */

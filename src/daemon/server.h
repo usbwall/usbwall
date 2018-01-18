@@ -1,5 +1,11 @@
+/**
+ * \file server.h
+ * \brief FIXME
+ */
 #ifndef SERVER_H
 # define SERVER_H
+
+#pragma once
 
 # define SERV_PORT 4196
 # define BUF_LEN 1024

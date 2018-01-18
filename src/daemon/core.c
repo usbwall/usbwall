@@ -1,5 +1,3 @@
-#include "core.h"
-
 #include <assert.h>
 #include <signal.h>
 #include <stdlib.h>
@@ -13,18 +11,11 @@
 #include "ipc_pam.h"
 #include "config.h"
 #include "usb_access.h"
+#include "core.h"
 
 /* Globals */
-/**
- * \brief core internal global used to trigger the terminaison of the main
- * process.
- */
-static int g_terminaison = 0;
-/**
- * \brief core internal global used to notify the main process that a cfg update
- * is needed.
- */
-static int g_cfgupdate = 0;
+int g_terminaison = 0;
+int g_cfgupdate = 0;
 /* ****** */
 
 /**
@@ -113,7 +104,7 @@ static int notifs_lookup(void)
     g_cfgupdate = 0;
   }
 
-  return 0;
+  return DEVIDD_SUCCESS;
 }
 
 /**
@@ -148,27 +139,6 @@ static void handle_login(const char *username)
 
   list_destroy(devids, 1);
   list_destroy(device_list, 1);
-}
-
-/**
- * \brief core internal function handling signal when received.
- * \param signo  id number of the signal received
- */
-static void signal_handler(int signo)
-{
-  syslog(LOG_DEBUG, "Received signal no %d", signo);
-
-  if (signo == SIGTERM)
-  {
-    syslog(LOG_INFO, "SIGTERM received");
-    close_ipc_pam(); /* it will close all connections with pam */
-    g_terminaison = 1;
-  }
-  else if (signo == SIGHUP)
-  {
-    syslog(LOG_INFO, "SIGHUP received");
-    g_cfgupdate = 1;
-  }
 }
 
 /**
@@ -239,20 +209,5 @@ int usbwall_run(void)
   destroy_ipc_pam();
   /* *** */
 
-  return 0;
-}
-
-int signal_config(void)
-{
-  struct sigaction action;
-  action.sa_handler = signal_handler;
-  sigfillset(&action.sa_mask);
-  action.sa_flags = SA_RESTART;
-
-  if (sigaction(SIGTERM, &action, NULL) == -1)
-    return 1;
-  if (sigaction(SIGHUP, &action, NULL) == -1)
-    return 1;
-
-  return 0;
+  return DEVIDD_SUCCESS;
 }
