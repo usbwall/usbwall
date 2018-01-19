@@ -1,13 +1,18 @@
+/**
+ * \file complete_id.c
+ * \Brief FIXME
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <inttypes.h>
-#include <unistd.h>
+/* #include <unistd.h> */
 #include <string.h>
-#include <time.h>
+/* #include <time.h> */
 #include <assert.h>
 
+#include "misc/error_handler.h"
 #include "complete_id.h"
-#include "../misc/error_handler.h"
 
 /*********************************************************************************/
 
@@ -160,4 +165,3 @@ void free_array_id(char ***array_id)
 
   free(ptr);
 }
-
