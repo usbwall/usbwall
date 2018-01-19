@@ -43,8 +43,11 @@ sudo pkgin install cmake libusb1
 #### Runtime dependencies
 
 ### OpenBSD
-
-usbwall is not yet available on OpenBSD because it does not make use of PAM and usbwall cannot work without PAM yet.
+Open LDAP : sudo pkg_add openldap-client 
+CMAKE : Sudo pkg_add cmake
+Libusb : Sudo pkg_add libusb1-1.0.20p0 on OpenBSD 6.1, Sudo pkg_add libusb1-1.0.21 on OpenBSD 6.2
+PAM : sudo pkg_add openpam-20141014
+PAM dev :
 
 ## Dependencies from source
 
