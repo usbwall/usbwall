@@ -1,3 +1,7 @@
+/**
+ * \file config.h
+ * \brief handle for ldap configuration parsing and storage
+ */
 #include <assert.h>
 #include <fcntl.h>
 #include <ldap.h>
