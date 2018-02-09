@@ -1,5 +1,5 @@
-[![License](https://img.shields.io/github/license/turanic/usbwall.svg)](https://github.com/Turanic/usbwall/blob/master/LICENSE)
-[![Build Status](https://travis-ci.org/Turanic/usbwall.svg?branch=master)](https://travis-ci.org/Turanic/usbwall)
+[![License](https://img.shields.io/github/license/usbwall/usbwall.svg)](https://github.com/usbwall/usbwall/blob/master/LICENSE)
+[![Build Status](https://travis-ci.org/Oline/usbwall.svg?branch=master)](https://travis-ci.org/Oline/usbwall)
 
 # USBWall
 
