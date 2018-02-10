@@ -1,12 +1,18 @@
+env:
+  global:
+    - MAKEFLAGS="-j 4"
 language: c
+os:
+  - linux
+  - osx
 compiler:
   - clang
   - gcc
-os: linux
-dist: trusty
+dist:
+  - trusty
 sudo: required
 script:
-  - ./bootstrap DEBUG && make -j
+  - ./bootstrap && make
 addons:
   apt:
     packages:
@@ -15,3 +21,6 @@ addons:
       - libusb-1.0.0
       - libusb-1.0.0-dev
       - libldap-2.4-2
+matrix:
+  allow_failures:
+    - os: osx
