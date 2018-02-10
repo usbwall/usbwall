@@ -1,6 +1,13 @@
 env:
   global:
     - MAKEFLAGS="-j 4"
+    # The next declaration is the encrypted COVERITY_SCAN_TOKEN, created
+    #   via the "travis encrypt" command using the project repo's public key
+    - secure: "cwEKlHDhL1D9jRg64vTEJ2bhb1+rOJmIX7LV0xz8UrvfDnv4zygF1gX2MoY3OOb/8kCTEBj/03q8IGmfMGij/rKL2Nkb+BAu/dyih6Te0r6E/FoTZZTBxf7lHbulUje9wHEMFnFlSH0FVMFOnSh0TBz1YqvEzt+HinGgjGD4kUg="
+
+before_install:
+  - echo -n | openssl s_client -connect https://scan.coverity.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | sudo tee -a /etc/ssl/certs/ca-
+
 language: c
 os:
   - linux
@@ -21,6 +28,15 @@ addons:
       - libusb-1.0.0
       - libusb-1.0.0-dev
       - libldap-2.4-2
+  coverity_scan:
+    project:
+      name: "Oline/usbwall"
+      description: "Control accesses to usb devices regarding defined policy"
+    notification_email: sylvain@unmondelibre.fr
+    build_command_prepend: "./bootstrap"
+    build_command: "make"
+    branch_pattern: coverity_scan
+
 matrix:
   allow_failures:
     - os: osx

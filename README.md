@@ -1,5 +1,6 @@
 [![License](https://img.shields.io/github/license/usbwall/usbwall.svg)](https://github.com/usbwall/usbwall/blob/master/LICENSE)
 [![Build Status](https://travis-ci.org/Oline/usbwall.svg?branch=master)](https://travis-ci.org/Oline/usbwall)
+[![Coverity Scan Build Status](https://scan.coverity.com/projects/15103/badge.svg)](https://scan.coverity.com/projects/oline-usbwall)
 
 # USBWall
 
@@ -59,9 +60,9 @@ not.
 
 ## Contributors
 
-Arthur d'Avray   (arthur.davray@epita.fr)  
-Mathilde Beylier (mathilde.beylier@epita.fr)  
-Sylvain Leroy    (sylvain@unmondelibre.fr)  
+Arthur d'Avray   (arthur.davray@epita.fr)
+Mathilde Beylier (mathilde.beylier@epita.fr)
+Sylvain Leroy    (sylvain@unmondelibre.fr)
 Damien Pradier   (damien.pradier@epita.fr)
 
 This project was also inspired from the previous libpam-devid project made by
