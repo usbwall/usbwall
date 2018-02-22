@@ -10,6 +10,7 @@
 #include <libusb.h>
 
 #include "config.h"
+#include "backend_ldap.h"
 #include "devuser.h"
 #include "usb_access.h"
 #include "complete_id.h"

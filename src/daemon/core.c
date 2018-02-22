@@ -10,6 +10,7 @@
 #include "devuser.h"
 #include "ipc_pam.h"
 #include "config.h"
+#include "backend_ldap.h"
 #include "usb_access.h"
 #include "core.h"
 

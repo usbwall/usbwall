@@ -3,6 +3,8 @@ set(DAEMON_SRC
   core.c
   devusb.c
   devuser.c
+  backend_ldap.c
+  # backend_file.c
   ipc_pam.c
   config.c
   uw_pid.c
