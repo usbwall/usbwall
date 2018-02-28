@@ -4,10 +4,10 @@
 
 # name: backend
 # description: specify the backend containing the configuration.
-# possible values: files, ldap
+# possible values: file, ldap
 # exemple: ldap
 # type: string
-backend: files
+backend: file
 
 ########
 # Specific to backend file
