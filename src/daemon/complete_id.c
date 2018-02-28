@@ -14,7 +14,7 @@
 #include "misc/error_handler.h"
 #include "complete_id.h"
 
-/*********************************************************************************/
+/********************************************************************************/
 
 /**
  *  \brief Transform devusb fields into strings, and store it in array_id

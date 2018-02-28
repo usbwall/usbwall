@@ -13,6 +13,7 @@ enum devidd_err
   DEVIDD_ERR_IO, /* Input/Output error */
   DEVIDD_ERR_EAGAIN, /* Ressource temporarily unavailable */
   DEVIDD_ERR_PERM, /* Operation not permitted */
+  DEVIDD_ERR_CONFIG, /* Problem in daemon configuration */
   DEVIDD_ERR_OTHER /* Generic error */
 };
 

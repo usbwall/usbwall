@@ -164,6 +164,8 @@ static void core_loop(void)
 
     list_destroy(usernames, 1);
   } while ((usernames = wait_for_logging()));
+
+  return;
 }
 
 int usbwall_run(void)

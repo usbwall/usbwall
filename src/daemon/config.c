@@ -6,7 +6,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <syslog.h>
+#include <string.h>
 
+#include "error_handler.h"
 #include "parser.h"
 #include "config.h"
 
@@ -24,35 +26,50 @@ static struct config *g_configuration = NULL;
 static int check_cfg(const struct config *cfg)
 {
   assert(cfg);
+  assert(cfg->backend);
 
-  int result = 0;
+  if ((cfg == NULL) || (cfg->backend == NULL))
+    return DEVIDD_ERR_OTHER;
 
-  if (!cfg->uri)
-  {
-    syslog(LOG_ERR, "URI field is missing in configuration");
-    result = 1;
-  }
-  if (!cfg->basedn)
-  {
-    syslog(LOG_ERR, "Basedn field is missing in configuration");
-    result = 1;
-  }
-  if (!cfg->binddn)
-  {
-    syslog(LOG_ERR, "Binddn field is missing in configuration");
-    result = 1;
-  }
-  if (!cfg->bindpw)
-  {
-    syslog(LOG_ERR, "Bindpw field is missing in configuration");
-    result = 1;
-  }
-  if (cfg->version == 0)
-  {
-    syslog(LOG_ERR, "Version field is invalid in configuration");
-    result = 1;
-  }
+  int result = DEVIDD_SUCCESS;
 
+  if (!strcmp(cfg->backend, "file"))
+    {
+      if (!cfg->config_file)
+	{
+	  syslog(LOG_ERR, "config_file field is missing in configuration");
+	  result = DEVIDD_ERR_CONFIG;
+	}
+    }
+  else if (!strcmp(cfg->backend, "ldap"))
+    {
+      if (!cfg->uri)
+	{
+	  syslog(LOG_ERR, "URI field is missing in configuration");
+	  result = DEVIDD_ERR_CONFIG;
+	}
+      if (!cfg->basedn)
+	{
+	  syslog(LOG_ERR, "Basedn field is missing in configuration");
+	  result = DEVIDD_ERR_CONFIG;
+	}
+      if (!cfg->binddn)
+	{
+	  syslog(LOG_ERR, "Binddn field is missing in configuration");
+	  result = DEVIDD_ERR_CONFIG;
+	}
+      if (!cfg->bindpw)
+	{
+	  syslog(LOG_ERR, "Bindpw field is missing in configuration");
+	  result = DEVIDD_ERR_CONFIG;
+	}
+      if (cfg->version == 0)
+	{
+	  syslog(LOG_ERR, "Version field is invalid in configuration");
+	  result = DEVIDD_ERR_CONFIG;
+	}
+    }
+  
   return result;
 }
 

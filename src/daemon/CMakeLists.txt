@@ -17,6 +17,7 @@ set(DAEMON_SRC
   server.c
   )
 
+include_directories(../misc)
 include_directories(${USB1_INCLUDE_DIRS})
 include_directories(${LDAP_INCLUDE_DIRS})
 

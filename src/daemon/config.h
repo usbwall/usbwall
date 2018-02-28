@@ -13,12 +13,15 @@
  */
 struct config
 {
+  char *backend;	/**< backend to use */
+  /* FILE configuration */
+  char *config_file;    /**< path to the configuration file */
   /* LDAP configuration */
-  char *uri;     /**< uri of the ldap */
-  char *basedn;  /**< base domain name to access users on ldap */
-  char *binddn;  /**< bind domain name to connect to ldap */
-  char *bindpw;  /**< bind password to connect to ldap */
-  short version; /**< ldap version (2 and 3 are supported) */
+  char *uri;		/**< uri of the ldap */
+  char *basedn;		/**< base domain name to access users on ldap */
+  char *binddn;		/**< bind domain name to connect to ldap */
+  char *bindpw;		/**< bind password to connect to ldap */
+  short version;	/**< ldap version (2 and 3 are supported) */
 };
 
 /**

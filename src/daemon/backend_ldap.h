@@ -56,7 +56,7 @@ struct linked_list *devids_get(const char *username);
  *
  * \return 0 if success, any other value if any error occured
  */
-int uw_open_ldap(void);
+/* int uw_open_ldap(void); */
 
 /**
  * \brief Entry function of the daemon
@@ -65,7 +65,7 @@ int uw_open_ldap(void);
  *
  * \return 0 if success, any other value if any error occured
  */
-int uw_read_ldap(int argc, char *argv[]);
+/* int uw_read_ldap(int argc, char *argv[]); */
 
 /**
  * \brief Entry function of the daemon
@@ -74,7 +74,7 @@ int uw_read_ldap(int argc, char *argv[]);
  *
  * \return 0 if success, any other value if any error occured
  */
-int uw_write_ldap(int argc, char *argv[]);
+/* int uw_write_ldap(int argc, char *argv[]); */
 
 /**
  * \brief Entry function of the daemon
@@ -83,6 +83,6 @@ int uw_write_ldap(int argc, char *argv[]);
  *
  * \return 0 if success, any other value if any error occured
  */
-int uw_close_ldap(int argc, char *argv[]);
+/* int uw_close_ldap(int argc, char *argv[]); */
 
 #endif /* !BACKEND_LDAP_H */

@@ -12,6 +12,7 @@
  */
 #define MAX_LINE_LEN 256
 
+/********************************************************************************/
 /**
  * \brief Internal parser global variable containing the name of the fields
  * of a configuration structure. It is quite useful to iterate over every
@@ -19,6 +20,8 @@
  */
 static const char *g_fields[] =
 {
+  "backend",
+  "config_file",
   "uri",
   "basedn",
   "binddn",
@@ -27,6 +30,7 @@ static const char *g_fields[] =
   NULL
 };
 
+/********************************************************************************/
 /**
  * \brief Internal parser function that take a string and delete comments from
  * it
@@ -46,6 +50,7 @@ static void skip_comments(char *line)
     *comment_start = '\0';
 }
 
+/********************************************************************************/
 /**
  * \brief check if a line is empty, i.e. the line contain only spaces or tabs
  *
@@ -62,6 +67,7 @@ static int line_is_empty(const char *line)
   return !(*line);
 }
 
+/********************************************************************************/
 /**
  * \brief Internal parser function to parse a line of the configuration file to
  * extract the value of a given field and return it
@@ -76,6 +82,10 @@ static char *parse_line(const char *line, const char *field)
 {
   assert(line && field);
 
+#ifndef NDEBUG
+  printf("Entering %s:", "parse_line");
+#endif
+
   /* create the format to give to sscanf :
    * format = field %s %s
    * The first %s correspond to the value of the field
@@ -83,7 +93,7 @@ static char *parse_line(const char *line, const char *field)
    * is given to the field */
   const char *format_part = " %s %s ";
   size_t format_size = strlen(field) + strlen(format_part) + 2;
-  char format[format_size];
+  char format[format_size]; /* no init ? */
   snprintf(format, format_size, " %s%s", field, format_part);
   /* *** */
 
@@ -112,6 +122,7 @@ static char *parse_line(const char *line, const char *field)
   return value;
 }
 
+/********************************************************************************/
 /**
  * \brief store in a configuration structure the given value, in the field
  * correspondig to the given string.
@@ -125,7 +136,11 @@ static void store_cfg_value(struct config *config,
                             const char *field,
                             char *value)
 {
-  if (field == g_fields[4]) // version
+#ifndef NDEBUG
+  printf("Entering %s\n", "store_cfg_value");
+#endif
+
+  if (field == g_fields[6]) // version
   {
     /* special case, the field should be an integer */
     char *err_ptr = NULL;
@@ -141,13 +156,17 @@ static void store_cfg_value(struct config *config,
   /* the field is a string, select the pointer corresponding to the structure
    * field given in argument */
   char **destination = NULL;
-  if (field == g_fields[0]) // uri
+  if (field == g_fields[0]) // backend
+    destination = &config->backend;
+  else if (field == g_fields[1]) // config_file
     destination = &config->uri;
-  else if (field == g_fields[1]) // basedn
+  else if (field == g_fields[2]) // uri
+    destination = &config->uri;
+  else if (field == g_fields[3]) // basedn
     destination = &config->basedn;
-  else if (field == g_fields[2]) // binddn
+  else if (field == g_fields[4]) // binddn
     destination = &config->binddn;
-  else if (field == g_fields[3]) // bindpw
+  else if (field == g_fields[5]) // bindpw
     destination = &config->bindpw;
 
   /* check if the field was already given a value */
@@ -157,9 +176,15 @@ static void store_cfg_value(struct config *config,
     free(*destination);
   }
 
+#ifndef NDEBUG
+  printf("value = \n", value);
+  printf("destination = \n", *destination);
+#endif
+
   *destination = value;
 }
 
+/********************************************************************************/
 struct config *parse_config(FILE *istream)
 {
   assert(istream);
@@ -177,13 +202,22 @@ struct config *parse_config(FILE *istream)
     if (line_is_empty(buffer))
       continue;
 
+#ifndef NDEBUG
+  printf("Entering for while in %s\n", "parse_config");
+#endif
     char *value = NULL;
     /* iterate over each field name of the config structure */
     for (int field_idx = 0; g_fields[field_idx]; ++field_idx)
     {
+#ifndef NDEBUG
+  printf("Entering for loop in %s and checking for %s\n", "parse_config", g_fields[field_idx]);
+#endif
       const char *field = g_fields[field_idx];
       if ((value = parse_line(buffer, field)))
       {
+#ifndef NDEBUG
+  printf("[%s] extracted value = %s\n", "parse_config", value);
+#endif
         /* store attributes to config */
         store_cfg_value(config, field, value);
         break;
