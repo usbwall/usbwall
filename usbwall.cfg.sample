@@ -2,12 +2,33 @@
 # Sample configuration for usbwall
 #
 
+# name: backend
+# description: specify the backend containing the configuration.
+# possible values: files, ldap
+# exemple: ldap
+# type: string
+backend: files
+
+########
+# Specific to backend file
+########
+
+# name: config_file
+# description: specify the file listing the authorization list
+# exemple: /etc/usbwall.list
+# type: string
+config_file: /tmp/usbwall.list
+
+########
+# Specific to backend LDAP
+########
+
 # name: uri
 # description: specify the LDAP URI to connect to. Conform
 #   to standard URI declaration (see man ldap.conf(5)).
 # example: ldap://my_ldap_server/
 # type: string
-uri ldap://usbwall.org:389/
+uri ldap://exemple.com:389/
 
 # name: basedn
 # description: specify the base DN used for search request
