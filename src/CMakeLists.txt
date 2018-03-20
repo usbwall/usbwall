@@ -40,7 +40,6 @@ set(MY_COMPILE_WARNINGS
   "Wmissing-field-initializers"
   "Wmissing-format-attribute"
   "Wmissing-include-dirs"
-  "Wmissing-noreturn"
   "Wmissing-parameter-type"
   "Wmissing-prototypes"
   "Wmultichar"
@@ -68,8 +67,6 @@ set(MY_COMPILE_WARNINGS
   "Wstrict-overflow=5"
   "Wstrict-prototypes"
   "Wsuggest-attribute=const"
-  "Wsuggest-attribute=noreturn"
-  "Wsuggest-attribute=pure"
   "Wswitch"
   #"Wswitch-default"
   "Wswitch-enum"
@@ -251,6 +248,7 @@ add_subdirectory(daemon)
 add_subdirectory(devidd_ctl)
 add_subdirectory(misc)
 add_subdirectory(pam)
+add_subdirectory(test)
 
 ###########################
 ### Construction of usbwalld
@@ -288,3 +286,11 @@ target_link_libraries(usbwalld ${CMAKE_THREAD_LIBS_INIT})
 
 add_library(pam_usbwall SHARED $<TARGET_OBJECTS:pam_obj>)
 target_link_libraries(pam_usbwall pam)
+
+###########################
+### Construction of usbwall_test
+###########################
+SET (CMAKE_C_COMPILER "/usr/bin/clang")
+SET (CMAKE_C_FLAGS    "-Wall -Wextra -Wconversion -Wredundant-decls -Wno-unused-parameter -O3")
+add_executable(usbwall_test
+  $<TARGET_OBJECTS:misc_obj> $<TARGET_OBJECTS:usbwall_test_obj>)
