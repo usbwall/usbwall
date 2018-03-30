@@ -1,4 +1,4 @@
-Here is how to use the Doxygen documentation of all functions:
+Here is how to use the Doxygen documentation for all functions:
 * First you have to click on the "Files" tab
  * Then in "File list" you can choose the function for which you want to see the 
    diagram
