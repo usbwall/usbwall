@@ -774,15 +774,16 @@ WARN_LOGFILE           =
 INPUT                  = ../src/daemon \
                          ../src/pam
 
-# This tag is used to add the README document
+# This tag is used to add the README document into the documentation
 
 INPUT			+= ../README.md
 
-# This tag is used to add the HOW TO USE graph
+# This tag is used to add the HOW TO USE Doxygen
 
 INPUT			+= ../USE_GRAPH.md
 
 # This tag is used to add the INSTALLATION document
+
 INPUT			+= ../INSTALL.md
 
 # This tag can be used to specify the character encoding of the source files
