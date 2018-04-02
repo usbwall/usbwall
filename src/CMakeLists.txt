@@ -291,6 +291,6 @@ target_link_libraries(pam_usbwall pam)
 ### Construction of usbwall_test
 ###########################
 SET (CMAKE_C_COMPILER "/usr/bin/clang")
-SET (CMAKE_C_FLAGS    "-Wall -Wextra -Wconversion -Wredundant-decls -Wno-unused-parameter -O3")
+SET (CMAKE_C_FLAGS    "-Wall -Wextra -Wconversion -Wredundant-decls -Wno-unused-parameter -O3 -g ")
 add_executable(usbwall_test
   $<TARGET_OBJECTS:misc_obj> $<TARGET_OBJECTS:usbwall_test_obj>)
