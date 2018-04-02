@@ -5,6 +5,7 @@ set(DAEMON_SRC
   devuser.c
   ipc_pam.c
   config.c
+  daemon_main.c
   main.c
   parser.c
   usb_access.c
