@@ -1,3 +1,5 @@
+\brief This file explain how to install USBWALL
+
 # INSTALL
 
 ## Dependencies using distribution packages
