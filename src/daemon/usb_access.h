@@ -1,8 +1,11 @@
 /**
- * \file devusb.h
+ * \file usb_access.h
  * \brief Containing functions to manipulate the accessibility of usb devices,
  * on the system.
  */
+#ifndef USB_ACCESS_H
+# define USB_ACCESS_H
+
 #pragma once
 
 #include <misc/linked_list.h>
@@ -47,3 +50,5 @@ void set_usb_default_access(int value);
  */
 __attribute__((pure))
 int device_is_valid(struct devusb *device);
+
+#endif /* ! USB_ACCESS_H  */
