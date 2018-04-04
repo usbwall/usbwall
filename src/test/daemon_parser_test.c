@@ -54,7 +54,7 @@ CTEST(parser, parse_line) {
 	//ASSERT_STR(NULL, parse_line(str3_line, "")); // Fails
 }
 
-CTEST_SKIP(parser, store_cfg_value) { // Fails
+CTEST(parser, store_cfg_value) { // Fails
 
 	struct config *config = malloc(sizeof(struct config));
 
@@ -64,11 +64,8 @@ CTEST_SKIP(parser, store_cfg_value) { // Fails
   	}
 
   	char str1_l[] = "uri ldap://usbwall.org:389/";
-	char str1_f[3] = "uri";
-	//char str1_v[23] = "ldap://usbwall.org:389/";
-
-	store_cfg_value(config, str1_f, parse_line(str1_l, str1_f));
-	//config->uri = v1;
+	char str1_f[] = "uri";
+	store_cfg_value(config, "uri", parse_line(str1_l, str1_f));
 	ASSERT_STR("ldap://usbwall.org:389/", config->uri);
 }
 
