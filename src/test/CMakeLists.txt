@@ -5,6 +5,7 @@ set(TEST_SRC
   daemon_parser_test.c
   daemon_format_validity_test.c
   daemon_main_test.c
+  daemon_usb_access_test.c
   )
 
 include_directories(../daemon/)
