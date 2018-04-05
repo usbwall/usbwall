@@ -57,6 +57,25 @@ folder.
 - *debug* is an optional argument that specify if the debug mode is activated or
 not.
 
+### Doxygen documentation
+
+In order to have a global documentation of each function of the project with comments and diagram showing dependencies you can install Doxygen:
+
+~~~sh
+sudo apt-get install doxygen
+~~~
+
+Then to generate the documation you have to do:
+
+~~~sh
+make doc
+~~~
+
+To open the index page of the generated documentation with firefox (if you are using another web browser just put yours) do:
+
+~~~sh
+firefox ./out/html/index.html 
+~~~
 ## Contributors
 
 Arthur d'Avray   (arthur.davray@epita.fr)  
