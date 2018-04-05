@@ -17,7 +17,7 @@ int32_t check_serial_format(char *serial)
   uint32_t i = 0;
   size_t len = 0;
 
-  /* Check lenght validity */
+  /* Check length validity */
   len = strlen(serial);
   if ((len < 12) || (len > 126))
   {

@@ -50,14 +50,16 @@ static LDAP *setup_ldap(const struct config *cfg)
   assert(cfg);
 
   LDAP *ldap_ptr = NULL;
-
+   
+  //check if the LDAP init is successful
   if (ldap_initialize(&ldap_ptr, cfg->uri) != LDAP_SUCCESS)
   {
     syslog(LOG_WARNING, "Ldap initialization failed");
 
     return NULL;
   }
-
+  
+  //check if the version used is supported by LDAP
   if (ldap_set_option(ldap_ptr, LDAP_OPT_PROTOCOL_VERSION, &cfg->version)
       != LDAP_OPT_SUCCESS)
   {
@@ -69,6 +71,7 @@ static LDAP *setup_ldap(const struct config *cfg)
     return NULL;
   }
 
+  //check if the sasl authentication biding is succesful
   if (ldap_sasl_bind_s(ldap_ptr,
         cfg->binddn,
         NULL,

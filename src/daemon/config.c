@@ -27,26 +27,31 @@ static int check_cfg(const struct config *cfg)
 
   int result = 0;
 
+  //check if the config file contain the URI field
   if (!cfg->uri)
   {
     syslog(LOG_ERR, "URI field is missing in configuration");
     result = 1;
   }
+    //check if the config file contain the basedn field
   if (!cfg->basedn)
   {
     syslog(LOG_ERR, "Basedn field is missing in configuration");
     result = 1;
   }
+    //check if the config file contain the binddn field
   if (!cfg->binddn)
   {
     syslog(LOG_ERR, "Binddn field is missing in configuration");
     result = 1;
   }
+    //check if the config file contain the bindpw field
   if (!cfg->bindpw)
   {
     syslog(LOG_ERR, "Bindpw field is missing in configuration");
     result = 1;
   }
+    //check if version field is correct
   if (cfg->version == 0)
   {
     syslog(LOG_ERR, "Version field is invalid in configuration");
@@ -92,7 +97,7 @@ const char *cfg_file_find(void)
 
   /**
    * \todo
-   * FIXME : This value MUST be takken from a config file, NOT hardcoded
+   * FIXME : This value MUST be taken from a config file, NOT hardcoded
    */
 #if defined(BSD)
   return "/usr/local/etc/usbwall.cfg";
@@ -106,6 +111,7 @@ int update_configuration(const char *cfg_file)
   assert(cfg_file);
 
   FILE *stream = fopen(cfg_file, "r");
+  //check if we can open the configuration file
   if (!stream)
   {
     syslog(LOG_ERR, "Configuration file not accessible : %s", cfg_file);
