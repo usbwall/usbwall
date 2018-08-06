@@ -44,10 +44,16 @@ sudo pkgin install cmake libusb1
 
 ### OpenBSD
 
+#### Compilation dependencies
+
+~~~sh
+sudo pkg_add cmake
+~~~
+
 #### Runtime dependencies
 
 ~~~sh
-Open LDAP : sudo pkg_add openldap-client 
+sudo pkg_add openldap-client openpam-20141014
 ~~~
 
 ~~~sh
@@ -55,22 +61,8 @@ Libusb on OpenBSD 6.1 : Sudo pkg_add libusb1-1.0.20p0
 ~~~
 
 ~~~sh
-Libusb on OpenBSD 6.2 : Sudo pkg_add libusb1-1.0.21 on OpenBSD
+Libusb on OpenBSD 6.2 : Sudo pkg_add libusb1-1.0.21
 ~~~ 
-
-~~~sh
-PAM : sudo pkg_add openpam-20141014
-~~~
-
-~~~sh
-PAM dev :
-~~~
-
-#### Compilation dependencies
-
-~~~sh
-CMAKE : Sudo pkg_add cmake
-~~~
 
 ## Dependencies from source
 
