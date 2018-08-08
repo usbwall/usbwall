@@ -33,17 +33,17 @@ int uw_open_file(const char *filename)
   return DEVIDD_SUCCESS;
 }
 
-char *uw_check_rule()
-{
+/* char *uw_check_rule() */
+/* { */
 
-  return DEVIDD_SUCCESS;
-}
+/*   return DEVIDD_SUCCESS; */
+/* } */
 
-struct linked_list *uw_check_rules()
-{
+/* struct linked_list *uw_check_rules() */
+/* { */
 
-  return DEVIDD_SUCCESS;
-}
+/*   return DEVIDD_SUCCESS; */
+/* } */
 
 /* int uw_read_file(int argc, char *argv[]) */
 /* { */

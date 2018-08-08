@@ -332,6 +332,7 @@ static int hotplug_callback(struct libusb_context *ctx __attribute__((unused)),
   struct linked_list *users = usernames_get();
   int authorized_status = 0;
 
+  const struct config *cfg = configuration_get();
   /**
    * \todo FIXME for having duplicated code
    */
@@ -348,15 +349,16 @@ static int hotplug_callback(struct libusb_context *ctx __attribute__((unused)),
     }
 
   if (!strcmp(cfg->backend, "ldap"))
-    list_for_each(user_node_ptr, users)
-      if (check_devid(device->complete_id, uw_ldap_devids_get(user_node_ptr->data))
-	  == DEVIDD_SUCCESS)
-	{
-	  authorized_status = 1;
-	  break;
-	}
-  list_destroy(users, 1);
-}
+      {
+	  list_for_each(user_node_ptr, users)
+	      if (check_devid(device->complete_id, uw_ldap_devids_get(user_node_ptr->data))
+		  == DEVIDD_SUCCESS)
+		  {
+		      authorized_status = 1;
+		      break;
+		  }
+	  list_destroy(users, 1);
+      }
 
   int rcode = 0;
   if ((rcode = update_device_access(device, authorized_status)))
