@@ -82,9 +82,9 @@ static char *parse_line(const char *line, const char *field)
 {
   assert(line && field);
 
-#ifndef NDEBUG
-  printf("Entering %s:", "parse_line");
-#endif
+/* #ifndef NDEBUG */
+/*   printf("Entering %s:\n", "parse_line"); */
+/* #endif */
 
   /* create the format to give to sscanf :
    * format = field %s %s
@@ -92,15 +92,18 @@ static char *parse_line(const char *line, const char *field)
    * The second %s is just a check to make sure that only one value
    * is given to the field */
   const char *format_part = " %s %s ";
-  size_t format_size = strlen(field) + strlen(format_part) + 2;
+  size_t format_size = strlen(field) + strlen(format_part) + 2; /* +2 ???*/
   char format[format_size]; /* no init ? */
-  snprintf(format, format_size, " %s%s", field, format_part);
+  snprintf(format, format_size, " %s%s", field, format_part); /* This format cannot work...?*/
   /* *** */
 
   /* call to sscanf to parse the line and extract the value for the field */
   char buffer[MAX_LINE_LEN] = { '\0' };
   char aux_buffer[MAX_LINE_LEN] = { '\0' };
 
+#ifndef NDEBUG
+  printf("[parse_line] scanning for \"%s\" in: %s", format, line);
+#endif
   int parse_success = sscanf(line, format, buffer, aux_buffer);
   /* parse_success can have 3 values :
    * - 0 : field pattern was not found
@@ -109,6 +112,10 @@ static char *parse_line(const char *line, const char *field)
   if (parse_success != 1)
     return NULL;
   /* *** */
+
+#ifndef NDEBUG
+  printf("[parse_line] scanning success for \"%s\" in: %s", format, line);
+#endif
 
   /* We have the value, now let's allocate just the right size for it, copy the
    * value in the heap, and return a pointer to it */
@@ -136,10 +143,6 @@ static void store_cfg_value(struct config *config,
                             const char *field,
                             char *value)
 {
-#ifndef NDEBUG
-  printf("Entering %s\n", "store_cfg_value");
-#endif
-
   if (field == g_fields[6]) // version
   {
     /* special case, the field should be an integer */
@@ -159,7 +162,7 @@ static void store_cfg_value(struct config *config,
   if (field == g_fields[0]) // backend
     destination = &config->backend;
   else if (field == g_fields[1]) // config_file
-    destination = &config->uri;
+    destination = &config->config_file;
   else if (field == g_fields[2]) // uri
     destination = &config->uri;
   else if (field == g_fields[3]) // basedn
@@ -177,8 +180,7 @@ static void store_cfg_value(struct config *config,
   }
 
 #ifndef NDEBUG
-  printf("value = \n", value);
-  printf("destination = \n", *destination);
+  printf("[store_cfg_value] Writing value = %s -> destination = %s\n", value, *destination);
 #endif
 
   *destination = value;
@@ -202,15 +204,12 @@ struct config *parse_config(FILE *istream)
     if (line_is_empty(buffer))
       continue;
 
-#ifndef NDEBUG
-  printf("Entering for while in %s\n", "parse_config");
-#endif
     char *value = NULL;
     /* iterate over each field name of the config structure */
     for (int field_idx = 0; g_fields[field_idx]; ++field_idx)
     {
 #ifndef NDEBUG
-  printf("Entering for loop in %s and checking for %s\n", "parse_config", g_fields[field_idx]);
+  printf("[parse_config] Checking for %s option\n", g_fields[field_idx]);
 #endif
       const char *field = g_fields[field_idx];
       if ((value = parse_line(buffer, field)))

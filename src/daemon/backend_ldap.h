@@ -24,7 +24,7 @@
  *
  * \return the LDAP connection handler pointer. NULL if an error occured
  */
-LDAP *setup_ldap(const struct config *cfg);
+LDAP *uw_setup_ldap(const struct config *cfg);
 
 /**
  * \brief check if the ldap is accessible and usable. Be
@@ -33,7 +33,7 @@ LDAP *setup_ldap(const struct config *cfg);
  *  Making devids accessible.
  * \return 1 if an error occured, 0 otherwhise.
  */
-int devids_check(void);
+int uw_ldap_devids_check(void);
 
 /**
  * \brief Extract the list of usb serial ids allowed by
@@ -47,7 +47,7 @@ int devids_check(void);
  * retrieved the devids from the given username. In the
  * case of a connection problem, NULL is returned.
  */
-struct linked_list *devids_get(const char *username);
+struct linked_list *uw_ldap_devids_get(const char *username);
 
 /**
  * \brief Entry function of the daemon

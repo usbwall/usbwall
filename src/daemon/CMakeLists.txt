@@ -4,7 +4,7 @@ set(DAEMON_SRC
   devusb.c
   devuser.c
   backend_ldap.c
-  # backend_file.c
+  backend_file.c
   ipc_pam.c
   config.c
   uw_pid.c

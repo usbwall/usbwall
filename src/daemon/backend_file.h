@@ -14,33 +14,33 @@
  *
  * \return 0 if success, any other value if any error occured
  */
-int uw_open_file(void);
+int uw_open_file(const char *filename);
 
-/**
- * \brief Entry function of the daemon
- *
- * \param argc  number of arguments
- *
- * \return 0 if success, any other value if any error occured
- */
-int uw_read_file(int argc, char *argv[]);
+/* /\** */
+/*  * \brief Entry function of the daemon */
+/*  * */
+/*  * \param argc  number of arguments */
+/*  * */
+/*  * \return 0 if success, any other value if any error occured */
+/*  *\/ */
+/* int uw_read_file(int argc, char *argv[]); */
 
-/**
- * \brief Entry function of the daemon
- *
- * \param argc  number of arguments
- *
- * \return 0 if success, any other value if any error occured
- */
-int uw_write_file(int argc, char *argv[]);
+/* /\** */
+/*  * \brief Entry function of the daemon */
+/*  * */
+/*  * \param argc  number of arguments */
+/*  * */
+/*  * \return 0 if success, any other value if any error occured */
+/*  *\/ */
+/* int uw_write_file(int argc, char *argv[]); */
 
-/**
- * \brief Entry function of the daemon
- *
- * \param argc  number of arguments
- *
- * \return 0 if success, any other value if any error occured
- */
-int uw_close_file(int argc, char *argv[]);
+/* /\** */
+/*  * \brief Entry function of the daemon */
+/*  * */
+/*  * \param argc  number of arguments */
+/*  * */
+/*  * \return 0 if success, any other value if any error occured */
+/*  *\/ */
+/* int uw_close_file(int argc, char *argv[]); */
 
 #endif /* !BACKEND_FILE_H */

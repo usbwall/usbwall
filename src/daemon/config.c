@@ -12,29 +12,45 @@
 #include "parser.h"
 #include "config.h"
 
+/********************************************************************************/
+
 static struct config *g_configuration = NULL;
 
+/********************************************************************************/
 /**
  * \brief config internal function checking if a config structure is correctly
  * field.
  *
  * \param cfg  config to be checked
  *
- * \return 0 if the structure is correct, 1 in the case of an incomplete or
+ * \return DEVIDD_SUCCESS if the structure is correct, 1 in the case of an incomplete or
  * invalid config.
  */
 static int check_cfg(const struct config *cfg)
 {
   assert(cfg);
-  assert(cfg->backend);
 
-  if ((cfg == NULL) || (cfg->backend == NULL))
+  if (cfg == NULL)
     return DEVIDD_ERR_OTHER;
+
+  if (cfg->backend == NULL)
+    {
+      /* If backend is null, it means it wasn't found in config file */
+      syslog(LOG_ERR, "\'backend\' option is missing from configuration file");
+      return DEVIDD_ERR_CONFIG;
+    }
 
   int result = DEVIDD_SUCCESS;
 
+#ifndef NDEBUG
+  printf("[check_cfg] backend = %s\n", cfg->backend);
+#endif
+
   if (!strcmp(cfg->backend, "file"))
     {
+#ifndef NDEBUG
+  printf("[check_cfg] config_file = %s\n", cfg->config_file);
+#endif
       if (!cfg->config_file)
 	{
 	  syslog(LOG_ERR, "config_file field is missing in configuration");
@@ -73,6 +89,7 @@ static int check_cfg(const struct config *cfg)
   return result;
 }
 
+/********************************************************************************/
 /**
  * \brief config internal function that free the given configuration
  * structure. The cfg pointer should not be NULL.
@@ -83,6 +100,8 @@ static void destroy_config(struct config *cfg)
 {
   assert(cfg);
 
+  free(cfg->backend);
+  free(cfg->config_file);
   free(cfg->uri);
   free(cfg->basedn);
   free(cfg->binddn);
@@ -90,6 +109,7 @@ static void destroy_config(struct config *cfg)
   free(cfg);
 }
 
+/********************************************************************************/
 __attribute__((pure))
 const struct config *configuration_get(void)
 {
@@ -98,6 +118,7 @@ const struct config *configuration_get(void)
   return g_configuration;
 }
 
+/********************************************************************************/
 __attribute__((const))
 const char *cfg_file_find(void)
 {
@@ -118,6 +139,7 @@ const char *cfg_file_find(void)
 #endif
 }
 
+/********************************************************************************/
 int update_configuration(const char *cfg_file)
 {
   assert(cfg_file);
@@ -151,9 +173,10 @@ int update_configuration(const char *cfg_file)
   destroy_configuration();
   g_configuration = config;
 
-  return 0;
+  return DEVIDD_SUCCESS;
 }
 
+/********************************************************************************/
 void destroy_configuration(void)
 {
   if (!g_configuration)

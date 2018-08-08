@@ -18,7 +18,7 @@
 #include "backend_ldap.h"
 
 
-LDAP *setup_ldap(const struct config *cfg)
+LDAP *uw_setup_ldap(const struct config *cfg)
 {
   assert(cfg);
 
@@ -76,7 +76,7 @@ LDAP *setup_ldap(const struct config *cfg)
  * The function will request the devids from the LDAP for the given uid
  * (username). The returned values are bervals to be coherant with the LDAP API.
  */
-static struct berval **extract_devids(LDAP *ldap_ptr,
+static struct berval **uw_extract_devids(LDAP *ldap_ptr,
     const char *username,
     const struct config *cfg)
 {
@@ -133,10 +133,10 @@ static struct berval **extract_devids(LDAP *ldap_ptr,
   return res;
 }
 
-int devids_check(void)
+int uw_ldap_devids_check(void)
 {
   const struct config *cfg = configuration_get();
-  LDAP *ldap_ptr = setup_ldap(cfg);
+  LDAP *ldap_ptr = uw_setup_ldap(cfg);
   if (!ldap_ptr)
   {
     syslog(LOG_ERR, "Initial LDAP connection can't be established.");
@@ -150,16 +150,16 @@ int devids_check(void)
   return 0;
 }
 
-struct linked_list *devids_get(const char *username)
+struct linked_list *uw_ldap_devids_get(const char *username)
 {
   assert(username);
   const struct config *cfg = configuration_get();
 
-  LDAP *ldap_ptr = setup_ldap(cfg); // init the connection
+  LDAP *ldap_ptr = uw_setup_ldap(cfg); // init the connection
   if (!ldap_ptr)
     return NULL;
 
-  struct berval **values = extract_devids(ldap_ptr, username, cfg);
+  struct berval **values = uw_extract_devids(ldap_ptr, username, cfg);
   ldap_unbind_ext(ldap_ptr, NULL, NULL); // close the connection
 
   struct linked_list *devids = list_make();

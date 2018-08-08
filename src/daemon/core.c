@@ -9,16 +9,20 @@
 
 #include "devuser.h"
 #include "ipc_pam.h"
+#include "uw_pid.h"
 #include "config.h"
+#include "backend_file.h"
 #include "backend_ldap.h"
 #include "usb_access.h"
 #include "core.h"
 
+/********************************************************************************/
 /* Globals */
 int g_terminaison = 0;
 int g_cfgupdate = 0;
 /* ****** */
 
+/********************************************************************************/
 /**
  * \brief core internal function to filter for allowed devices.
  * \param allowed_devices  The list containing devices to filter.
@@ -76,6 +80,7 @@ static struct linked_list *filter_devices(struct linked_list *allowed_devices,
   return forbidden_devices;
 }
 
+/********************************************************************************/
 /**
  * \brief core internal function to handle globals lookup.
  * notification is received
@@ -108,6 +113,7 @@ static int notifs_lookup(void)
   return DEVIDD_SUCCESS;
 }
 
+/********************************************************************************/
 /**
  * \brief core internal function to handle a user connection
  * \param username the login of the connected user.
@@ -128,7 +134,7 @@ static void handle_login(const char *username)
   if (!device_list)
     return;
 
-  devids = devids_get(username);
+  devids = uw_ldap_devids_get(username);
   if (!devids)
     return;
 
@@ -142,6 +148,7 @@ static void handle_login(const char *username)
   list_destroy(device_list, 1);
 }
 
+/********************************************************************************/
 /**
  * \brief core internal function used to isolate the main loop.
  * This function should be call only after every modules is initialized
@@ -168,24 +175,44 @@ static void core_loop(void)
   return;
 }
 
+/********************************************************************************/
 int usbwall_run(void)
 {
-  /* Initialization of the IPC_PAM module */
-  if (init_ipc_pam())
-    return 1;
-  /* *** */
-
   /* Creation of the configuration structure */
   if (update_configuration(cfg_file_find()))
   {
-    destroy_ipc_pam();
-
     return 1;
   }
   /* *** */
 
-  /* Initial check for the ldap server */
-  if (devids_check())
+  /* We set the pid file for the process */
+  const char *pidfile = "/var/run/usbwall.pid";
+  int pidfile_fd = -1;
+  if ((pidfile_fd = uw_create_pidfile(pidfile)) == -1)
+    {
+      destroy_configuration();
+      return 1; /* pidfile is mandatory to ensure unique instance */
+    }
+  /* *** */
+
+  /* Initialization of the IPC_PAM module */
+  if (init_ipc_pam())
+    {
+      destroy_configuration();
+      return 1;
+    }
+  /* *** */
+
+  /* Choose the backend to use */
+  struct config const *cfg = configuration_get();
+  int rcode = 0;
+  syslog(LOG_INFO, "Reading devIDs");
+  if (!strcmp(cfg->backend, "file"))
+    rcode = uw_open_file(cfg->config_file);
+  if (!strcmp(cfg->backend, "ldap"))
+    rcode = uw_ldap_devids_check(); /* Initial check for the ldap server */
+
+  if (rcode)
   {
     destroy_ipc_pam();
     destroy_configuration();
@@ -210,6 +237,7 @@ int usbwall_run(void)
   close_devusb();
   destroy_configuration();
   destroy_ipc_pam();
+  uw_remove_pidfile(pidfile, pidfile_fd);
   /* *** */
 
   return DEVIDD_SUCCESS;

@@ -11,11 +11,11 @@
 #include <unistd.h>
 
 #include "misc/error_handler.h"
-#include "uw_pid.h"
 #include "uw_signal.h"
 #include "core.h"
 #include "main.h"
 
+/********************************************************************************/
 /**
  * \brief daemonize the process
  *
@@ -52,6 +52,7 @@ static int daemonize(void)
   return DEVIDD_SUCCESS;
 }
 
+/********************************************************************************/
 /**
  * \brief parse arguments and execute the associated action. The function will
  * also appropriatly open the syslog
@@ -91,10 +92,15 @@ static int parse_args(int argc, char *argv[])
   return DEVIDD_SUCCESS;
 }
 
+/********************************************************************************/
 int main(int argc, char *argv[])
 {
-  if (parse_args(argc, argv))
-    return DEVIDD_SUCCESS;
+  int rcode = 0;
+
+  /* Command line parsing */
+  rcode = parse_args(argc, argv);
+  if (rcode != DEVIDD_SUCCESS)
+    return rcode;
 
   if (uw_signal_config())
   {
@@ -103,18 +109,10 @@ int main(int argc, char *argv[])
     return DEVIDD_ERR_OTHER; /* a valid signal handling is mandatory */
   }
 
-  /* We set the pid file for the process */
-  const char *pidfile = "/var/run/usbwall.pid";
-  int pidfile_fd = -1;
-  if ((pidfile_fd = uw_create_pidfile(pidfile)) == -1)
-    return DEVIDD_ERR_OTHER; /* pidfile is mandatory to ensure unique instance */
-
   /* We start the daemon */
   syslog(LOG_INFO, "Usbwall started");
-  int rcode = usbwall_run();
+  rcode = usbwall_run();
   syslog(LOG_INFO, "Usbwall terminated");
-
-  uw_remove_pidfile(pidfile, pidfile_fd);
 
   closelog();
 

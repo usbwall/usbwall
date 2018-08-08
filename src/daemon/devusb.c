@@ -11,6 +11,7 @@
 
 #include "config.h"
 #include "backend_ldap.h"
+#include "backend_file.h"
 #include "devuser.h"
 #include "usb_access.h"
 #include "complete_id.h"
@@ -331,14 +332,31 @@ static int hotplug_callback(struct libusb_context *ctx __attribute__((unused)),
   struct linked_list *users = usernames_get();
   int authorized_status = 0;
 
-  list_for_each(user_node_ptr, users)
-    if (check_devid(device->complete_id, devids_get(user_node_ptr->data))
-        == DEVIDD_SUCCESS)
+  /**
+   * \todo FIXME for having duplicated code
+   */
+  if (!strcmp(cfg->backend, "file"))
     {
-      authorized_status = 1;
-      break;
+      list_for_each(user_node_ptr, users)
+	if (check_devid(device->complete_id, uw_ldap_devids_get(user_node_ptr->data))
+	    == DEVIDD_SUCCESS)
+	  {
+	    authorized_status = 1;
+	    break;
+	  }
+      list_destroy(users, 1);
     }
+
+  if (!strcmp(cfg->backend, "ldap"))
+    list_for_each(user_node_ptr, users)
+      if (check_devid(device->complete_id, uw_ldap_devids_get(user_node_ptr->data))
+	  == DEVIDD_SUCCESS)
+	{
+	  authorized_status = 1;
+	  break;
+	}
   list_destroy(users, 1);
+}
 
   int rcode = 0;
   if ((rcode = update_device_access(device, authorized_status)))
@@ -378,6 +396,8 @@ static void *wait_for_hotplug(void *arg __attribute__((unused)))
 int init_devusb(void)
 {
   assert(configuration_get());
+
+  syslog(LOG_INFO, "Initializing USB bindings");
 
   if (libusb_init(NULL) != LIBUSB_SUCCESS)
   {
