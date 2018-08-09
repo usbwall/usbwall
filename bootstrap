@@ -3,6 +3,8 @@
 SCRIPT=$(readlink -f "$0")
 SCRIPTPATH=$(dirname "$SCRIPT")
 BUILDDIR="$SCRIPTPATH/_build"
+MINGWGCC="/usr/bin/x86_64-w64-mingw32-gcc"
+TOOLCHAIN=toolchain-mingw.cmake
 
 # define build mode
 if [ "$1" = "DEBUG" ]; then
@@ -19,4 +21,4 @@ mkdir -p $BUILDDIR
 
 # launch cmake
 echo "launching cmake in $BUILDDIR mode=$MODE"
-cd $BUILDDIR && cmake .. -DCMAKE_BUILD_TYPE=$MODE
+cd $BUILDDIR && cmake .. -DCMAKE_C_COMPILER=$MINGWGCC -DCMAKE_TOOLCHAIN_FILE=$TOOLCHAIN -DCMAKE_BUILD_TYPE=$MODE
