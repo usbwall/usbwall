@@ -9,7 +9,6 @@ set(DAEMON_SRC
   config.c
   uw_pid.c
   uw_signal.c
-  daemon_main.c
   main.c
   parser.c
   usb_access.c
