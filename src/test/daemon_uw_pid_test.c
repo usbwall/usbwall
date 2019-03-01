@@ -1,18 +1,19 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include "ctest.h"
 
-#include "../daemon/daemon_main.c"
+#include "uw_pid.c"
 
 /**
- * \Daemon Main unit tests 
+ * \Daemon uw_pid unit tests
  */
 
-CTEST(main, create_pidfile) {
+CTEST(uw_pid, uw_create_pidfile) {
 	char pid_path[] = "/tmp/usbwall_test_pid";
 	remove(pid_path);
-	int ret = create_pidfile(pid_path);
+	int ret = uw_create_pidfile(pid_path);
 	ASSERT_NOT_EQUAL(-1, ret);
 
 	char buffer[100];
@@ -24,11 +25,11 @@ CTEST(main, create_pidfile) {
 	remove(pid_path);
 }
 
-CTEST(main, remove_pidfile) {
+CTEST(uw_pid, uw_remove_pidfile) {
 	char pid_path[] = "/tmp/usbwall_test_pid_remove";
 	FILE *fp = fopen(pid_path, "ab+");
 	if( access( pid_path, F_OK ) != -1 ) {
-		remove_pidfile(pid_path, fileno(fp));
+		uw_remove_pidfile(pid_path, fileno(fp));
 		if( access( pid_path, F_OK ) != -1 ) {
 			CTEST_ERR("Couldn't remove pidfile: %d", fileno(fp));
 			ASSERT_FAIL();
@@ -38,17 +39,3 @@ CTEST(main, remove_pidfile) {
 		ASSERT_FAIL();
 	}
 }
-
-/**
-Un-testable as is.
-CTEST_SKIP(main, daemonize) {
-}
-*/
-
-/**
-Un-testable as is.
-CTEST_SKIP(main, parse_args) {
-	char *str1[1];
-	str1[0] = "-h";
-}
-*/
