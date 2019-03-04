@@ -3,8 +3,8 @@
 #include <stdlib.h>
 #include "ctest.h"
 
-#include "../daemon/parser.c"
-#include "../daemon/config.h"
+#include "daemon/parser.c"
+#include "daemon/config.h"
 
 /**
  * \Parser module unit tests 

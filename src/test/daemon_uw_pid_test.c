@@ -4,7 +4,7 @@
 #include <unistd.h>
 #include "ctest.h"
 
-#include "uw_pid.c"
+#include "daemon/uw_pid.c"
 
 /**
  * \Daemon uw_pid unit tests

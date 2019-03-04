@@ -3,8 +3,8 @@
 #include <stdlib.h>
 #include "ctest.h"
 
-#include "../daemon/usb_access.c"
-#include "../misc/error_handler.h"
+#include "daemon/usb_access.c"
+#include "misc/error_handler.h"
 
 /**
  * \daemon usb access module unit tests 
