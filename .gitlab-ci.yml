@@ -1,0 +1,21 @@
+before_script:
+  - apt install -y cmake libusb-1.0-0-dev libldap2-dev libpam0g-dev
+
+stages:
+  - build
+  - test
+  - deploy
+
+job builder:
+  stage: build
+  script:
+    - ./bootstrap
+    - make
+
+job tester:
+  stage: test
+  script: make test
+
+job deploy:
+  stage: deploy
+  script: make install
