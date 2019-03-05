@@ -6,7 +6,8 @@ set(TEST_SRC
   daemon_format_validity_test.c
   daemon_uw_pid_test.c
   daemon_usb_access_test.c
+  ../daemon/format_validity.c
+  ../daemon/uw_pid.c
   )
 
-include_directories(../daemon)
 add_library(usbwall_test_obj OBJECT ${TEST_SRC})

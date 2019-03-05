@@ -3,7 +3,8 @@
 #include <stdlib.h>
 #include "ctest.h"
 
-#include "daemon/format_validity.c"
+#include "misc/error_handler.h"
+#include "daemon/format_validity.h"
 
 /**
  * \format validity unit tests 
