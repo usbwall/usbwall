@@ -1,5 +1,5 @@
 before_script:
-  - apt install -y cmake libusb-1.0-0-dev libldap2-dev libpam0g-dev
+  - sudo apt install -y cmake libusb-1.0-0-dev libldap2-dev libpam0g-dev
 
 stages:
   - build
