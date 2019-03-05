@@ -1,18 +1,26 @@
-before_script:
-  - sudo apt install -y cmake libusb-1.0-0-dev libldap2-dev libpam0g-dev
-
 stages:
+  - install
+  - prebuild
   - build
   - test
   - deploy
 
-job builder:
-  stage: build
+job install:
+  stage: install
+  script:
+    - sudo apt install -y cmake libusb-1.0-0-dev libldap2-dev libpam0g-dev
+
+job prebuild:
+  stage: prebuild
   script:
     - ./bootstrap
+
+job build:
+  stage: build
+  script:
     - make
 
-job tester:
+job test:
   stage: test
   script: make test
 
