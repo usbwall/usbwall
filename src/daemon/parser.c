@@ -41,7 +41,7 @@ static void skip_comments(char *line)
 {
   /**
    * \todo
-   * FIXME: Bug if a sharp is used as a full character, like in
+   * FIXME: Bug if a number/hash sign is used as a full character, like in
    * a password. Thanks to Sylvain for reporting this bug.
    */
   char *comment_start = strchr(line, '#');

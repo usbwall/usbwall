@@ -8,7 +8,7 @@
 #include <syslog.h>
 #include <string.h>
 
-#include "error_handler.h"
+#include "misc/error_handler.h"
 #include "parser.h"
 #include "config.h"
 
