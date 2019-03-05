@@ -10,4 +10,10 @@ set(TEST_SRC
   ../daemon/uw_pid.c
   )
 
-add_library(usbwall_test_obj OBJECT ${TEST_SRC})
+add_library(usbwall_test_obj OBJECT EXCLUDE_FROM_ALL ${TEST_SRC})
+
+###########################
+### Construction of usbwall_test
+###########################
+add_executable(usbwall_test EXCLUDE_FROM_ALL
+  $<TARGET_OBJECTS:usbwall_test_obj>)

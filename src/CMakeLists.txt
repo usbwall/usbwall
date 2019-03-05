@@ -286,11 +286,3 @@ target_link_libraries(usbwalld ${CMAKE_THREAD_LIBS_INIT})
 
 add_library(pam_usbwall SHARED $<TARGET_OBJECTS:pam_obj>)
 target_link_libraries(pam_usbwall pam)
-
-###########################
-### Construction of usbwall_test
-###########################
-#SET (CMAKE_C_COMPILER "/usr/bin/clang")
-#SET (CMAKE_C_FLAGS    "-Wall -Wextra -Wconversion -Wredundant-decls -Wno-unused-parameter -O3 -g ")
-add_executable(usbwall_test
-  $<TARGET_OBJECTS:usbwall_test_obj>)
