@@ -58,11 +58,11 @@ test daemon help:
   script:
     - out/usbwalld --help
   dependencies:
-    - building default
+    - build default
 
 test test:
   stage: test
   script:
     - out/usbwall_test
   dependencies:
-    - building test
+    - build test
