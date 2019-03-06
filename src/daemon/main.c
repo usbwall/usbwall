@@ -78,7 +78,7 @@ static int parse_args(int argc, char *argv[])
     {
       fprintf(stderr, "%s", help_msg);
 
-      return DEVIDD_ERR_OTHER;
+      return DEVIDD_SUCCESS;
     }
 
     fprintf(stderr, "Unknown argument %s\n%s", argv[1], help_msg);
