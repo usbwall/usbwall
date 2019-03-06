@@ -23,7 +23,7 @@ CTEST(parser, skip_comments) {
 
     ASSERT_STR("This Is a valid Line.", str1);
     ASSERT_STR("\0", str2);
-    ASSERT_STR("c#ke", str3); // Fails
+    ASSERT_STR("c", str3);
     ASSERT_STR("", str4);
 }
 
@@ -54,7 +54,7 @@ CTEST(parser, parse_line) {
 	//ASSERT_STR(NULL, parse_line(str3_line, "")); // Fails
 }
 
-CTEST(parser, store_cfg_value) { // Fails
+CTEST(parser, store_cfg_value) {
 
 	struct config *config = malloc(sizeof(struct config));
 
