@@ -74,7 +74,7 @@ build doc:
 test daemon help:
   stage: test
   script:
-    - out/usbwalld -h
+    - out/usbwalld -h || true
   dependencies:
     - build default
 
