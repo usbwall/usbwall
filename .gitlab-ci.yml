@@ -12,7 +12,7 @@ install environment:
 prebuild:
   stage: prebuild
   script:
-    - test ! -d _build && ./bootstrap
+    - test ! -d _build && ./bootstrap || true
   cache:
     paths:
       - _build/
@@ -21,7 +21,7 @@ prebuild:
 build default:
   stage: build
   script:
-    - test ! -d _build && ./bootstrap
+    - test ! -d _build && ./bootstrap || true
     - make
   artifacts:
     name: "default-binaries"
@@ -30,21 +30,30 @@ build default:
       - out/libpam_usbwall.so
       - out/usbwalld
     expire_in: 1h
+  cache:
+    paths:
+      - _build/
+    key: ${CI_COMMIT_REF_SLUG}
 
 build test:
   stage: build
   script:
-    - test ! -d _build && ./bootstrap
+    - test ! -d _build && ./bootstrap || true
     - make test
   artifacts:
     name: "test-binary"
     paths:
       - out/usbwall_test
+    expire_in: 1h
+  cache:
+    paths:
+      - _build/
+    key: ${CI_COMMIT_REF_SLUG}
 
 build doc:
   stage: build
   script:
-    - test ! -d _build && ./bootstrap
+    - test ! -d _build && ./bootstrap || true
     - make doc
   artifacts:
     name: "documentation"
@@ -52,6 +61,11 @@ build doc:
       - out/html
       - out/latex
       - out/man
+    expire_in: 1h
+  cache:
+    paths:
+      - _build/
+    key: ${CI_COMMIT_REF_SLUG}
       
 test daemon help:
   stage: test
