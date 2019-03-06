@@ -3,27 +3,69 @@ stages:
   - prebuild
   - build
   - test
-  - deploy
 
-job install:
+
+
+
+install environment:
   stage: install
   script:
-    - sudo apt install -y cmake libusb-1.0-0-dev libldap2-dev libpam0g-dev
+    - sudo apt install -y cmake libusb-1.0-0-dev libldap2-dev libpam0g-dev doxygen
 
-job prebuild:
+prebuild:
   stage: prebuild
   script:
-    - ./bootstrap
+    - test ! -d _build && ./bootstrap
+  cache:
+    path:
+      - _build/
+    key: ${CI_COMMIT_REF_SLUG}
 
-job build:
+build default:
   stage: build
   script:
+    - test ! -d _build && ./bootstrap
     - make
+  artifacts:
+    name: "default-binaries"
+    paths:
+      - out/deviddctl
+      - out/libpam_usbwall.so
+      - out/usbwalld
+    expire_in: 1h
 
-job test:
+build test:
+  stage: build
+  script:
+    - test ! -d _build && ./bootstrap
+    - make test
+  artifacts:
+    name: "test-binary"
+    paths:
+      - out/usbwall_test
+
+build doc:
+  stage: build
+  script:
+    - test ! -d _build && ./bootstrap
+    - make doc
+  artifacts:
+    name: "documentation"
+    paths:
+      - out/html
+      - out/latex
+      - out/man
+      
+test daemon help:
   stage: test
-  script: make test
+  script:
+    - out/usbwalld --help
+  dependencies:
+    - building default
 
-job deploy:
-  stage: deploy
-  script: make install
+test test:
+  stage: test
+  script:
+    - out/usbwall_test
+  dependencies:
+    - building test
