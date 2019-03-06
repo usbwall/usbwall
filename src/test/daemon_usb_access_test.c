@@ -56,7 +56,7 @@ CTEST(usb_access, write_bool) { // fails
 }
 
 
-CTEST(usb_access, ports_to_string){
+CTEST_SKIP(usb_access, ports_to_string){
 	uint8_t ports1[3];
 	ports1[0] = 1;
 	ports1[1] = 2;
