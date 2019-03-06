@@ -4,9 +4,6 @@ stages:
   - build
   - test
 
-
-
-
 install environment:
   stage: install
   script:
@@ -17,7 +14,7 @@ prebuild:
   script:
     - test ! -d _build && ./bootstrap
   cache:
-    path:
+    paths:
       - _build/
     key: ${CI_COMMIT_REF_SLUG}
 
