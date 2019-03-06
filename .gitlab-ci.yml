@@ -12,16 +12,17 @@ install environment:
 prebuild:
   stage: prebuild
   script:
-    - test ! -d _build && ./bootstrap || true
+    - test -d _build && test -d out || ./bootstrap
   cache:
     paths:
       - _build/
+      - out/
     key: ${CI_COMMIT_REF_SLUG}
 
 build default:
   stage: build
   script:
-    - test ! -d _build && ./bootstrap || true
+    - test -d _build && test -d out || ./bootstrap
     - make
   artifacts:
     name: "default-binaries"
@@ -33,12 +34,13 @@ build default:
   cache:
     paths:
       - _build/
+      - out/
     key: ${CI_COMMIT_REF_SLUG}
 
 build test:
   stage: build
   script:
-    - test ! -d _build && ./bootstrap || true
+    - test -d _build && test -d out || ./bootstrap
     - make test
   artifacts:
     name: "test-binary"
@@ -48,12 +50,13 @@ build test:
   cache:
     paths:
       - _build/
+      - out/
     key: ${CI_COMMIT_REF_SLUG}
 
 build doc:
   stage: build
   script:
-    - test ! -d _build && ./bootstrap || true
+    - test -d _build && test -d out || ./bootstrap
     - make doc
   artifacts:
     name: "documentation"
@@ -65,6 +68,7 @@ build doc:
   cache:
     paths:
       - _build/
+      - out/
     key: ${CI_COMMIT_REF_SLUG}
       
 test daemon help:
