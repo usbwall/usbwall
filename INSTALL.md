@@ -18,6 +18,20 @@ sudo apt install cmake libusb-1.0-0-dev libldap2-dev libpam0g-dev
 sudo apt install libusb-1.0-0
 ~~~
 
+### Linux/OpenSuse
+
+#### Compilation dependencies
+
+~~~sh
+sudo zypper install cmake libusb-1_0-devel openldap2-devel pam-devel doxygen graphviz
+~~~
+
+#### Runtime dependencies
+
+~~~sh
+sudo apt install libusb-1_0-0
+~~~
+
 ### FreeBSD and DragonFly BSD
 
 #### Compilation dependencies
@@ -62,7 +76,7 @@ Libusb on OpenBSD 6.1 : Sudo pkg_add libusb1-1.0.20p0
 
 ~~~sh
 Libusb on OpenBSD 6.2 : Sudo pkg_add libusb1-1.0.21
-~~~ 
+~~~
 
 ## Dependencies from source
 
