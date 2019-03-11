@@ -3,6 +3,9 @@ stages:
   - build
   - test
 
+variables:
+  - NB_ARCHS_RUNNERS: 3
+
 install environment:debian:
   stage: install
   tags:
@@ -10,17 +13,30 @@ install environment:debian:
   script:
     - sudo apt install -y cmake libusb-1.0-0-dev libldap2-dev libpam0g-dev doxygen graphviz
 
-build default:debian:
+install environment:freebsd:
+  stage: install
+  script:
+    - sudo pkg install -y cmake openldap-client
+  tags:
+    - freebsd
+
+install environment:opensuse:
+  stage: install
+  script:
+    - sudo zypper install -y cmake libusb-1_0-devel openldap2-devel pam-devel doxygen graphviz
+  tags:
+    - opensuse
+
+build default ${CI_RUNNER_TAGS}:
+  parallel: ${NB_ARCHS_RUNNERS}
   allow_failure: true
   stage: build
-  tags:
-    - debian
   before_script:
     - test -d _build && test -d out || ./bootstrap
   script:
     - make
   artifacts:
-    name: "default-binaries"
+    name: "default-binaries-${CI_RUNNER_TAGS}"
     paths:
       - out/deviddctl
       - out/libpam_usbwall.so
@@ -30,19 +46,18 @@ build default:debian:
     paths:
       - _build/
       - out/
-    key: ${CI_COMMIT_REF_SLUG}
+    key: ${CI_COMMIT_REF_SLUG}-${CI_RUNNER_TAGS}
 
-build test:debian:
+build test ${CI_RUNNER_TAGS}:
+  parallel: ${NB_ARCHS_RUNNERS}
   allow_failure: true
   stage: build
-  tags:
-    - debian
   before_script:
     - test -d _build && test -d out || ./bootstrap
   script:
     - make test
   artifacts:
-    name: "test-binary"
+    name: "test-binary-${CI_RUNNER_TAGS}"
     paths:
       - out/usbwall_test
     expire_in: 1h
@@ -50,19 +65,18 @@ build test:debian:
     paths:
       - _build/
       - out/
-    key: ${CI_COMMIT_REF_SLUG}
+    key: ${CI_COMMIT_REF_SLUG}-${CI_RUNNER_TAGS}
 
-build doc:debian:
+build doc ${CI_RUNNER_TAGS}:
+  parallel: ${NB_ARCHS_RUNNERS}
   allow_failure: true
   stage: build
-  tags:
-    - debian
   before_script:
     - test -d _build && test -d out || ./bootstrap
   script:
     - make doc
   artifacts:
-    name: "documentation"
+    name: "documentation-${CI_RUNNER_TAGS}"
     paths:
       - out/html
       - out/latex
@@ -72,22 +86,16 @@ build doc:debian:
     paths:
       - _build/
       - out/
-    key: ${CI_COMMIT_REF_SLUG}
-      
-test daemon help:debian:
+    key: ${CI_COMMIT_REF_SLUG}-${CI_RUNNER_TAGS}
+
+test daemon help ${CI_RUNNER_TAGS}:
+  parallel: ${NB_ARCHS_RUNNERS}
   stage: test
-  tags:
-    - debian
   script:
     - out/usbwalld -h || true
-  dependencies:
-    - build default:debian
 
-test test:debian:
+test test ${CI_RUNNER_TAGS}:
+  parallel: ${NB_ARCHS_RUNNERS}
   stage: test
-  tags:
-    - debian
   script:
     - out/usbwall_test
-  dependencies:
-    - build test:debian
