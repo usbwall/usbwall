@@ -81,7 +81,7 @@ test daemon help:debian:
   script:
     - out/usbwalld -h || true
   dependencies:
-    - build default
+    - build default:debian
 
 test test:debian:
   stage: test
@@ -90,4 +90,4 @@ test test:debian:
   script:
     - out/usbwall_test
   dependencies:
-    - build test
+    - build test:debian
