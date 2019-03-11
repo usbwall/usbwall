@@ -9,12 +9,6 @@ install environment:
   script:
     - sudo apt install -y cmake libusb-1.0-0-dev libldap2-dev libpam0g-dev doxygen graphviz
 
-staging:
-  variables:
-    ENVIRONMENT: staging
-  stage: install
-  trigger: usbwall
-
 prebuild:
   stage: prebuild
   script:
