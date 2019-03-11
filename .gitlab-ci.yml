@@ -1,28 +1,23 @@
 stages:
   - install
-  - prebuild
   - build
   - test
 
-install environment:
+install environment:debian:
   stage: install
+  tags:
+    - debian
   script:
     - sudo apt install -y cmake libusb-1.0-0-dev libldap2-dev libpam0g-dev doxygen graphviz
 
-prebuild:
-  stage: prebuild
-  script:
-    - test -d _build && test -d out || ./bootstrap
-  cache:
-    paths:
-      - _build/
-      - out/
-    key: ${CI_COMMIT_REF_SLUG}
-
-build default:
+build default:debian:
+  allow_failure: true
   stage: build
-  script:
+  tags:
+    - debian
+  before_script:
     - test -d _build && test -d out || ./bootstrap
+  script:
     - make
   artifacts:
     name: "default-binaries"
@@ -37,10 +32,14 @@ build default:
       - out/
     key: ${CI_COMMIT_REF_SLUG}
 
-build test:
+build test:debian:
+  allow_failure: true
   stage: build
-  script:
+  tags:
+    - debian
+  before_script:
     - test -d _build && test -d out || ./bootstrap
+  script:
     - make test
   artifacts:
     name: "test-binary"
@@ -53,10 +52,14 @@ build test:
       - out/
     key: ${CI_COMMIT_REF_SLUG}
 
-build doc:
+build doc:debian:
+  allow_failure: true
   stage: build
-  script:
+  tags:
+    - debian
+  before_script:
     - test -d _build && test -d out || ./bootstrap
+  script:
     - make doc
   artifacts:
     name: "documentation"
@@ -71,15 +74,19 @@ build doc:
       - out/
     key: ${CI_COMMIT_REF_SLUG}
       
-test daemon help:
+test daemon help:debian:
   stage: test
+  tags:
+    - debian
   script:
     - out/usbwalld -h || true
   dependencies:
     - build default
 
-test test:
+test test:debian:
   stage: test
+  tags:
+    - debian
   script:
     - out/usbwall_test
   dependencies:
