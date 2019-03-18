@@ -12,24 +12,21 @@ debian:
 
 freebsd:
   stage: install
-  tags:
-    - freebsd
   script:
     - sudo pkg install -y cmake openldap-client
+  tags:
+    - freebsd
 
 opensuse:
   stage: install
-  tags:
-    - opensuse
   script:
     - sudo zypper install -y cmake libusb-1_0-devel openldap2-devel pam-devel doxygen graphviz
+  tags:
+    - opensuse
 
-default:
-  parallel: 3
+.build default: &build_default
   allow_failure: true
   stage: build
-  tags:
-    - "${CI_RUNNER_TAGS}"
   before_script:
     - test -d _build && test -d out || ./bootstrap
   script:
@@ -41,18 +38,30 @@ default:
       - out/libpam_usbwall.so
       - out/usbwalld
     expire_in: 1h
-#  cache:
-#    paths:
-#      - _build/
-#      - out/
-#    key: ${CI_COMMIT_REF_SLUG}-${CI_RUNNER_TAGS}
+  cache: &cache_def
+    paths:
+      - _build/
+      - out/
+    key: ${CI_COMMIT_REF_SLUG}-${CI_RUNNER_TAGS}
 
-test:
-  parallel: 3
+build default:debian:
+  tags:
+    - debian
+  <<: *build_default
+
+build default:freebsd:
+  tags:
+    - freebsd
+  <<: *build_default
+
+build default:opensuse:
+  tags:
+    - opensuse
+  <<: *build_default
+
+.build test: &build_test
   allow_failure: true
   stage: build
-  tags:
-    - "${CI_RUNNER_TAGS}"
   before_script:
     - test -d _build && test -d out || ./bootstrap
   script:
@@ -62,18 +71,26 @@ test:
     paths:
       - out/usbwall_test
     expire_in: 1h
-#  cache:
-#    paths:
-#      - _build/
-#      - out/
-#    key: ${CI_COMMIT_REF_SLUG}-${CI_RUNNER_TAGS}
+  cache: *cache_def
 
-doc:
-  parallel: 3
+build test:debian:
+  tags:
+    - debian
+  <<: *build_test
+
+build test:freebsd:
+  tags:
+    - freebsd
+  <<: *build_test
+
+build test:opensuse:
+  tags:
+    - opensuse
+  <<: *build_test
+
+.build doc:debian: &build_doc
   allow_failure: true
   stage: build
-  tags:
-    - "${CI_RUNNER_TAGS}"
   before_script:
     - test -d _build && test -d out || ./bootstrap
   script:
@@ -85,24 +102,71 @@ doc:
       - out/latex
       - out/man
     expire_in: 1h
-#  cache:
-#    paths:
-#      - _build/
-#      - out/
-#    key: ${CI_COMMIT_REF_SLUG}-${CI_RUNNER_TAGS}
+  cache: *cache_def
 
-daemon help:
-  parallel: 3
-  stage: test
+build doc:debian:
   tags:
-    - "${CI_RUNNER_TAGS}"
+    - debian
+  <<: *build_doc
+
+build doc:freebsd:
+  tags:
+    - freebsd
+  <<: *build_doc
+
+build doc:opensuse:
+  tags:
+    - opensuse
+  <<: *build_doc
+
+.test daemon help: &test_daemon
+  stage: test
   script:
     - out/usbwalld -h || true
 
-test:
-  parallel: 3
-  stage: test
+test daemon help:debian:
   tags:
-    - "${CI_RUNNER_TAGS}"
+    - debian
+  <<: *test_daemon
+  dependencies:
+    - build default:debian
+
+test daemon help:freebsd:
+  tags:
+    - freebsd
+  <<: *test_daemon
+  dependencies:
+    - build default:freebsd
+
+test daemon help:opensuse:
+  tags:
+    - opensuse
+  <<: *test_daemon
+  dependencies:
+    - build default:opensuse
+
+.test test: &test_test
+  stage: test
   script:
     - out/usbwall_test
+
+test test:debian:
+  tags:
+    - debian
+  <<: *test_test
+  dependencies:
+    - build test:debian
+
+test test:freebsd:
+  tags:
+    - freebsd
+  <<: *test_test
+  dependencies:
+    - build test:freebsd
+
+test test:opensuse:
+  tags:
+    - opensuse
+  <<: *test_test
+  dependencies:
+    - build test:opensuse
