@@ -3,28 +3,28 @@ stages:
   - build
   - test
 
-debian:
+debian:install:
   stage: install
   tags:
     - debian
   script:
     - sudo apt install -y cmake libusb-1.0-0-dev libldap2-dev libpam0g-dev doxygen graphviz
 
-freebsd:
+freebsd:install:
   stage: install
   script:
     - sudo pkg install -y cmake openldap-client
   tags:
     - freebsd
 
-opensuse:
+opensuse:install:
   stage: install
   script:
     - sudo zypper install -y cmake libusb-1_0-devel openldap2-devel pam-devel doxygen graphviz
   tags:
     - opensuse
 
-.build default: &build_default
+.daemon:build: &daemon_build
   allow_failure: true
   stage: build
   before_script:
@@ -44,22 +44,22 @@ opensuse:
       - out/
     key: ${CI_COMMIT_REF_SLUG}-${CI_RUNNER_TAGS}
 
-default:debian:
+daemon:debian:build:
   tags:
     - debian
-  <<: *build_default
+  <<: *daemon_build
 
-default:freebsd:
+daemon:freebsd:build:
   tags:
     - freebsd
-  <<: *build_default
+  <<: *daemon_build
 
-default:opensuse:
+daemon:opensuse:build:
   tags:
     - opensuse
-  <<: *build_default
+  <<: *daemon_build
 
-.build test: &build_test
+.testsuite:build: &testsuite_build
   allow_failure: true
   stage: build
   before_script:
@@ -73,22 +73,22 @@ default:opensuse:
     expire_in: 1h
   cache: *cache_def
 
-test:debian:
+testsuite:debian:build:
   tags:
     - debian
-  <<: *build_test
+  <<: *testsuite_build
 
-test:freebsd:
+testsuite:freebsd:build:
   tags:
     - freebsd
-  <<: *build_test
+  <<: *testsuite_build
 
-test:opensuse:
+testsuite:opensuse:build:
   tags:
     - opensuse
-  <<: *build_test
+  <<: *testsuite_build
 
-.build doc:debian: &build_doc
+.doc:build: &doc_build
   allow_failure: true
   stage: build
   before_script:
@@ -104,69 +104,69 @@ test:opensuse:
     expire_in: 1h
   cache: *cache_def
 
-doc:debian:
+doc:debian:build:
   tags:
     - debian
-  <<: *build_doc
+  <<: *doc_build
 
-doc:freebsd:
+doc:freebsd:build:
   tags:
     - freebsd
-  <<: *build_doc
+  <<: *doc_build
 
-doc:opensuse:
+doc:opensuse:build:
   tags:
     - opensuse
-  <<: *build_doc
+  <<: *doc_build
 
-.test daemon help: &test_daemon
+.daemon-help:test: &daemon-help_test
   stage: test
   script:
     - out/usbwalld -h || true
 
-daemon_help:debian:
+daemon-help:debian:test:
   tags:
     - debian
-  <<: *test_daemon
+  <<: *daemon-help_test
   dependencies:
-    - build default:debian
+    - daemon:debian:build
 
-daemon_help:freebsd:
+daemon-help:freebsd:test:
   tags:
     - freebsd
-  <<: *test_daemon
+  <<: *daemon-help_test
   dependencies:
-    - build default:freebsd
+    - daemon:freebsd:build
 
-daemon_help:opensuse:
+daemon-help:opensuse:test:
   tags:
     - opensuse
-  <<: *test_daemon
+  <<: *daemon-help_test
   dependencies:
-    - build default:opensuse
+    - daemon:opensuse:build
 
-.test test: &test_test
+.testsuite:test: &testsuite_test
   stage: test
   script:
     - out/usbwall_test
 
-test:debian:
+testsuite:debian:test:
   tags:
     - debian
-  <<: *test_test
+  <<: *testsuite_test
   dependencies:
-    - build test:debian
+    - testsuite:debian:build
 
-test:freebsd:
+testsuite:freebsd:test:
   tags:
     - freebsd
-  <<: *test_test
+  <<: *testsuite_test
   dependencies:
-    - build test:freebsd
+    - testsuite:freebsd:build
 
-test:opensuse:
+testsuite:opensuse:test:
   tags:
     - opensuse
-  <<: *test_test
+  <<: *testsuite_test
   dependencies:
-    - build test:opensuse
+    - testsuite:opensuse:build
