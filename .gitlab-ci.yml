@@ -44,17 +44,17 @@ opensuse:
       - out/
     key: ${CI_COMMIT_REF_SLUG}-${CI_RUNNER_TAGS}
 
-build default:debian:
+default:debian:
   tags:
     - debian
   <<: *build_default
 
-build default:freebsd:
+default:freebsd:
   tags:
     - freebsd
   <<: *build_default
 
-build default:opensuse:
+default:opensuse:
   tags:
     - opensuse
   <<: *build_default
@@ -73,17 +73,17 @@ build default:opensuse:
     expire_in: 1h
   cache: *cache_def
 
-build test:debian:
+test:debian:
   tags:
     - debian
   <<: *build_test
 
-build test:freebsd:
+test:freebsd:
   tags:
     - freebsd
   <<: *build_test
 
-build test:opensuse:
+test:opensuse:
   tags:
     - opensuse
   <<: *build_test
@@ -104,17 +104,17 @@ build test:opensuse:
     expire_in: 1h
   cache: *cache_def
 
-build doc:debian:
+doc:debian:
   tags:
     - debian
   <<: *build_doc
 
-build doc:freebsd:
+doc:freebsd:
   tags:
     - freebsd
   <<: *build_doc
 
-build doc:opensuse:
+doc:opensuse:
   tags:
     - opensuse
   <<: *build_doc
@@ -124,21 +124,21 @@ build doc:opensuse:
   script:
     - out/usbwalld -h || true
 
-test daemon help:debian:
+daemon_help:debian:
   tags:
     - debian
   <<: *test_daemon
   dependencies:
     - build default:debian
 
-test daemon help:freebsd:
+daemon_help:freebsd:
   tags:
     - freebsd
   <<: *test_daemon
   dependencies:
     - build default:freebsd
 
-test daemon help:opensuse:
+daemon_help:opensuse:
   tags:
     - opensuse
   <<: *test_daemon
@@ -150,21 +150,21 @@ test daemon help:opensuse:
   script:
     - out/usbwall_test
 
-test test:debian:
+test:debian:
   tags:
     - debian
   <<: *test_test
   dependencies:
     - build test:debian
 
-test test:freebsd:
+test:freebsd:
   tags:
     - freebsd
   <<: *test_test
   dependencies:
     - build test:freebsd
 
-test test:opensuse:
+test:opensuse:
   tags:
     - opensuse
   <<: *test_test
