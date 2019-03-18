@@ -8,12 +8,12 @@ debian:install:
   tags:
     - debian
   script:
-    - sudo apt install -y cmake libusb-1.0-0-dev libldap2-dev libpam0g-dev doxygen graphviz
+    - sudo apt-get install -y cmake libusb-1.0-0-dev libldap2-dev libpam0g-dev doxygen graphviz
 
 freebsd:install:
   stage: install
   script:
-    - sudo pkg install -y cmake openldap-client
+    - sudo pkg install -y cmake openldap-client doxygen graphviz
   tags:
     - freebsd
 
