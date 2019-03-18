@@ -38,11 +38,11 @@ opensuse:install:
       - out/libpam_usbwall.so
       - out/usbwalld
     expire_in: 1h
-  cache: &cache_def
-    paths:
-      - _build/
-      - out/
-    key: ${CI_COMMIT_REF_SLUG}-${CI_RUNNER_TAGS}
+#  cache: &cache_def
+#    paths:
+#      - _build/
+#      - out/
+#    key: ${CI_COMMIT_REF_SLUG}-${CI_RUNNER_TAGS}
 
 daemon:debian:build:
   tags:
@@ -71,7 +71,7 @@ daemon:opensuse:build:
     paths:
       - out/usbwall_test
     expire_in: 1h
-  cache: *cache_def
+#  cache: *cache_def
 
 testsuite:debian:build:
   tags:
@@ -102,7 +102,7 @@ testsuite:opensuse:build:
       - out/latex
       - out/man
     expire_in: 1h
-  cache: *cache_def
+#  cache: *cache_def
 
 doc:debian:build:
   tags:
